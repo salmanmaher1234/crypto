@@ -1,0 +1,77 @@
+import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+
+export function LoginModal() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, isLoginPending, loginError } = useAuth();
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    login({ username, password }, {
+      onError: () => {
+        toast({
+          title: "Login failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">CryptoInvest Pro</CardTitle>
+          <CardDescription>Sign in to your investment account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoginPending}
+            >
+              {isLoginPending ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+          
+          <div className="mt-4 text-sm text-gray-600 text-center">
+            <p>Demo accounts:</p>
+            <p>Admin: admin / admin123</p>
+            <p>Customer: sarah / password123</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
