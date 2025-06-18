@@ -2,25 +2,58 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertBankAccountSchema, insertTransactionSchema, insertBettingOrderSchema, insertWithdrawalRequestSchema, insertAnnouncementSchema } from "@shared/schema";
-import { z } from "zod";
+
+// Simple in-memory session store for development
+const sessions = new Map<string, { userId: number; expires: number }>();
+
+function generateSessionId(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+function getSessionUserId(req: any): number | null {
+  const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
+  if (!sessionId) return null;
+  
+  const session = sessions.get(sessionId);
+  if (!session || session.expires < Date.now()) {
+    sessions.delete(sessionId);
+    return null;
+  }
+  
+  return session.userId;
+}
+
+function createSession(userId: number): string {
+  const sessionId = generateSessionId();
+  sessions.set(sessionId, {
+    userId,
+    expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+  });
+  return sessionId;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication middleware
   const authenticateUser = (req: any, res: any, next: any) => {
-    if (!req.session?.userId) {
+    const userId = getSessionUserId(req);
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    req.userId = userId;
     next();
   };
 
   const requireAdmin = async (req: any, res: any, next: any) => {
-    if (!req.session?.userId) {
+    const userId = getSessionUserId(req);
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const user = await storage.getUser(req.session.userId);
+    
+    const user = await storage.getUser(userId);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
+    req.userId = userId;
     next();
   };
 
@@ -34,29 +67,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      if (req.session) {
-        req.session.userId = user.id;
-      }
+      const sessionId = createSession(user.id);
+      res.cookie('sessionId', sessionId, { 
+        httpOnly: true, 
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'lax'
+      });
+      
       const { password: _, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword });
+      res.json({ user: userWithoutPassword, sessionId });
     } catch (error) {
       res.status(500).json({ message: "Login failed" });
     }
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    if (req.session?.destroy) {
-      req.session.destroy(() => {
-        res.json({ message: "Logged out successfully" });
-      });
-    } else {
-      res.json({ message: "Logged out successfully" });
+    const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
+    if (sessionId) {
+      sessions.delete(sessionId);
     }
+    res.clearCookie('sessionId');
+    res.json({ message: "Logged out successfully" });
   });
 
-  app.get("/api/auth/me", authenticateUser, async (req, res) => {
+  app.get("/api/auth/me", async (req, res) => {
     try {
-      const userId = req.session?.userId;
+      const userId = getSessionUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -104,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
-      const bankAccounts = await storage.getBankAccountsByUserId(req.session.userId);
+      const bankAccounts = await storage.getBankAccountsByUserId(req.userId);
       res.json(bankAccounts);
     } catch (error) {
       res.status(500).json({ message: "Failed to get bank accounts" });
@@ -115,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertBankAccountSchema.parse({
         ...req.body,
-        userId: req.session.userId,
+        userId: req.userId,
       });
       
       const bankAccount = await storage.createBankAccount(validatedData);
@@ -128,13 +164,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Transaction routes
   app.get("/api/transactions", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.userId);
       let transactions;
       
       if (user?.role === "admin") {
         transactions = await storage.getAllTransactions();
       } else {
-        transactions = await storage.getTransactionsByUserId(req.session.userId);
+        transactions = await storage.getTransactionsByUserId(req.userId);
       }
       
       res.json(transactions);
@@ -193,13 +229,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Betting order routes
   app.get("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.userId);
       let orders;
       
       if (user?.role === "admin") {
         orders = await storage.getAllBettingOrders();
       } else {
-        orders = await storage.getBettingOrdersByUserId(req.session.userId);
+        orders = await storage.getBettingOrdersByUserId(req.userId);
       }
       
       res.json(orders);
@@ -221,16 +257,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertBettingOrderSchema.parse({
         ...req.body,
-        userId: req.session.userId,
+        userId: req.userId,
       });
       
       const order = await storage.createBettingOrder(validatedData);
       
       // Deduct amount from available balance
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.userId);
       if (user) {
         const amount = parseFloat(validatedData.amount);
-        await storage.updateUser(req.session.userId, {
+        await storage.updateUser(req.userId, {
           availableBalance: (parseFloat(user.availableBalance) - amount).toFixed(2),
         });
       }
@@ -260,13 +296,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Withdrawal request routes
   app.get("/api/withdrawal-requests", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.userId);
       let requests;
       
       if (user?.role === "admin") {
         requests = await storage.getPendingWithdrawalRequests();
       } else {
-        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId);
+        requests = await storage.getWithdrawalRequestsByUserId(req.userId);
       }
       
       res.json(requests);
@@ -279,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertWithdrawalRequestSchema.parse({
         ...req.body,
-        userId: req.session.userId,
+        userId: req.userId,
       });
       
       const request = await storage.createWithdrawalRequest(validatedData);
