@@ -44,7 +44,10 @@ export function useAuth() {
       return data;
     },
     onSuccess: () => {
+      // Enable and trigger the auth query after successful login
+      queryClient.setQueryDefaults(["/api/auth/me"], { enabled: true });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
     },
   });
 
