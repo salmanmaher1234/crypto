@@ -112,8 +112,12 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
     const user: User = {
-      ...insertUser,
       id,
+      username: insertUser.username,
+      email: insertUser.email,
+      password: insertUser.password,
+      name: insertUser.name,
+      role: insertUser.role || "customer",
       balance: "0.00",
       availableBalance: "0.00",
       frozenBalance: "0.00",
@@ -122,8 +126,8 @@ export class MemStorage implements IStorage {
       direction: "Actual",
       accountStatus: "Active",
       withdrawalStatus: "Allowed",
-      fundPassword: null,
-      invitationCode: null,
+      fundPassword: insertUser.fundPassword || null,
+      invitationCode: insertUser.invitationCode || null,
       isActive: true,
     };
     this.users.set(id, user);
@@ -173,8 +177,12 @@ export class MemStorage implements IStorage {
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
     const id = this.currentId++;
     const transaction: Transaction = {
-      ...insertTransaction,
       id,
+      userId: insertTransaction.userId,
+      type: insertTransaction.type,
+      amount: insertTransaction.amount,
+      status: insertTransaction.status || "pending",
+      description: insertTransaction.description || null,
       createdAt: new Date(),
     };
     this.transactions.set(id, transaction);
@@ -286,8 +294,10 @@ export class MemStorage implements IStorage {
   async createAnnouncement(insertAnnouncement: InsertAnnouncement): Promise<Announcement> {
     const id = this.currentId++;
     const announcement: Announcement = {
-      ...insertAnnouncement,
       id,
+      title: insertAnnouncement.title,
+      content: insertAnnouncement.content,
+      type: insertAnnouncement.type || "News",
       isActive: true,
       createdAt: new Date(),
     };

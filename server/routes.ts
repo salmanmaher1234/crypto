@@ -5,9 +5,8 @@ import { insertUserSchema, insertBankAccountSchema, insertTransactionSchema, ins
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Authentication middleware
+  // Authentication middleware with any typing to bypass TypeScript issues
   const authenticateUser = (req: any, res: any, next: any) => {
-    // Simple session-based authentication
     if (!req.session?.userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -15,6 +14,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   const requireAdmin = async (req: any, res: any, next: any) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const user = await storage.getUser(req.session.userId);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
@@ -32,7 +34,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      req.session.userId = user.id;
+      if (req.session) {
+        req.session.userId = user.id;
+      }
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error) {
@@ -41,14 +45,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    req.session.destroy(() => {
+    if (req.session?.destroy) {
+      req.session.destroy(() => {
+        res.json({ message: "Logged out successfully" });
+      });
+    } else {
       res.json({ message: "Logged out successfully" });
-    });
+    }
   });
 
   app.get("/api/auth/me", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
