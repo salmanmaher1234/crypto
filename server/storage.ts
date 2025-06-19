@@ -78,21 +78,49 @@ export class MemStorage implements IStorage {
     this.currentId = 1;
 
     // Initialize with admin user
-    this.createUser({
+    const adminUser = {
       username: "admin",
       email: "admin@cryptoinvest.com",
       password: "admin123",
       name: "Administrator",
-      role: "admin",
+      role: "admin" as const,
+    };
+    const admin = this.createUser(adminUser);
+    
+    // Update admin with full data
+    this.updateUser(admin.id, {
+      balance: "10000.00",
+      availableBalance: "10000.00",
+      frozenBalance: "0.00",
+      reputation: 100,
+      winLoseSetting: "To Win",
+      direction: "Actual",
+      accountStatus: "Active",
+      withdrawalStatus: "Allowed",
+      isActive: true,
     });
 
     // Initialize with sample customer
-    this.createUser({
+    const customerUser = {
       username: "sarah",
       email: "sarah@email.com",
       password: "password123",
       name: "Sarah Johnson",
-      role: "customer",
+      role: "customer" as const,
+    };
+    const customer = this.createUser(customerUser);
+    
+    // Update customer with full data
+    this.updateUser(customer.id, {
+      balance: "5000.00",
+      availableBalance: "4500.00",
+      frozenBalance: "500.00",
+      reputation: 85,
+      winLoseSetting: "To Win",
+      direction: "Actual",
+      accountStatus: "Active",
+      withdrawalStatus: "Allowed",
+      isActive: true,
     });
   }
 

@@ -39,7 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    req.userId = userId;
+    (req as any).userId = userId;
     next();
   };
 
@@ -53,7 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
-    req.userId = userId;
+    (req as any).userId = userId;
     next();
   };
 
@@ -140,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
-      const bankAccounts = await storage.getBankAccountsByUserId(req.userId);
+      const bankAccounts = await storage.getBankAccountsByUserId((req as any).userId);
       res.json(bankAccounts);
     } catch (error) {
       res.status(500).json({ message: "Failed to get bank accounts" });
@@ -151,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertBankAccountSchema.parse({
         ...req.body,
-        userId: req.userId,
+        userId: (req as any).userId,
       });
       
       const bankAccount = await storage.createBankAccount(validatedData);
@@ -164,13 +164,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Transaction routes
   app.get("/api/transactions", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.userId);
+      const user = await storage.getUser((req as any).userId);
       let transactions;
       
       if (user?.role === "admin") {
         transactions = await storage.getAllTransactions();
       } else {
-        transactions = await storage.getTransactionsByUserId(req.userId);
+        transactions = await storage.getTransactionsByUserId((req as any).userId);
       }
       
       res.json(transactions);
@@ -229,13 +229,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Betting order routes
   app.get("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.userId);
+      const user = await storage.getUser((req as any).userId);
       let orders;
       
       if (user?.role === "admin") {
         orders = await storage.getAllBettingOrders();
       } else {
-        orders = await storage.getBettingOrdersByUserId(req.userId);
+        orders = await storage.getBettingOrdersByUserId((req as any).userId);
       }
       
       res.json(orders);
@@ -244,9 +244,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/betting-orders/active", authenticateUser, requireAdmin, async (req, res) => {
+  app.get("/api/betting-orders/active", authenticateUser, async (req, res) => {
     try {
-      const orders = await storage.getActiveBettingOrders();
+      const user = await storage.getUser((req as any).userId);
+      let orders;
+      
+      if (user?.role === "admin") {
+        orders = await storage.getActiveBettingOrders();
+      } else {
+        const userOrders = await storage.getBettingOrdersByUserId((req as any).userId);
+        orders = userOrders.filter(order => order.status === "active");
+      }
+      
       res.json(orders);
     } catch (error) {
       res.status(500).json({ message: "Failed to get active orders" });
@@ -257,16 +266,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertBettingOrderSchema.parse({
         ...req.body,
-        userId: req.userId,
+        userId: (req as any).userId,
       });
       
       const order = await storage.createBettingOrder(validatedData);
       
       // Deduct amount from available balance
-      const user = await storage.getUser(req.userId);
+      const user = await storage.getUser((req as any).userId);
       if (user) {
         const amount = parseFloat(validatedData.amount);
-        await storage.updateUser(req.userId, {
+        await storage.updateUser((req as any).userId, {
           availableBalance: (parseFloat(user.availableBalance) - amount).toFixed(2),
         });
       }
@@ -296,13 +305,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Withdrawal request routes
   app.get("/api/withdrawal-requests", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.userId);
+      const user = await storage.getUser((req as any).userId);
       let requests;
       
       if (user?.role === "admin") {
         requests = await storage.getPendingWithdrawalRequests();
       } else {
-        requests = await storage.getWithdrawalRequestsByUserId(req.userId);
+        requests = await storage.getWithdrawalRequestsByUserId((req as any).userId);
       }
       
       res.json(requests);
@@ -315,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertWithdrawalRequestSchema.parse({
         ...req.body,
-        userId: req.userId,
+        userId: (req as any).userId,
       });
       
       const request = await storage.createWithdrawalRequest(validatedData);

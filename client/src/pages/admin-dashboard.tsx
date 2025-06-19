@@ -93,9 +93,9 @@ export default function AdminDashboard() {
               </Button>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
-                  {user?.name?.charAt(0)}
+                  {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
-                <span className="text-gray-700">{user?.name}</span>
+                <span className="text-gray-700">{user?.name || user?.username}</span>
                 <Button
                   variant="ghost"
                   size="sm"

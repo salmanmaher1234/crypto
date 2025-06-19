@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Edit, Wallet, Lock, Eye } from "lucide-react";
+import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
@@ -24,9 +24,9 @@ export function MemberManagement() {
 
   const filteredUsers = users?.filter(user =>
     user.role === "customer" &&
-    (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     user.username.toLowerCase().includes(searchTerm.toLowerCase()))
+    ((user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+     (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+     (user.username || '').toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
   const handleUpdateUser = (updates: Partial<User>) => {
@@ -380,7 +380,7 @@ function CustomerEditForm({
                 }}
                 className="rounded-l-none bg-primary hover:bg-primary/90"
               >
-                <Unlock className="w-4 h-4" />
+                <LockOpen className="w-4 h-4" />
               </Button>
             </div>
           </div>

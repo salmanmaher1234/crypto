@@ -91,10 +91,10 @@ export default function CustomerApp() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-3">
-                {user?.name?.charAt(0)}
+                {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-900">{user?.name}</div>
+                <div className="text-sm font-medium text-gray-900">{user?.name || user?.username}</div>
                 <div className="text-xs text-gray-500">Welcome back</div>
               </div>
             </div>
