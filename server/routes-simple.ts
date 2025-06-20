@@ -20,6 +20,9 @@ function getSessionUserId(req: any): number | null {
     return null;
   }
   
+  // Refresh session on each request
+  refreshSession(sessionId);
+  
   return session.userId;
 }
 
@@ -27,9 +30,16 @@ function createSession(userId: number): string {
   const sessionId = generateSessionId();
   sessions.set(sessionId, {
     userId,
-    expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+    expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
   });
   return sessionId;
+}
+
+function refreshSession(sessionId: string): void {
+  const session = sessions.get(sessionId);
+  if (session) {
+    session.expires = Date.now() + (7 * 24 * 60 * 60 * 1000); // Extend for 7 days
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -70,8 +80,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = createSession(user.id);
       res.cookie('sessionId', sessionId, { 
         httpOnly: true, 
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'lax'
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        sameSite: 'lax',
+        secure: false // Allow HTTP for development
       });
       
       const { password: _, ...userWithoutPassword } = user;

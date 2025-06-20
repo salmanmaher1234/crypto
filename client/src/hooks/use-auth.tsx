@@ -15,11 +15,14 @@ export function useAuth() {
   useEffect(() => {
     const sessionId = localStorage.getItem('sessionId');
     if (sessionId) {
-      // If we have a sessionId, enable the auth query
+      // If we have a sessionId, enable the auth query and fetch once
       queryClient.setQueryDefaults(["/api/auth/me"], { enabled: true });
-      queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.refetchQueries({ queryKey: ["/api/auth/me"] }).then(() => {
+        setIsInitialized(true);
+      });
+    } else {
+      setIsInitialized(true);
     }
-    setIsInitialized(true);
   }, [queryClient]);
 
   const { data: authData, isLoading } = useQuery<AuthResponse | null>({
@@ -40,8 +43,12 @@ export function useAuth() {
       });
 
       if (response.status === 401) {
-        // Clear invalid session
-        localStorage.removeItem('sessionId');
+        // Only clear session if we're sure it's invalid
+        // Don't clear on network errors or temporary issues
+        const text = await response.text();
+        if (text.includes("Unauthorized") || text.includes("Invalid")) {
+          localStorage.removeItem('sessionId');
+        }
         return null;
       }
 
@@ -54,8 +61,10 @@ export function useAuth() {
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
     enabled: false, // Will be enabled programmatically
   });
 
