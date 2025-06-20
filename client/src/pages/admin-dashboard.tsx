@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MemberManagement } from "@/components/admin/member-management";
+import { MemberManagement } from "@/components/admin/member-management-new";
 import { BettingOrders } from "@/components/admin/betting-orders";
 import { WalletManagement } from "@/components/admin/wallet-management";
 import { Reports } from "@/components/admin/reports";
