@@ -1,0 +1,230 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ChevronRight, TrendingUp, TrendingDown, RotateCcw } from "lucide-react";
+import { useCryptoPrices } from "@/lib/api";
+
+interface CryptoHomeProps {
+  onSelectCurrency: (currency: string) => void;
+}
+
+export function CryptoHome({ onSelectCurrency }: CryptoHomeProps) {
+  const { data: cryptoPrices, refetch } = useCryptoPrices();
+
+  const cryptoData = [
+    {
+      symbol: "BTC/USDT",
+      name: "Bitcoin",
+      price: cryptoPrices?.["BTC/USD"]?.price || "105445.41",
+      change: cryptoPrices?.["BTC/USD"]?.change || "+0.45%",
+      changeValue: "+470.19",
+      isPositive: true,
+      icon: "₿",
+      color: "orange"
+    },
+    {
+      symbol: "ETH/USDT", 
+      name: "Ethereum",
+      price: "2513.72",
+      change: "+0.80%",
+      changeValue: "+20.15",
+      isPositive: true,
+      icon: "⧫",
+      color: "blue"
+    },
+    {
+      symbol: "DOGE/USDT",
+      name: "Dogecoin", 
+      price: "0.18371",
+      change: "-1.26%",
+      changeValue: "-0.0023",
+      isPositive: false,
+      icon: "Ð",
+      color: "yellow"
+    },
+    {
+      symbol: "CHZ/USDT",
+      name: "Chiliz",
+      price: "0.03778",
+      change: "-1.51%", 
+      changeValue: "-0.0006",
+      isPositive: false,
+      icon: "⚽",
+      color: "red"
+    },
+    {
+      symbol: "LTC/USDT",
+      name: "Litecoin",
+      price: "412.89",
+      change: "+2.1%",
+      changeValue: "+8.49",
+      isPositive: true,
+      icon: "Ł",
+      color: "gray"
+    },
+    {
+      symbol: "XRP/USDT", 
+      name: "Ripple",
+      price: "1.89",
+      change: "-0.8%",
+      changeValue: "-0.015",
+      isPositive: false,
+      icon: "◊",
+      color: "blue"
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+            <span className="text-white font-bold">$</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Home</h1>
+            <p className="text-sm text-gray-600">1216650</p>
+          </div>
+        </div>
+        <Button variant="ghost" size="sm" onClick={() => refetch()}>
+          <RotateCcw className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Crypto Exchange Banner */}
+      <Card className="bg-gradient-to-r from-purple-600 to-blue-600 text-white overflow-hidden">
+        <CardContent className="p-6 relative">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h2 className="text-lg font-bold">What is a</h2>
+              <h2 className="text-2xl font-bold">Crypto</h2>
+              <h2 className="text-2xl font-bold">Exchange</h2>
+            </div>
+            <div className="flex space-x-2">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <span className="text-yellow-300 text-xl">₿</span>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <span className="text-blue-300 text-xl">⧫</span>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <span className="text-blue-300 text-xl">₮</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex space-x-1 mt-4">
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+            <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+            <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Stats Cards */}
+      <div className="grid grid-cols-2 gap-3">
+        {cryptoData.slice(0, 4).map((crypto) => (
+          <Card 
+            key={crypto.symbol}
+            className={`cursor-pointer hover:shadow-md transition-shadow ${
+              crypto.isPositive ? 'border-green-200' : 'border-red-200'
+            }`}
+            onClick={() => onSelectCurrency(crypto.symbol)}
+          >
+            <CardContent className="p-4">
+              <div className="text-sm font-medium text-gray-600 mb-1">
+                {crypto.symbol}
+              </div>
+              <div className="text-lg font-bold mb-1">
+                {crypto.price}
+              </div>
+              <div className={`text-sm ${crypto.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                {crypto.change}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Market Overview Chart Area */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium">Market Overview</h3>
+            <div className="flex space-x-2">
+              <div className="flex items-center space-x-1 text-green-600">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm">+12.8</span>
+              </div>
+              <div className="flex items-center space-x-1 text-red-600">
+                <TrendingDown className="w-4 h-4" />
+                <span className="text-sm">-5.2</span>
+              </div>
+            </div>
+          </div>
+          <div className="h-24 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg flex items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/30 to-transparent transform skew-x-12"></div>
+            <span className="text-gray-600 text-sm">Market Chart Visualization</span>
+          </div>
+          <div className="flex justify-center space-x-4 mt-4 text-sm text-gray-600">
+            <span>Litecoin</span>
+            <span>Bitcoin</span>
+            <span>Ripple</span>
+            <span>Ethereum</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Currency List */}
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
+          <h3 className="font-medium">Currency</h3>
+          <div className="grid grid-cols-2 gap-8 text-sm font-medium text-gray-600">
+            <span>Real Price</span>
+            <span>Rise Fall</span>
+          </div>
+        </div>
+        
+        {cryptoData.map((crypto) => (
+          <Card 
+            key={crypto.symbol}
+            className="cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => onSelectCurrency(crypto.symbol)}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
+                    ${crypto.color === 'orange' ? 'bg-orange-500' :
+                      crypto.color === 'blue' ? 'bg-blue-500' :
+                      crypto.color === 'yellow' ? 'bg-yellow-500' :
+                      crypto.color === 'red' ? 'bg-red-500' :
+                      'bg-gray-500'}`}>
+                    {crypto.icon}
+                  </div>
+                  <div>
+                    <div className="font-medium">{crypto.symbol}</div>
+                    <div className="text-sm text-gray-600">{crypto.name}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium">{crypto.price}</div>
+                </div>
+                <div className="text-right">
+                  <Badge 
+                    variant={crypto.isPositive ? "default" : "destructive"}
+                    className={crypto.isPositive ? "bg-green-500" : "bg-red-500"}
+                  >
+                    {crypto.change}
+                  </Badge>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

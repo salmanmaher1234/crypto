@@ -5,6 +5,8 @@ import { BalanceCard } from "@/components/customer/balance-card";
 import { TradingInterface } from "@/components/customer/trading-interface";
 import { TransactionHistory } from "@/components/customer/transaction-history";
 import { Profile } from "@/components/customer/profile";
+import { CryptoHome } from "@/components/customer/crypto-home";
+import { CryptoTrading } from "@/components/customer/crypto-trading";
 import { Home, TrendingUp, Wallet, User, Settings, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -17,18 +19,25 @@ const sections = [
 
 export default function CustomerApp() {
   const [activeSection, setActiveSection] = useState("home");
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
 
   const renderSection = () => {
+    // If a currency is selected, show the trading page
+    if (selectedCurrency) {
+      return (
+        <CryptoTrading 
+          currency={selectedCurrency}
+          onBack={() => setSelectedCurrency(null)}
+        />
+      );
+    }
+
     switch (activeSection) {
       case "home":
         return (
-          <div className="space-y-6">
-            <BalanceCard />
-            <TradingInterface />
-            <TransactionHistory />
-          </div>
+          <CryptoHome onSelectCurrency={setSelectedCurrency} />
         );
       case "trade":
         return <TradingInterface />;
@@ -43,11 +52,7 @@ export default function CustomerApp() {
         return <Profile />;
       default:
         return (
-          <div className="space-y-6">
-            <BalanceCard />
-            <TradingInterface />
-            <TransactionHistory />
-          </div>
+          <CryptoHome onSelectCurrency={setSelectedCurrency} />
         );
     }
   };
