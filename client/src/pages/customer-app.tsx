@@ -7,12 +7,14 @@ import { TransactionHistory } from "@/components/customer/transaction-history";
 import { Profile } from "@/components/customer/profile";
 import { CryptoHome } from "@/components/customer/crypto-home";
 import { CryptoTrading } from "@/components/customer/crypto-trading";
-import { Home, TrendingUp, Wallet, User, Settings, LogOut } from "lucide-react";
+import { CustomerBettingOrders } from "@/components/customer/betting-orders";
+import { Home, TrendingUp, Wallet, User, FileText, Settings, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 
 const sections = [
   { id: "home", label: "Home", icon: Home },
   { id: "trade", label: "Trade", icon: TrendingUp },
+  { id: "orders", label: "Orders", icon: FileText },
   { id: "wallet", label: "Wallet", icon: Wallet },
   { id: "profile", label: "Profile", icon: User },
 ];
@@ -41,6 +43,8 @@ export default function CustomerApp() {
         );
       case "trade":
         return <TradingInterface />;
+      case "orders":
+        return <CustomerBettingOrders />;
       case "wallet":
         return (
           <div className="space-y-6">
