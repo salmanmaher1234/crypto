@@ -1,4 +1,4 @@
-# CryptoInvest Pro - Deployment Guide
+# SuperCoin - Deployment Guide
 
 ## Project Overview
 This is a full-stack cryptocurrency investment platform built with React, Express.js, and PostgreSQL.

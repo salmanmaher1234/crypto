@@ -1,8 +1,8 @@
-# CryptoInvest Pro - Investment Platform
+# SuperCoin - Investment Platform
 
 ## Overview
 
-CryptoInvest Pro is a full-stack cryptocurrency investment platform built with React, Express.js, and PostgreSQL. The application provides both customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions.
+SuperCoin is a full-stack cryptocurrency investment platform built with React, Express.js, and PostgreSQL. The application provides both customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions.
 
 ## System Architecture
 
@@ -97,6 +97,7 @@ CryptoInvest Pro is a full-stack cryptocurrency investment platform built with R
 
 Changelog:
 - June 24, 2025. Initial setup
+- June 24, 2025. Updated application name to SuperCoin and removed demo credentials from login page
 
 ## User Preferences
 

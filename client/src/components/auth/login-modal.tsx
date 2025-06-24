@@ -31,7 +31,7 @@ export function LoginModal() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">CryptoInvest Pro</CardTitle>
+          <CardTitle className="text-2xl font-bold">SuperCoin</CardTitle>
           <CardDescription>Sign in to your investment account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,11 +67,7 @@ export function LoginModal() {
             </Button>
           </form>
           
-          <div className="mt-4 text-sm text-gray-600 text-center">
-            <p>Demo accounts:</p>
-            <p>Admin: admin / admin123</p>
-            <p>Customer: sarah / password123</p>
-          </div>
+
 
           {/* Register Link */}
           <div className="text-center mt-4">

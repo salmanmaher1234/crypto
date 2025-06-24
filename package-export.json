@@ -1,7 +1,7 @@
 {
-  "name": "cryptoinvest-pro",
+  "name": "supercoin",
   "version": "1.0.0",
-  "description": "Cryptocurrency Investment Platform",
+  "description": "SuperCoin Trading Platform",
   "main": "dist/index.js",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
