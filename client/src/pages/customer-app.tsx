@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BalanceCard } from "@/components/customer/balance-card";
 import { TradingInterface } from "@/components/customer/trading-interface";
 import { TransactionHistory } from "@/components/customer/transaction-history";
+import { Profile } from "@/components/customer/profile";
 import { Home, TrendingUp, Wallet, User, Settings, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -39,39 +40,7 @@ export default function CustomerApp() {
           </div>
         );
       case "profile":
-        return (
-          <div className="p-4">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4">Profile Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Name</label>
-                  <p className="text-gray-900">{user?.name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Email</label>
-                  <p className="text-gray-900">{user?.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Username</label>
-                  <p className="text-gray-900">{user?.username}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Reputation Score</label>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-900 font-medium">{user?.reputation}/100</span>
-                    <div className="flex-1 h-2 bg-gray-200 rounded-full">
-                      <div
-                        className="h-2 bg-success rounded-full"
-                        style={{ width: `${user?.reputation}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <Profile />;
       default:
         return (
           <div className="space-y-6">
