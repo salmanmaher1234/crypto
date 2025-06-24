@@ -66,10 +66,21 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
         agentInvitationCode: data.agentInvitationCode || undefined,
       };
 
-      return await apiRequest("/api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
         body: JSON.stringify(registerData),
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Registration failed");
+      }
+
+      return await response.json();
     },
     onSuccess: () => {
       toast({
