@@ -123,8 +123,11 @@ export class MemStorage implements IStorage {
       isActive: true,
     });
 
-    // Add sample betting orders for sarah (customer.id = 2)
-    this.addSampleBettingOrders(customer.id);
+    // Add sample betting orders for sarah - use hard-coded ID 2 since that's the second user
+    this.addSampleBettingOrders(2);
+    
+    // Debug: Log the created orders
+    console.log(`Created ${this.bettingOrders.size} betting orders for user 2`);
   }
 
   private addSampleBettingOrders(userId: number) {
@@ -148,6 +151,7 @@ export class MemStorage implements IStorage {
       expiresAt: new Date(baseTime.getTime() + 120000)
     };
     this.bettingOrders.set(closedOrder1.id, closedOrder1);
+    console.log(`Added order ${closedOrder1.id} for user ${userId}`);
 
     const closedOrder2: BettingOrder = {
       id: this.currentId++,
