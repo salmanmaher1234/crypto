@@ -125,39 +125,74 @@ export function CustomerBettingOrders() {
         ) : (
           <div className="space-y-4">
             {filteredOrders.map((order) => (
-              <Card key={order.id} className="border-l-4 border-l-blue-500">
+              <Card key={order.id} className="bg-gray-50 border border-gray-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      {getOrderTypeIcon(order.orderType)}
-                      <span className="font-medium">{order.currency}</span>
-                      <Badge className={`text-white ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </Badge>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-gray-500">
-                        {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}
-                      </div>
-                    </div>
+                  <div className="flex justify-end mb-3">
+                    <button className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                      <span className="text-xs">›</span>
+                    </button>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Order Type:</span>
-                      <div className="font-medium capitalize">{order.orderType}</div>
+                  <div className="space-y-3 text-sm">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-gray-500 text-xs">Currency</span>
+                        <div className="font-medium">{order.currency}</div>
+                      </div>
+                      <div className="text-right">
+                        <button className="text-blue-600 text-xs font-medium">Copy</button>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-gray-600">Amount:</span>
-                      <div className="font-medium">${parseFloat(order.amount).toFixed(2)}</div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-gray-500 text-xs">Order No.</span>
+                        <div className="font-medium text-xs">B{order.id.toString().padStart(15, '0')}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-xs">Order Amount</span>
+                        <div className="font-medium">{parseFloat(order.amount).toFixed(0)}</div>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-gray-600">Entry Price:</span>
-                      <div className="font-medium">{order.entryPrice}</div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-gray-500 text-xs">Profit Amount</span>
+                        <div className="font-medium text-red-600">
+                          {order.profit ? parseFloat(order.profit).toFixed(0) : "0"}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-xs">Buy Direction</span>
+                        <div className={`font-medium ${order.orderType === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                          {order.orderType === 'up' ? 'Buy Up' : 'Buy Down'}
+                        </div>
+                      </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-gray-500 text-xs">Scale</span>
+                        <div className="font-medium">{order.duration.replace('s', '%')}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-xs">Billing Time</span>
+                        <div className="font-medium">{order.duration}</div>
+                      </div>
+                    </div>
+
                     <div>
-                      <span className="text-gray-600">Duration:</span>
-                      <div className="font-medium">{order.duration}</div>
+                      <span className="text-gray-500 text-xs">Order Time</span>
+                      <div className="font-medium text-xs">
+                        {new Date(order.createdAt).toLocaleString('en-GB', {
+                          year: 'numeric',
+                          month: '2-digit', 
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        })}
+                      </div>
                     </div>
                   </div>
 

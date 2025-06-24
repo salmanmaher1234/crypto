@@ -122,6 +122,98 @@ export class MemStorage implements IStorage {
       withdrawalStatus: "Allowed",
       isActive: true,
     });
+
+    // Add sample betting orders for sarah (customer.id = 2)
+    this.addSampleBettingOrders(customer.id);
+  }
+
+  private addSampleBettingOrders(userId: number) {
+    const now = new Date();
+    const baseTime = new Date('2025-06-08T13:03:49.000Z');
+
+    // Sample closed orders
+    const closedOrder1: BettingOrder = {
+      id: this.currentId++,
+      userId: userId,
+      currency: "BTC/USDT",
+      orderType: "down",
+      amount: "12000",
+      entryPrice: "42150.00",
+      duration: "120s",
+      status: "completed",
+      profit: "14800",
+      exitPrice: "41950.00",
+      createdAt: baseTime,
+      updatedAt: baseTime,
+      expiresAt: new Date(baseTime.getTime() + 120000)
+    };
+    this.bettingOrders.set(closedOrder1.id, closedOrder1);
+
+    const closedOrder2: BettingOrder = {
+      id: this.currentId++,
+      userId: userId,
+      currency: "BTC/USDT",
+      orderType: "down", 
+      amount: "12000",
+      entryPrice: "42200.00",
+      duration: "60s",
+      status: "completed",
+      profit: "16800",
+      exitPrice: "41800.00",
+      createdAt: new Date(baseTime.getTime() - 3600000),
+      updatedAt: new Date(baseTime.getTime() - 3600000),
+      expiresAt: new Date(baseTime.getTime() - 3600000 + 60000)
+    };
+    this.bettingOrders.set(closedOrder2.id, closedOrder2);
+
+    const closedOrder3: BettingOrder = {
+      id: this.currentId++,
+      userId: userId,
+      currency: "BTC/USDT",
+      orderType: "up",
+      amount: "8000", 
+      entryPrice: "41900.00",
+      duration: "60s",
+      status: "completed",
+      profit: "9120",
+      exitPrice: "42150.00",
+      createdAt: new Date(baseTime.getTime() - 7200000),
+      updatedAt: new Date(baseTime.getTime() - 7200000),
+      expiresAt: new Date(baseTime.getTime() - 7200000 + 60000)
+    };
+    this.bettingOrders.set(closedOrder3.id, closedOrder3);
+
+    // Sample pending order
+    const pendingOrder: BettingOrder = {
+      id: this.currentId++,
+      userId: userId,
+      currency: "ETH/USDT",
+      orderType: "up",
+      amount: "5000",
+      entryPrice: "2450.00", 
+      duration: "180s",
+      status: "pending",
+      createdAt: new Date(now.getTime() - 1800000),
+      updatedAt: new Date(now.getTime() - 1800000),
+      expiresAt: new Date(now.getTime() - 1800000 + 180000)
+    };
+    this.bettingOrders.set(pendingOrder.id, pendingOrder);
+
+    // Sample cancelled order
+    const cancelledOrder: BettingOrder = {
+      id: this.currentId++,
+      userId: userId,
+      currency: "SOL/USDT",
+      orderType: "down",
+      amount: "3000",
+      entryPrice: "98.50",
+      duration: "90s",
+      status: "cancelled", 
+      createdAt: new Date(baseTime.getTime() - 86400000),
+      updatedAt: new Date(baseTime.getTime() - 86400000),
+      expiresAt: new Date(baseTime.getTime() - 86400000 + 90000)
+    };
+    this.bettingOrders.set(cancelledOrder.id, cancelledOrder);
   }
 
   // User management
