@@ -22,7 +22,8 @@ import {
   Eye,
   ChevronRight,
   ArrowLeft,
-  Plus
+  Plus,
+  Lock
 } from "lucide-react";
 
 export function Profile() {
@@ -32,7 +33,7 @@ export function Profile() {
   const createBankAccount = useCreateBankAccount();
   const { toast } = useToast();
   
-  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'digitalwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showBankDialog, setShowBankDialog] = useState(false);
@@ -428,8 +429,8 @@ export function Profile() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
-                  <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => setShowRechargeDialog(true)}>
-                    Deposit
+                  <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => setCurrentView('digitalwallet')}>
+                    View Details
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setShowWithdrawDialog(true)}>
                     Withdraw
@@ -520,6 +521,131 @@ export function Profile() {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
+    );
+  }
+
+  // Digital Wallet View
+  if (currentView === 'digitalwallet') {
+    return (
+      <div className="min-h-screen bg-gray-100 p-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentView('wallet')}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <CardTitle className="flex-1 text-center text-lg font-medium">Digital Wallet</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {userBankAccounts.length === 0 ? (
+              <div className="text-center py-12">
+                <Wallet className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-600 mb-2">No Wallet Added</h3>
+                <p className="text-sm text-gray-500 mb-6">Add a bank account to start using your digital wallet</p>
+                <Button 
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                  onClick={() => setShowBankDialog(true)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Bank Account
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg text-white">
+                  <h3 className="font-medium mb-2">Digital Wallet Balance</h3>
+                  <div className="text-2xl font-bold">${parseFloat(user?.balance || "0").toFixed(2)}</div>
+                  <div className="text-sm opacity-90">Available: ${parseFloat(user?.availableBalance || "0").toFixed(2)}</div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Button className="bg-green-500 hover:bg-green-600" onClick={() => setShowRechargeDialog(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Deposit
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowWithdrawDialog(true)}>
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Withdraw
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">Linked Bank Accounts</h4>
+                  {userBankAccounts.map((account) => (
+                    <div key={account.id} className="p-3 bg-white rounded-lg border">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">{account.bankName}</div>
+                          <div className="text-sm text-gray-600">{account.accountHolderName}</div>
+                          <div className="text-sm text-gray-500">****{account.accountNumber.slice(-4)}</div>
+                        </div>
+                        <Badge variant="outline" className="text-green-600 border-green-600">Active</Badge>
+                      </div>
+                    </div>
+                  ))}
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setShowBankDialog(true)}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Another Bank Account
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Add Bank Account Dialog */}
+            <Dialog open={showBankDialog} onOpenChange={setShowBankDialog}>
+              <DialogContent className="max-w-sm">
+                <DialogHeader>
+                  <DialogTitle className="text-center">Add Bank Wallet</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Input
+                      placeholder="Please enter holder's name"
+                      value={bankFormData.accountHolderName}
+                      onChange={(e) => setBankFormData({...bankFormData, accountHolderName: e.target.value})}
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Please enter bank name"
+                      value={bankFormData.bankName}
+                      onChange={(e) => setBankFormData({...bankFormData, bankName: e.target.value})}
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Please enter A/C No"
+                      value={bankFormData.accountNumber}
+                      onChange={(e) => setBankFormData({...bankFormData, accountNumber: e.target.value})}
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Please enter IFSC Code"
+                      value={bankFormData.ifscCode}
+                      onChange={(e) => setBankFormData({...bankFormData, ifscCode: e.target.value})}
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <Button 
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                    onClick={handleBankAccountSave}
+                    disabled={createBankAccount.isPending}
+                  >
+                    {createBankAccount.isPending ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
       </div>
     );
   }
