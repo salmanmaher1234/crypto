@@ -36,6 +36,21 @@ export function Profile() {
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showBankDialog, setShowBankDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [showFundPasswordDialog, setShowFundPasswordDialog] = useState(false);
+  const [showPlatformWallet, setShowPlatformWallet] = useState(false);
+  const [rechargeAmount, setRechargeAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [fundPasswordData, setFundPasswordData] = useState({
+    currentFundPassword: "",
+    newFundPassword: "",
+    confirmFundPassword: ""
+  });
   const [bankFormData, setBankFormData] = useState({
     accountHolderName: "",
     bankName: "",
@@ -150,11 +165,43 @@ export function Profile() {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label>Amount</Label>
-                      <Input placeholder="Enter amount" type="number" />
+                      <Label>Current Balance: ${parseFloat(user?.balance || "0").toFixed(2)}</Label>
                     </div>
-                    <Button className="w-full bg-green-500 hover:bg-green-600">
-                      Confirm Recharge
+                    <div>
+                      <Label>Recharge Amount</Label>
+                      <Input 
+                        placeholder="Enter amount" 
+                        type="number" 
+                        value={rechargeAmount}
+                        onChange={(e) => setRechargeAmount(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("100")}>
+                        $100
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("500")}>
+                        $500
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1000")}>
+                        $1000
+                      </Button>
+                    </div>
+                    <Button 
+                      className="w-full bg-green-500 hover:bg-green-600"
+                      onClick={() => {
+                        if (rechargeAmount && parseFloat(rechargeAmount) > 0) {
+                          toast({
+                            title: "Recharge successful",
+                            description: `$${rechargeAmount} has been added to your account`,
+                          });
+                          setRechargeAmount("");
+                          setShowRechargeDialog(false);
+                        }
+                      }}
+                      disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0}
+                    >
+                      Confirm Recharge ${rechargeAmount || "0"}
                     </Button>
                   </div>
                 </DialogContent>
@@ -172,11 +219,54 @@ export function Profile() {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label>Amount</Label>
-                      <Input placeholder="Enter amount" type="number" />
+                      <Label>Available Balance: ${parseFloat(user?.availableBalance || user?.balance || "0").toFixed(2)}</Label>
                     </div>
-                    <Button className="w-full bg-purple-500 hover:bg-purple-600">
-                      Confirm Withdrawal
+                    <div>
+                      <Label>Withdrawal Amount</Label>
+                      <Input 
+                        placeholder="Enter amount" 
+                        type="number" 
+                        value={withdrawAmount}
+                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setWithdrawAmount("50")}>
+                        $50
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setWithdrawAmount("100")}>
+                        $100
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setWithdrawAmount("500")}>
+                        $500
+                      </Button>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Withdrawal fee: 2% • Processing time: 1-3 business days
+                    </div>
+                    <Button 
+                      className="w-full bg-purple-500 hover:bg-purple-600"
+                      onClick={() => {
+                        const amount = parseFloat(withdrawAmount);
+                        const available = parseFloat(user?.availableBalance || user?.balance || "0");
+                        if (withdrawAmount && amount > 0 && amount <= available) {
+                          toast({
+                            title: "Withdrawal requested",
+                            description: `$${withdrawAmount} withdrawal request submitted`,
+                          });
+                          setWithdrawAmount("");
+                          setShowWithdrawDialog(false);
+                        } else if (amount > available) {
+                          toast({
+                            title: "Insufficient funds",
+                            description: "Amount exceeds available balance",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0}
+                    >
+                      Confirm Withdrawal ${withdrawAmount || "0"}
                     </Button>
                   </div>
                 </DialogContent>
@@ -313,18 +403,40 @@ export function Profile() {
             <CardTitle className="flex-1 text-center text-lg font-medium">My Wallet</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-12 bg-white"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-bold">$</span>
+            <div className="space-y-3">
+              <div className="p-4 bg-white rounded-lg border">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 font-bold">$</span>
+                    </div>
+                    <span className="font-medium">Digital Wallet</span>
+                  </div>
                 </div>
-                <span>Digital Wallet</span>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Balance:</span>
+                    <span className="font-medium">${parseFloat(user?.balance || "0").toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Available:</span>
+                    <span className="font-medium text-green-600">${parseFloat(user?.availableBalance || "0").toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Frozen:</span>
+                    <span className="font-medium text-red-600">${parseFloat(user?.frozenBalance || "0").toFixed(2)}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => setShowRechargeDialog(true)}>
+                    Deposit
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setShowWithdrawDialog(true)}>
+                    Withdraw
+                  </Button>
+                </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-gray-400" />
-            </Button>
+            </div>
 
             <Button 
               variant="ghost" 
@@ -459,18 +571,167 @@ export function Profile() {
   if (currentView === 'security') {
     return renderSubView('Security Settings', (
       <div className="space-y-4">
-        <Button variant="outline" className="w-full justify-start">
-          Change Login Password
+        <Button 
+          variant="outline" 
+          className="w-full justify-start h-12"
+          onClick={() => setShowPasswordDialog(true)}
+        >
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <Shield className="w-4 h-4 text-blue-600" />
+            </div>
+            <span>Change Login Password</span>
+          </div>
         </Button>
-        <Button variant="outline" className="w-full justify-start">
-          Change Fund Password
+        
+        <Button 
+          variant="outline" 
+          className="w-full justify-start h-12"
+          onClick={() => setShowFundPasswordDialog(true)}
+        >
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <Lock className="w-4 h-4 text-green-600" />
+            </div>
+            <span>Change Fund Password</span>
+          </div>
         </Button>
-        <Button variant="outline" className="w-full justify-start">
-          Two-Factor Authentication
+        
+        <Button variant="outline" className="w-full justify-start h-12">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <Shield className="w-4 h-4 text-purple-600" />
+            </div>
+            <span>Two-Factor Authentication</span>
+          </div>
         </Button>
-        <Button variant="outline" className="w-full justify-start">
-          Login History
+        
+        <Button variant="outline" className="w-full justify-start h-12">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+              <Eye className="w-4 h-4 text-orange-600" />
+            </div>
+            <span>Login History</span>
+          </div>
         </Button>
+
+        {/* Change Password Dialog */}
+        <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Change Login Password</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Current Password</Label>
+                <Input
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div>
+                <Label>New Password</Label>
+                <Input
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <Label>Confirm New Password</Label>
+                <Input
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <Button 
+                className="w-full bg-blue-500 hover:bg-blue-600"
+                onClick={() => {
+                  if (passwordData.newPassword === passwordData.confirmPassword) {
+                    toast({
+                      title: "Password updated",
+                      description: "Login password has been changed successfully",
+                    });
+                    setShowPasswordDialog(false);
+                    setPasswordData({currentPassword: "", newPassword: "", confirmPassword: ""});
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "Passwords don't match",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                Update Password
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Change Fund Password Dialog */}
+        <Dialog open={showFundPasswordDialog} onOpenChange={setShowFundPasswordDialog}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Change Fund Password</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Current Fund Password</Label>
+                <Input
+                  type="password"
+                  value={fundPasswordData.currentFundPassword}
+                  onChange={(e) => setFundPasswordData({...fundPasswordData, currentFundPassword: e.target.value})}
+                  placeholder="Enter current fund password"
+                />
+              </div>
+              <div>
+                <Label>New Fund Password</Label>
+                <Input
+                  type="password"
+                  value={fundPasswordData.newFundPassword}
+                  onChange={(e) => setFundPasswordData({...fundPasswordData, newFundPassword: e.target.value})}
+                  placeholder="Enter new fund password"
+                />
+              </div>
+              <div>
+                <Label>Confirm New Fund Password</Label>
+                <Input
+                  type="password"
+                  value={fundPasswordData.confirmFundPassword}
+                  onChange={(e) => setFundPasswordData({...fundPasswordData, confirmFundPassword: e.target.value})}
+                  placeholder="Confirm new fund password"
+                />
+              </div>
+              <Button 
+                className="w-full bg-green-500 hover:bg-green-600"
+                onClick={() => {
+                  if (fundPasswordData.newFundPassword === fundPasswordData.confirmFundPassword) {
+                    toast({
+                      title: "Fund password updated",
+                      description: "Fund password has been changed successfully",
+                    });
+                    setShowFundPasswordDialog(false);
+                    setFundPasswordData({currentFundPassword: "", newFundPassword: "", confirmFundPassword: ""});
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "Fund passwords don't match",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                Update Fund Password
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     ));
   }
@@ -478,10 +739,68 @@ export function Profile() {
   if (currentView === 'platform') {
     return renderSubView('Platform Wallet', (
       <div className="space-y-4">
-        <div className="text-center py-8">
-          <CreditCard className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600">Platform wallet features</p>
-          <p className="text-sm text-gray-500">Manage your platform payments and earnings</p>
+        <div className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              <CreditCard className="w-8 h-8" />
+              <span className="font-medium text-lg">Platform Wallet</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Platform Balance:</span>
+              <span className="font-bold">${parseFloat(user?.balance || "0").toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Rewards Earned:</span>
+              <span className="font-bold">$0.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Trading Bonus:</span>
+              <span className="font-bold">$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Button className="bg-purple-500 hover:bg-purple-600 text-white">
+            <Plus className="w-4 h-4 mr-2" />
+            Top Up
+          </Button>
+          <Button variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Transfer
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="font-medium text-gray-700">Recent Platform Transactions</h3>
+          <div className="space-y-2">
+            <div className="p-3 bg-white rounded-lg border flex justify-between items-center">
+              <div>
+                <div className="font-medium text-sm">Welcome Bonus</div>
+                <div className="text-xs text-gray-500">Platform reward</div>
+              </div>
+              <div className="text-green-600 font-medium">+$10.00</div>
+            </div>
+            <div className="p-3 bg-white rounded-lg border flex justify-between items-center">
+              <div>
+                <div className="font-medium text-sm">Trading Fee</div>
+                <div className="text-xs text-gray-500">Platform charge</div>
+              </div>
+              <div className="text-red-600 font-medium">-$2.50</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <h4 className="font-medium text-blue-900 mb-2">Platform Benefits</h4>
+          <ul className="text-sm text-blue-700 space-y-1">
+            <li>• Lower trading fees</li>
+            <li>• Priority customer support</li>
+            <li>• Exclusive investment opportunities</li>
+            <li>• Enhanced security features</li>
+          </ul>
         </div>
       </div>
     ));
