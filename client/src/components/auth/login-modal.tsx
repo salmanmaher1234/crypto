@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { RegisterModal } from "./register-modal";
 
 export function LoginModal() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showRegister, setShowRegister] = useState(false);
   const { login, isLoginPending, loginError } = useAuth();
   const { toast } = useToast();
 
@@ -70,8 +72,27 @@ export function LoginModal() {
             <p>Admin: admin / admin123</p>
             <p>Customer: sarah / password123</p>
           </div>
+
+          {/* Register Link */}
+          <div className="text-center mt-4">
+            <span className="text-gray-600">Don't have an account? </span>
+            <button
+              type="button"
+              onClick={() => setShowRegister(true)}
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Register Now
+            </button>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Register Modal */}
+      <RegisterModal
+        isOpen={showRegister}
+        onClose={() => setShowRegister(false)}
+        onSwitchToLogin={() => setShowRegister(false)}
+      />
     </div>
   );
 }

@@ -92,6 +92,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const result = insertUserSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid user data", errors: result.error.errors });
+      }
+
+      const { username, email } = result.data;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      const existingEmail = await storage.getUserByEmail(email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      const user = await storage.createUser({
+        ...result.data,
+        role: "customer",
+        isActive: true,
+        balance: "0",
+        availableBalance: "0",
+        frozenBalance: "0",
+        reputation: 85
+      });
+
+      const { password: _, ...userWithoutPassword } = user;
+      res.status(201).json({ user: userWithoutPassword, message: "Registration successful" });
+    } catch (error) {
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
   app.post("/api/auth/logout", (req, res) => {
     const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
     if (sessionId) {

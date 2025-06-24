@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   accountStatus: text("account_status").notNull().default("Active"), // Active, Prohibit
   withdrawalStatus: text("withdrawal_status").notNull().default("Allowed"), // Allowed, Prohibit
   fundPassword: text("fund_password"),
+  agentInvitationCode: text("agent_invitation_code"),
   invitationCode: text("invitation_code"),
   isActive: boolean("is_active").notNull().default(true),
 });
