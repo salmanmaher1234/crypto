@@ -214,7 +214,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
         <div className="text-right flex items-center gap-2">
           <p className="text-sm text-gray-600">
-            {user?.balance ? parseFloat(user.balance).toLocaleString() : '0'}
+            {user?.availableBalance ? parseFloat(user.availableBalance).toLocaleString() : '0'}
           </p>
           <Button
             variant="ghost"

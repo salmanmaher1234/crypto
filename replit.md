@@ -113,6 +113,7 @@ Changelog:
 - June 27, 2025. Added minimum order validation of 1000 - users cannot place orders with amounts less than 1000, validation implemented in both crypto-trading and trading-interface components with custom error message "Amount cannot be less than 1000" and input field hints showing minimum requirement
 - June 27, 2025. Removed minimum amount hints from input placeholders and labels - validation now only shows inline red error text below input fields when user submits invalid amount, error clears when user starts typing
 - June 27, 2025. Fixed refresh icon functionality in Place Order section - manual refresh icon now properly updates Real balance display according to current user balance from database with spinning animation and proper state management
+- June 27, 2025. Removed refresh icon from Place Order section and implemented real-time balance synchronization - home page balance now automatically updates when orders are placed in trading section, both sections display availableBalance and sync through React Query cache
 
 ## User Preferences
 
