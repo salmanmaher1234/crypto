@@ -397,26 +397,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         change: generateChange(),
         changeType: Math.random() > 0.5 ? "positive" : "negative"
       },
-      "ADA/USD": {
-        price: generatePrice(0.45),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
-      },
-      "SOL/USD": {
-        price: generatePrice(215.67),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
-      },
+
       "LTC/USD": {
         price: generatePrice(412.89),
         change: generateChange(),
         changeType: Math.random() > 0.5 ? "positive" : "negative"
       },
-      "XRP/USD": {
-        price: generatePrice(1.89),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
-      },
+
       "CHZ/USD": {
         price: generatePrice(0.03778),
         change: generateChange(),

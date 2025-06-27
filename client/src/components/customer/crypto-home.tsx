@@ -63,24 +63,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       icon: "Ð",
       color: "yellow"
     },
-    {
-      symbol: "ADA/USDT",
-      name: "Cardano",
-      price: cryptoPrices?.["ADA/USD"]?.price || "0.45",
-      change: cryptoPrices?.["ADA/USD"]?.change || "+5.1%",
-      isPositive: cryptoPrices?.["ADA/USD"]?.change ? !cryptoPrices["ADA/USD"].change.startsWith('-') : true,
-      icon: "₳",
-      color: "blue"
-    },
-    {
-      symbol: "SOL/USDT",
-      name: "Solana",
-      price: cryptoPrices?.["SOL/USD"]?.price || "215.67",
-      change: cryptoPrices?.["SOL/USD"]?.change || "+3.2%",
-      isPositive: cryptoPrices?.["SOL/USD"]?.change ? !cryptoPrices["SOL/USD"].change.startsWith('-') : true,
-      icon: "◎",
-      color: "purple"
-    },
+
     {
       symbol: "LTC/USDT",
       name: "Litecoin",
@@ -90,15 +73,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       icon: "Ł",
       color: "gray"
     },
-    {
-      symbol: "XRP/USDT", 
-      name: "Ripple",
-      price: cryptoPrices?.["XRP/USD"]?.price || "1.89",
-      change: cryptoPrices?.["XRP/USD"]?.change || "-0.8%",
-      isPositive: cryptoPrices?.["XRP/USD"]?.change ? !cryptoPrices["XRP/USD"].change.startsWith('-') : false,
-      icon: "◊",
-      color: "blue"
-    },
+
     {
       symbol: "CHZ/USDT",
       name: "Chiliz",
