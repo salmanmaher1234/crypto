@@ -365,89 +365,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mock crypto prices endpoint with dynamic updates
+  // Static crypto prices endpoint
   app.get("/api/crypto-prices", (req, res) => {
-    // Generate slightly varying prices to simulate real-time updates
-    const baseTime = Date.now();
-    const variation = (Math.sin(baseTime / 10000) * 0.02) + (Math.random() * 0.01 - 0.005);
-    
-    const generatePrice = (basePrice: number) => {
-      const newPrice = basePrice * (1 + variation);
-      return newPrice.toFixed(2);
-    };
-    
-    const generateChange = () => {
-      const changeValue = (Math.random() * 6 - 3); // Range: -3% to +3%
-      return changeValue >= 0 ? `+${changeValue.toFixed(1)}%` : `${changeValue.toFixed(1)}%`;
-    };
-    
     res.json({
       "BTC/USD": {
-        price: generatePrice(42150.00),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "42150.00",
+        change: "+2.5%",
+        changeType: "positive"
       },
       "ETH/USD": {
-        price: generatePrice(2850.00),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "2850.00",
+        change: "+1.8%",
+        changeType: "positive"
       },
       "DOGE/USD": {
-        price: generatePrice(0.18371),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.18371",
+        change: "-0.5%",
+        changeType: "negative"
       },
-
       "LTC/USD": {
-        price: generatePrice(412.89),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "412.89",
+        change: "+3.2%",
+        changeType: "positive"
       },
-
       "CHZ/USD": {
-        price: generatePrice(0.03778),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.03778",
+        change: "-1.2%",
+        changeType: "negative"
       },
       "BCH/USD": {
-        price: generatePrice(502.8),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "502.80",
+        change: "+0.8%",
+        changeType: "positive"
       },
       "PSG/USD": {
-        price: generatePrice(1.417),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "1.417",
+        change: "-2.1%",
+        changeType: "negative"
       },
       "JUV/USD": {
-        price: generatePrice(0.901),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.901",
+        change: "+1.5%",
+        changeType: "positive"
       },
       "ATM/USD": {
-        price: generatePrice(0.999),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.999",
+        change: "-0.3%",
+        changeType: "negative"
       },
       "EOS/USD": {
-        price: generatePrice(0.75),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.75",
+        change: "+2.1%",
+        changeType: "positive"
       },
       "TRX/USD": {
-        price: generatePrice(0.2712),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.2712",
+        change: "-1.8%",
+        changeType: "negative"
       },
       "ETC/USD": {
-        price: generatePrice(16.19),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "16.19",
+        change: "+0.9%",
+        changeType: "positive"
       },
       "BTS/USD": {
-        price: generatePrice(0.0045),
-        change: generateChange(),
-        changeType: Math.random() > 0.5 ? "positive" : "negative"
+        price: "0.0045",
+        change: "-3.2%",
+        changeType: "negative"
       }
     });
   });
