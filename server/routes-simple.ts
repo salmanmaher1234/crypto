@@ -324,16 +324,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("User ID:", (req as any).userId);
       console.log("Order data:", req.body);
       
-      // Generate order ID
-      const orderId = `${req.body.asset.replace('/', '')}${Date.now()}_${(req as any).userId}`;
-      
       const validatedData = insertBettingOrderSchema.parse({
         ...req.body,
         userId: (req as any).userId,
-        orderId: orderId,
-        status: 'active',
-        createdAt: new Date(),
-        expiresAt: new Date(Date.now() + req.body.duration * 1000),
       });
       console.log("Validated data:", validatedData);
       
