@@ -232,8 +232,8 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     // Minimum order validation
     if (amount < 1000) {
       toast({
-        title: "Minimum order amount",
-        description: "Minimum order amount is 1000",
+        title: "Invalid Amount",
+        description: "Amount cannot be less than 1000",
         variant: "destructive",
       });
       return;
