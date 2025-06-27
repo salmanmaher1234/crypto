@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateBettingOrder } from "@/lib/api";
+import { queryClient } from "@/lib/queryClient";
 import { ArrowLeft, TrendingUp, TrendingDown, BarChart3, Clock } from "lucide-react";
 
 interface CryptoTradingProps {
@@ -251,6 +252,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         });
         setShowOrderDialog(false);
         setOrderAmount("");
+        // Manually refresh user data to show updated balance
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         // Stay on trading page after successful order placement
       },
       onError: () => {
