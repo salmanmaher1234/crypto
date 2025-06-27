@@ -245,11 +245,27 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       duration: parseInt(selectedPeriod.replace('s', '')),
       entryPrice: currentCrypto.price,
     }, {
-      onSuccess: async () => {
-        // Force refresh user data to show updated balance immediately
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-        await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
+      onSuccess: async (data) => {
+        // Immediate cache clearing and refresh
+        queryClient.removeQueries({ queryKey: ["/api/auth/me"] });
         queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+        
+        // Fetch fresh user data immediately
+        try {
+          const response = await fetch("/api/auth/me", {
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Id": localStorage.getItem('sessionId') || ""
+            }
+          });
+          if (response.ok) {
+            const freshUserData = await response.json();
+            queryClient.setQueryData(["/api/auth/me"], freshUserData);
+          }
+        } catch (error) {
+          console.error("Failed to refresh user data:", error);
+        }
         
         toast({
           title: "Order submitted",
