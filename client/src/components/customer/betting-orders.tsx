@@ -67,6 +67,13 @@ export function CustomerBettingOrders() {
     }
   };
 
+  // Reset conditional query
+  const resetConditionalQuery = () => {
+    setStartDate("");
+    setEndDate("");
+    setTimeFilter("today");
+  };
+
 
 
   // Filter orders for current user
@@ -238,20 +245,32 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Order</h1>
-        <Select value={timeFilter} onValueChange={handleTimeFilterChange}>
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="yesterday">Yesterday</SelectItem>
-            <SelectItem value="week">Last Week</SelectItem>
-            <SelectItem value="month">Last Month</SelectItem>
-            <SelectItem value="3months">Last 3 Months</SelectItem>
-            <SelectItem value="all">All Orders</SelectItem>
-            <SelectItem value="conditional">Conditional Query</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={timeFilter} onValueChange={handleTimeFilterChange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="week">Last Week</SelectItem>
+              <SelectItem value="month">Last Month</SelectItem>
+              <SelectItem value="3months">Last 3 Months</SelectItem>
+              <SelectItem value="all">All Orders</SelectItem>
+              <SelectItem value="conditional">Conditional Query</SelectItem>
+            </SelectContent>
+          </Select>
+          {timeFilter === "conditional" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetConditionalQuery}
+              className="text-xs px-3"
+            >
+              Reset
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Tab Navigation */}
