@@ -167,9 +167,6 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Crypto Slider */}
       <div className="relative">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold">Cryptocurrencies</h3>
-        </div>
         
         <div className="overflow-hidden">
           <div 
