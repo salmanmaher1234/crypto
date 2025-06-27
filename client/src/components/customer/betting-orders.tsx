@@ -273,7 +273,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Scale</td>
-                              <td className="font-medium text-sm py-1">{order.duration}s ({getPayoutPercentage(order.duration)})</td>
+                              <td className="font-medium text-sm py-1">{getPayoutPercentage(order.duration)}</td>
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Billing Time</td>
