@@ -476,8 +476,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
                       selectedPeriod === period.value 
                         ? period.value === "60s" 
                           ? "bg-green-500 hover:bg-green-600" 
-                          : "bg-primary"
-                        : ""
+                          : "bg-primary hover:bg-primary/90"
+                        : "hover:bg-primary/10 hover:border-primary/30"
                     }`}
                     onClick={() => setSelectedPeriod(period.value)}
                   >
