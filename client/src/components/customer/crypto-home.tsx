@@ -24,7 +24,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
     "/slider-banner-2.svg"
   ];
 
-  // Auto-slide every 5 seconds
+  // Auto-slide every 5 seconds for banner
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
@@ -32,6 +32,16 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
     return () => clearInterval(interval);
   }, [sliderImages.length]);
+
+  // Auto-slide crypto boxes every 3 seconds
+  useEffect(() => {
+    const maxSlides = Math.ceil(cryptoData.length / 4);
+    const interval = setInterval(() => {
+      setCryptoSlideIndex((prev) => (prev + 1) % maxSlides);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [cryptoData.length]);
 
   const cryptoData = [
     {
