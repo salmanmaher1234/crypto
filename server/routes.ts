@@ -219,10 +219,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
-      const validatedData = insertBettingOrderSchema.parse({
+      console.log("Received betting order data:", req.body);
+      const dataToValidate = {
         ...req.body,
         userId: req.session.userId,
-      });
+      };
+      console.log("Data to validate:", dataToValidate);
+      
+      const validatedData = insertBettingOrderSchema.parse(dataToValidate);
+      console.log("Validated data:", validatedData);
       
       const order = await storage.createBettingOrder(validatedData);
       
@@ -237,7 +242,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(order);
     } catch (error) {
-      res.status(400).json({ message: "Invalid betting order data" });
+      console.error("Betting order error:", error);
+      res.status(400).json({ message: "Invalid betting order data", error: error.message });
     }
   });
 

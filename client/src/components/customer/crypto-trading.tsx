@@ -241,7 +241,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       asset: currency,
       amount: orderAmount,
       direction: orderType === "up" ? "Buy Up" : "Buy Down",
-      duration: selectedPeriod.replace('s', ''),
+      duration: parseInt(selectedPeriod.replace('s', '')),
       entryPrice: currentCrypto.price,
     }, {
       onSuccess: () => {
