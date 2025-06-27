@@ -233,11 +233,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Deduct amount from available balance
       const user = await storage.getUser(req.session.userId);
+      console.log("User before balance update:", user);
       if (user) {
         const amount = parseFloat(validatedData.amount);
-        await storage.updateUser(req.session.userId, {
-          availableBalance: (parseFloat(user.availableBalance) - amount).toFixed(2),
+        const newAvailableBalance = (parseFloat(user.availableBalance) - amount).toFixed(2);
+        console.log(`Updating balance: ${user.availableBalance} - ${amount} = ${newAvailableBalance}`);
+        
+        const updatedUser = await storage.updateUser(req.session.userId, {
+          availableBalance: newAvailableBalance,
         });
+        console.log("Updated user:", updatedUser);
       }
       
       res.json(order);
