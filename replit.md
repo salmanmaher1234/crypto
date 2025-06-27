@@ -111,6 +111,7 @@ Changelog:
 - June 27, 2025. Fixed navigation issue from cryptocurrency trading pages - bottom navigation tabs now properly clear crypto view state when clicked, allowing seamless navigation between all sections
 - June 27, 2025. Implemented dynamic real balance display with auto-refresh every 2 minutes and manual refresh icon - balance now shows user's actual balance from database, automatically updates every 2 minutes, includes spinning refresh icon for manual updates
 - June 27, 2025. Added minimum order validation of 1000 - users cannot place orders with amounts less than 1000, validation implemented in both crypto-trading and trading-interface components with custom error message "Amount cannot be less than 1000" and input field hints showing minimum requirement
+- June 27, 2025. Removed minimum amount hints from input placeholders and labels - validation now only shows inline red error text below input fields when user submits invalid amount, error clears when user starts typing
 
 ## User Preferences
 

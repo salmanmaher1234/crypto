@@ -13,6 +13,7 @@ export function TradingInterface() {
   const [selectedAsset, setSelectedAsset] = useState("BTC/USD");
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState(60);
+  const [validationError, setValidationError] = useState("");
   const { data: prices } = useCryptoPrices();
   const createOrder = useCreateBettingOrder();
   const { toast } = useToast();
@@ -29,13 +30,12 @@ export function TradingInterface() {
 
     // Minimum order validation
     if (parseFloat(amount) < 1000) {
-      toast({
-        title: "Invalid Amount",
-        description: "Amount cannot be less than 1000",
-        variant: "destructive",
-      });
+      setValidationError("Amount cannot be less than 1000");
       return;
     }
+    
+    // Clear validation error if amount is valid
+    setValidationError("");
 
     const entryPrice = prices?.[selectedAsset]?.price || "0";
     
@@ -108,16 +108,21 @@ export function TradingInterface() {
 
           {/* Amount Input */}
           <div>
-            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Investment Amount (Min: 1000)</label>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Investment Amount</label>
             <Input
               type="number"
-              placeholder="Minimum 1000"
+              placeholder="Enter amount"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              min="1000"
+              onChange={(e) => {
+                setAmount(e.target.value);
+                setValidationError(""); // Clear error when user types
+              }}
               step="0.01"
               className="text-sm sm:text-base"
             />
+            {validationError && (
+              <p className="text-red-500 text-sm mt-1">{validationError}</p>
+            )}
           </div>
 
           {/* Duration Selection */}

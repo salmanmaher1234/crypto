@@ -25,6 +25,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   const [orderType, setOrderType] = useState<"up" | "down">("up");
   const [selectedPeriod, setSelectedPeriod] = useState("60s");
   const [orderAmount, setOrderAmount] = useState("");
+  const [validationError, setValidationError] = useState("");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState("1m");
   const [chartType, setChartType] = useState<"candlestick" | "line">("candlestick");
   const [chartKey, setChartKey] = useState(0);
@@ -231,13 +232,12 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
 
     // Minimum order validation
     if (amount < 1000) {
-      toast({
-        title: "Invalid Amount",
-        description: "Amount cannot be less than 1000",
-        variant: "destructive",
-      });
+      setValidationError("Amount cannot be less than 1000");
       return;
     }
+    
+    // Clear validation error if amount is valid
+    setValidationError("");
 
     const availableBalance = parseFloat(user.availableBalance || user.balance || "0");
 
@@ -722,15 +722,20 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
 
             {/* Amount Input */}
             <div>
-              <h4 className="text-sm font-medium mb-2">Enter order amount (Min: 1000)</h4>
+              <h4 className="text-sm font-medium mb-2">Enter order amount</h4>
               <Input
                 type="number"
                 value={orderAmount}
-                onChange={(e) => setOrderAmount(e.target.value)}
-                placeholder="Minimum 1000"
-                min="1000"
+                onChange={(e) => {
+                  setOrderAmount(e.target.value);
+                  setValidationError(""); // Clear error when user types
+                }}
+                placeholder="Enter amount"
                 className="text-center"
               />
+              {validationError && (
+                <p className="text-red-500 text-sm mt-1">{validationError}</p>
+              )}
             </div>
 
             {/* Order Summary */}
