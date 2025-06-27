@@ -102,11 +102,83 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
     {
       symbol: "CHZ/USDT",
       name: "Chiliz",
-      price: cryptoPrices?.["CHZ/USD"]?.price || "0.037",
-      change: cryptoPrices?.["CHZ/USD"]?.change || "-1.5%",
+      price: cryptoPrices?.["CHZ/USD"]?.price || "0.03457",
+      change: cryptoPrices?.["CHZ/USD"]?.change || "-2.59%",
       isPositive: cryptoPrices?.["CHZ/USD"]?.change ? !cryptoPrices["CHZ/USD"].change.startsWith('-') : false,
       icon: "⚽",
       color: "red"
+    },
+    {
+      symbol: "BCH/USDT",
+      name: "Bitcoin Cash",
+      price: "502.8",
+      change: "+0.50%",
+      isPositive: true,
+      icon: "₿",
+      color: "green"
+    },
+    {
+      symbol: "PSG/USDT",
+      name: "Paris Saint-Germain",
+      price: "1.417",
+      change: "-2.01%",
+      isPositive: false,
+      icon: "⚽",
+      color: "blue"
+    },
+    {
+      symbol: "JUV/USDT",
+      name: "Juventus",
+      price: "0.901",
+      change: "-1.42%",
+      isPositive: false,
+      icon: "⚽",
+      color: "black"
+    },
+    {
+      symbol: "ATM/USDT",
+      name: "Atletico Madrid",
+      price: "0.999",
+      change: "-1.87%",
+      isPositive: false,
+      icon: "⚽",
+      color: "red"
+    },
+    {
+      symbol: "EOS/USDT",
+      name: "EOS",
+      price: "0",
+      change: "0.00%",
+      isPositive: true,
+      icon: "◉",
+      color: "gray"
+    },
+    {
+      symbol: "TRX/USDT",
+      name: "TRON",
+      price: "0.2712",
+      change: "+0.15%",
+      isPositive: true,
+      icon: "⬢",
+      color: "green"
+    },
+    {
+      symbol: "ETC/USDT",
+      name: "Ethereum Classic",
+      price: "16.19",
+      change: "-2.00%",
+      isPositive: false,
+      icon: "⧫",
+      color: "green"
+    },
+    {
+      symbol: "BTS/USDT",
+      name: "BitShares",
+      price: "502.8",
+      change: "+0.50%",
+      isPositive: true,
+      icon: "◆",
+      color: "blue"
     }
   ];
 
