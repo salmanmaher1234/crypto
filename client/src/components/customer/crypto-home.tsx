@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { ChevronRight, TrendingUp, TrendingDown, RotateCcw, ChevronLeft } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -16,6 +16,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   const { data: cryptoPrices, refetch } = useCryptoPrices();
   const { user } = useAuth();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [cryptoSlideIndex, setCryptoSlideIndex] = useState(0);
 
   // Slider images
   const sliderImages = [
@@ -165,64 +166,46 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </Card>
 
-      {/* Crypto Banner */}
+      {/* Crypto Slider */}
       <div className="relative">
-        <div 
-          className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl p-6 text-white relative overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23374151' fill-opacity='0.1'%3E%3Cpath d='M0 0h20v20H0z'/%3E%3Cpath d='M20 0v20H0V0z' fill='none' stroke='%23374151' stroke-opacity='0.1'/%3E%3C/g%3E%3C/svg%3E")`
-          }}
-        >
-          {/* Background trend line */}
-          <div className="absolute top-0 right-0 w-2/3 h-full opacity-10">
-            <svg viewBox="0 0 300 200" className="w-full h-full">
-              <path 
-                d="M 50 160 Q 100 140 150 120 Q 200 100 250 80 Q 280 60 300 40" 
-                stroke="#22c55e" 
-                strokeWidth="3" 
-                fill="none"
-              />
-            </svg>
-          </div>
-          
-          <div className="relative z-10 space-y-3">
-            {/* Display top 4 cryptocurrencies */}
-            {cryptoData.slice(0, 4).map((crypto, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className={`text-lg font-bold ${
-                    crypto.color === 'orange' ? 'text-orange-400' :
-                    crypto.color === 'blue' ? 'text-blue-400' :
-                    crypto.color === 'yellow' ? 'text-yellow-400' :
-                    crypto.color === 'purple' ? 'text-purple-400' :
-                    'text-gray-400'
-                  }`}>
-                    {crypto.name}
-                  </span>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <div className={`flex items-center space-x-1 ${crypto.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                    {crypto.isPositive ? (
-                      <span className="text-sm">▲</span>
-                    ) : (
-                      <span className="text-sm">▼</span>
-                    )}
-                    <span className="text-sm font-semibold">{crypto.change}</span>
-                  </div>
-                  <span className="text-white font-bold text-right min-w-[80px]">
-                    ${crypto.price}
-                  </span>
+        <div className="overflow-hidden">
+          <div 
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${cryptoSlideIndex * (100 / 4)}%)` }}
+          >
+            {/* Create duplicated array for seamless infinite loop */}
+            {[...cryptoData, ...cryptoData].map((crypto, index) => (
+              <div key={index} className="flex-shrink-0" style={{ width: '25%' }}>
+                <div className="px-1.5">
+                  <Card 
+                    className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
+                    onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                  >
+                    <CardContent className="p-3">
+                      <div className="text-center space-y-2">
+                        <div>
+                          <p className="font-semibold text-sm text-center">{crypto.symbol}</p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-sm font-bold text-center">${crypto.price}</p>
+                          <div className="flex items-center justify-center space-x-1">
+                            {crypto.isPositive ? (
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                            ) : (
+                              <TrendingDown className="w-3 h-3 text-red-500" />
+                            )}
+                            <span className={`text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                              {crypto.change}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             ))}
-          </div>
-          
-          {/* Trend arrow */}
-          <div className="absolute bottom-4 right-4">
-            <div className="flex items-center space-x-1 text-green-400">
-              <TrendingUp className="w-5 h-5" />
-            </div>
           </div>
         </div>
       </div>
