@@ -262,6 +262,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
           if (response.ok) {
             const freshUserData = await response.json();
             queryClient.setQueryData(["/api/auth/me"], freshUserData);
+            
+
           }
         } catch (error) {
           console.error("Failed to refresh user data:", error);
