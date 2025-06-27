@@ -447,4 +447,167 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { users, type User, type InsertUser, bettingOrders, type BettingOrder, type InsertBettingOrder, transactions, type Transaction, type InsertTransaction, withdrawalRequests, type WithdrawalRequest, type InsertWithdrawalRequest, announcements, type Announcement, type InsertAnnouncement, bankAccounts, type BankAccount, type InsertBankAccount } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async getBankAccountsByUserId(userId: number): Promise<BankAccount[]> {
+    return await db.select().from(bankAccounts).where(eq(bankAccounts.userId, userId));
+  }
+
+  async createBankAccount(insertBankAccount: InsertBankAccount): Promise<BankAccount> {
+    const [bankAccount] = await db
+      .insert(bankAccounts)
+      .values(insertBankAccount)
+      .returning();
+    return bankAccount;
+  }
+
+  async getBankAccount(id: number): Promise<BankAccount | undefined> {
+    const [bankAccount] = await db.select().from(bankAccounts).where(eq(bankAccounts.id, id));
+    return bankAccount || undefined;
+  }
+
+  async getTransactionsByUserId(userId: number): Promise<Transaction[]> {
+    return await db.select().from(transactions).where(eq(transactions.userId, userId));
+  }
+
+  async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
+    const [transaction] = await db
+      .insert(transactions)
+      .values(insertTransaction)
+      .returning();
+    return transaction;
+  }
+
+  async updateTransaction(id: number, updates: Partial<Transaction>): Promise<Transaction | undefined> {
+    const [transaction] = await db
+      .update(transactions)
+      .set(updates)
+      .where(eq(transactions.id, id))
+      .returning();
+    return transaction || undefined;
+  }
+
+  async getAllTransactions(): Promise<Transaction[]> {
+    return await db.select().from(transactions);
+  }
+
+  async getBettingOrdersByUserId(userId: number): Promise<BettingOrder[]> {
+    return await db.select().from(bettingOrders).where(eq(bettingOrders.userId, userId));
+  }
+
+  async createBettingOrder(insertOrder: InsertBettingOrder): Promise<BettingOrder> {
+    const [order] = await db
+      .insert(bettingOrders)
+      .values(insertOrder)
+      .returning();
+    return order;
+  }
+
+  async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {
+    const [order] = await db
+      .update(bettingOrders)
+      .set(updates)
+      .where(eq(bettingOrders.id, id))
+      .returning();
+    return order || undefined;
+  }
+
+  async getAllBettingOrders(): Promise<BettingOrder[]> {
+    return await db.select().from(bettingOrders);
+  }
+
+  async getActiveBettingOrders(): Promise<BettingOrder[]> {
+    return await db.select().from(bettingOrders).where(eq(bettingOrders.status, 'active'));
+  }
+
+  async getWithdrawalRequestsByUserId(userId: number): Promise<WithdrawalRequest[]> {
+    return await db.select().from(withdrawalRequests).where(eq(withdrawalRequests.userId, userId));
+  }
+
+  async createWithdrawalRequest(insertRequest: InsertWithdrawalRequest): Promise<WithdrawalRequest> {
+    const [request] = await db
+      .insert(withdrawalRequests)
+      .values(insertRequest)
+      .returning();
+    return request;
+  }
+
+  async updateWithdrawalRequest(id: number, updates: Partial<WithdrawalRequest>): Promise<WithdrawalRequest | undefined> {
+    const [request] = await db
+      .update(withdrawalRequests)
+      .set(updates)
+      .where(eq(withdrawalRequests.id, id))
+      .returning();
+    return request || undefined;
+  }
+
+  async getPendingWithdrawalRequests(): Promise<WithdrawalRequest[]> {
+    return await db.select().from(withdrawalRequests).where(eq(withdrawalRequests.status, 'pending'));
+  }
+
+  async getActiveAnnouncements(): Promise<Announcement[]> {
+    return await db.select().from(announcements).where(eq(announcements.isActive, true));
+  }
+
+  async createAnnouncement(insertAnnouncement: InsertAnnouncement): Promise<Announcement> {
+    const [announcement] = await db
+      .insert(announcements)
+      .values(insertAnnouncement)
+      .returning();
+    return announcement;
+  }
+
+  async updateAnnouncement(id: number, updates: Partial<Announcement>): Promise<Announcement | undefined> {
+    const [announcement] = await db
+      .update(announcements)
+      .set(updates)
+      .where(eq(announcements.id, id))
+      .returning();
+    return announcement || undefined;
+  }
+
+  async getAllAnnouncements(): Promise<Announcement[]> {
+    return await db.select().from(announcements);
+  }
+}
+
+export const storage = new DatabaseStorage();
