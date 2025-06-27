@@ -494,6 +494,13 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
               </div>
             </div>
 
+            {/* Available Balance Display */}
+            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+              <div className="text-sm font-medium text-blue-800 text-center">
+                Available Balance: ${parseFloat(user?.availableBalance || "0").toFixed(2)}
+              </div>
+            </div>
+
             {/* Amount Input */}
             <div>
               <h4 className="text-sm font-medium mb-2">Enter order amount</h4>

@@ -112,8 +112,8 @@ export class MemStorage implements IStorage {
     
     // Update customer with full data
     this.updateUser(customer.id, {
-      balance: "5000.00",
-      availableBalance: "4500.00",
+      balance: "10500.00",
+      availableBalance: "10000.00",
       frozenBalance: "500.00",
       reputation: 85,
       winLoseSetting: "To Win",
