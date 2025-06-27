@@ -263,8 +263,15 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </Card>
 
-      {/* Crypto Slider */}
+      {/* Crypto Slider with Live Indicator */}
       <div className="relative">
+        {/* Live Update Indicator */}
+        <div className="flex items-center justify-center mb-2">
+          <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-3 py-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-xs text-green-700 font-medium">Live Prices - Updates Every 1 Min</span>
+          </div>
+        </div>
         <div className="overflow-hidden">
           <div 
             className="flex transition-transform duration-500 ease-in-out"

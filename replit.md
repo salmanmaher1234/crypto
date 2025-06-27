@@ -115,6 +115,7 @@ Changelog:
 - June 27, 2025. Fixed refresh icon functionality in Place Order section - manual refresh icon now properly updates Real balance display according to current user balance from database with spinning animation and proper state management
 - June 27, 2025. Removed refresh icon from Place Order section and implemented real-time balance synchronization - home page balance now automatically updates when orders are placed in trading section, both sections display availableBalance and sync through React Query cache
 - June 27, 2025. Implemented real-time cryptocurrency price integration using CoinGecko API - replaced static backend prices with live market data for BTC, ETH, DOGE, LTC, CHZ, BCH and other cryptocurrencies including 24-hour price changes and trend indicators, automatically updates prices throughout the application
+- June 27, 2025. Enhanced automatic price refresh system with 1-minute intervals - cryptocurrency prices now automatically update every 60 seconds across all components including home page and trading pages, added visual live indicators with pulsing green dots to show real-time data status, prices continue updating even when browser is in background
 
 ## User Preferences
 

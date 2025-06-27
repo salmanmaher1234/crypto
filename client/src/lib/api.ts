@@ -178,6 +178,8 @@ export function useCreateBankAccount() {
 export function useCryptoPrices() {
   return useQuery({
     queryKey: ["/api/crypto-prices"],
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 60000, // Refetch every 1 minute (60 seconds)
+    refetchIntervalInBackground: true, // Continue refetching when window is in background
+    staleTime: 0, // Always consider data stale to ensure fresh updates
   });
 }

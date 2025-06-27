@@ -329,7 +329,11 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <h1 className="text-xl font-bold">{currentCrypto.name}</h1>
-        <div></div>
+        {/* Live Price Indicator */}
+        <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-3 py-1">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-xs text-green-700 font-medium">Live</span>
+        </div>
       </div>
 
       {/* Price Info */}
