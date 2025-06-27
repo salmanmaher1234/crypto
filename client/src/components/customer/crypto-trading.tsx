@@ -372,60 +372,246 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
             </div>
             
             {/* Chart Area */}
-            <div className="h-full w-full relative">
+            <div className="h-full w-full relative bg-gray-900">
               {chartType === "candlestick" ? (
-                <div className="h-full flex items-end justify-around px-4 pb-4 pt-12">
-                  {/* Candlestick Simulation */}
-                  {Array.from({ length: 20 }, (_, i) => {
-                    const height = Math.random() * 60 + 20 + (chartKey % 10);
-                    const isGreen = (Math.random() + chartKey * 0.1) > 0.5;
-                    return (
-                      <div key={i} className="flex flex-col items-center space-y-1">
-                        <div 
-                          className={`w-1 ${isGreen ? 'bg-green-500' : 'bg-red-500'}`}
-                          style={{ height: `${height}px` }}
-                        />
-                        <div 
-                          className={`w-3 border-2 ${isGreen ? 'border-green-500 bg-green-100' : 'border-red-500 bg-red-100'}`}
-                          style={{ height: `${Math.random() * 20 + 10}px` }}
-                        />
-                      </div>
-                    );
-                  })}
+                <div className="h-full w-full relative">
+                  {/* Price Grid and Labels */}
+                  <div className="absolute inset-0">
+                    <svg className="w-full h-full" viewBox="0 0 800 400">
+                      {/* Background Grid */}
+                      <defs>
+                        <pattern id="grid" width="40" height="20" patternUnits="userSpaceOnUse">
+                          <path d="M 40 0 L 0 0 0 20" fill="none" stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid)" />
+                      
+                      {/* Horizontal Price Lines */}
+                      {[...Array(8)].map((_, i) => {
+                        const y = 50 + (i * 40);
+                        const price = (parseFloat(currentCrypto.price) * (1.05 - i * 0.015)).toFixed(2);
+                        return (
+                          <g key={i}>
+                            <line x1="0" y1={y} x2="750" y2={y} stroke="#374151" strokeWidth="0.5" opacity="0.5"/>
+                            <text x="760" y={y + 4} fill="#9CA3AF" fontSize="10" textAnchor="start">
+                              {price}
+                            </text>
+                          </g>
+                        );
+                      })}
+                      
+                      {/* Candlesticks */}
+                      {Array.from({ length: 50 }, (_, i) => {
+                        const x = 20 + (i * 14);
+                        const basePrice = parseFloat(currentCrypto.price);
+                        const volatility = 0.02 + (chartKey % 5) * 0.005;
+                        
+                        // Generate OHLC data
+                        const open = basePrice * (0.998 + Math.sin(i * 0.3 + chartKey) * volatility);
+                        const close = open * (0.999 + Math.sin(i * 0.5 + chartKey * 1.1) * volatility);
+                        const high = Math.max(open, close) * (1 + Math.random() * volatility * 0.5);
+                        const low = Math.min(open, close) * (1 - Math.random() * volatility * 0.5);
+                        
+                        const isGreen = close > open;
+                        const color = isGreen ? "#10B981" : "#EF4444";
+                        const fillColor = isGreen ? "#10B981" : "#EF4444";
+                        
+                        // Scale to chart area
+                        const priceToY = (price) => 350 - ((price - basePrice * 0.97) / (basePrice * 0.06)) * 300;
+                        
+                        const highY = priceToY(high);
+                        const lowY = priceToY(low);
+                        const openY = priceToY(open);
+                        const closeY = priceToY(close);
+                        
+                        return (
+                          <g key={i}>
+                            {/* High-Low Line */}
+                            <line 
+                              x1={x + 4} 
+                              y1={highY} 
+                              x2={x + 4} 
+                              y2={lowY} 
+                              stroke={color} 
+                              strokeWidth="1"
+                            />
+                            {/* Candle Body */}
+                            <rect
+                              x={x}
+                              y={Math.min(openY, closeY)}
+                              width="8"
+                              height={Math.abs(closeY - openY) || 1}
+                              fill={fillColor}
+                              stroke={color}
+                              strokeWidth="1"
+                            />
+                          </g>
+                        );
+                      })}
+                      
+                      {/* Current Price Line */}
+                      <line 
+                        x1="0" 
+                        y1="200" 
+                        x2="750" 
+                        y2="200" 
+                        stroke="#F59E0B" 
+                        strokeWidth="1" 
+                        strokeDasharray="5,5"
+                      />
+                      <text x="760" y="204" fill="#F59E0B" fontSize="11" fontWeight="bold">
+                        {currentCrypto.price}
+                      </text>
+                    </svg>
+                  </div>
+                  
+                  {/* Volume Chart at Bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700">
+                    <div className="flex items-end justify-around h-full px-4 pb-2">
+                      {Array.from({ length: 50 }, (_, i) => {
+                        const height = Math.random() * 40 + 5 + (chartKey % 3) * 2;
+                        const isGreen = (Math.random() + chartKey * 0.1) > 0.5;
+                        return (
+                          <div 
+                            key={i}
+                            className={`w-2 ${isGreen ? 'bg-green-500' : 'bg-red-500'} opacity-60`}
+                            style={{ height: `${height}px` }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="absolute top-1 left-4 text-xs text-gray-400">Volume</div>
+                  </div>
+                  
+                  {/* Chart Crosshair */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-24 right-4 bg-gray-800 border border-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                      <div>O: {parseFloat(currentCrypto.price).toFixed(2)}</div>
+                      <div>H: {(parseFloat(currentCrypto.price) * 1.005).toFixed(2)}</div>
+                      <div>L: {(parseFloat(currentCrypto.price) * 0.995).toFixed(2)}</div>
+                      <div>C: {parseFloat(currentCrypto.price).toFixed(2)}</div>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="h-full relative">
-                  {/* Line Chart Simulation */}
-                  <svg className="w-full h-full" viewBox="0 0 400 200">
-                    <defs>
-                      <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#10b981', stopOpacity: 0.3 }} />
-                        <stop offset="100%" style={{ stopColor: '#10b981', stopOpacity: 0 }} />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d={`M 0 ${150 + (chartKey % 20)} Q 50 ${120 + (chartKey % 15)} 100 ${100 + (chartKey % 10)} T 200 ${80 + (chartKey % 25)} T 300 ${90 + (chartKey % 30)} T 400 ${70 + (chartKey % 20)}`}
-                      stroke="#10b981"
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                    <path
-                      d={`M 0 ${150 + (chartKey % 20)} Q 50 ${120 + (chartKey % 15)} 100 ${100 + (chartKey % 10)} T 200 ${80 + (chartKey % 25)} T 300 ${90 + (chartKey % 30)} T 400 ${70 + (chartKey % 20)} L 400 200 L 0 200 Z`}
-                      fill="url(#priceGradient)"
-                    />
-                  </svg>
+                <div className="h-full w-full relative bg-gray-900">
+                  {/* Price Grid and Labels for Line Chart */}
+                  <div className="absolute inset-0">
+                    <svg className="w-full h-full" viewBox="0 0 800 400">
+                      {/* Background Grid */}
+                      <defs>
+                        <pattern id="gridLine" width="40" height="20" patternUnits="userSpaceOnUse">
+                          <path d="M 40 0 L 0 0 0 20" fill="none" stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
+                        </pattern>
+                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" style={{ stopColor: '#10B981', stopOpacity: 0.3 }} />
+                          <stop offset="100%" style={{ stopColor: '#10B981', stopOpacity: 0 }} />
+                        </linearGradient>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#gridLine)" />
+                      
+                      {/* Horizontal Price Lines */}
+                      {[...Array(8)].map((_, i) => {
+                        const y = 50 + (i * 40);
+                        const price = (parseFloat(currentCrypto.price) * (1.05 - i * 0.015)).toFixed(2);
+                        return (
+                          <g key={i}>
+                            <line x1="0" y1={y} x2="750" y2={y} stroke="#374151" strokeWidth="0.5" opacity="0.5"/>
+                            <text x="760" y={y + 4} fill="#9CA3AF" fontSize="10" textAnchor="start">
+                              {price}
+                            </text>
+                          </g>
+                        );
+                      })}
+                      
+                      {/* Price Line */}
+                      <path
+                        d={`M 20 ${150 + (chartKey % 20)} 
+                           L 70 ${140 + (chartKey % 15)} 
+                           L 120 ${130 + (chartKey % 10)} 
+                           L 170 ${120 + (chartKey % 25)} 
+                           L 220 ${135 + (chartKey % 30)} 
+                           L 270 ${125 + (chartKey % 20)}
+                           L 320 ${115 + (chartKey % 35)}
+                           L 370 ${130 + (chartKey % 18)}
+                           L 420 ${120 + (chartKey % 22)}
+                           L 470 ${110 + (chartKey % 28)}
+                           L 520 ${125 + (chartKey % 32)}
+                           L 570 ${115 + (chartKey % 26)}
+                           L 620 ${105 + (chartKey % 24)}
+                           L 670 ${120 + (chartKey % 30)}
+                           L 720 ${110 + (chartKey % 20)}`}
+                        stroke="#10B981"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      
+                      {/* Fill Area */}
+                      <path
+                        d={`M 20 ${150 + (chartKey % 20)} 
+                           L 70 ${140 + (chartKey % 15)} 
+                           L 120 ${130 + (chartKey % 10)} 
+                           L 170 ${120 + (chartKey % 25)} 
+                           L 220 ${135 + (chartKey % 30)} 
+                           L 270 ${125 + (chartKey % 20)}
+                           L 320 ${115 + (chartKey % 35)}
+                           L 370 ${130 + (chartKey % 18)}
+                           L 420 ${120 + (chartKey % 22)}
+                           L 470 ${110 + (chartKey % 28)}
+                           L 520 ${125 + (chartKey % 32)}
+                           L 570 ${115 + (chartKey % 26)}
+                           L 620 ${105 + (chartKey % 24)}
+                           L 670 ${120 + (chartKey % 30)}
+                           L 720 ${110 + (chartKey % 20)}
+                           L 720 350 L 20 350 Z`}
+                        fill="url(#lineGradient)"
+                      />
+                      
+                      {/* Current Price Line */}
+                      <line 
+                        x1="0" 
+                        y1="200" 
+                        x2="750" 
+                        y2="200" 
+                        stroke="#F59E0B" 
+                        strokeWidth="1" 
+                        strokeDasharray="5,5"
+                      />
+                      <text x="760" y="204" fill="#F59E0B" fontSize="11" fontWeight="bold">
+                        {currentCrypto.price}
+                      </text>
+                    </svg>
+                  </div>
+                  
+                  {/* Volume Chart at Bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700">
+                    <div className="flex items-end justify-around h-full px-4 pb-2">
+                      {Array.from({ length: 50 }, (_, i) => {
+                        const height = Math.random() * 40 + 5 + (chartKey % 3) * 2;
+                        const isGreen = (Math.random() + chartKey * 0.1) > 0.5;
+                        return (
+                          <div 
+                            key={i}
+                            className={`w-2 ${isGreen ? 'bg-green-500' : 'bg-red-500'} opacity-60`}
+                            style={{ height: `${height}px` }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="absolute top-1 left-4 text-xs text-gray-400">Volume</div>
+                  </div>
+                  
+                  {/* Price Info */}
+                  <div className="absolute top-4 right-4 bg-gray-800 border border-gray-600 px-3 py-2 rounded text-sm text-gray-300">
+                    <div className="text-green-400 font-medium">
+                      {currentCrypto.price}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {currentCrypto.change}
+                    </div>
+                  </div>
                 </div>
               )}
-              
-              {/* Price Overlay */}
-              <div className="absolute bottom-3 right-3 bg-white dark:bg-gray-900 rounded px-2 py-1 text-sm border shadow-sm">
-                <span className="text-green-600 font-medium">
-                  {currentCrypto.price}
-                </span>
-                <span className="text-xs text-gray-500 ml-1">
-                  {currentCrypto.change}
-                </span>
-              </div>
             </div>
           </div>
         </CardContent>
