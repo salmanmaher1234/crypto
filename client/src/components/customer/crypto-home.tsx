@@ -183,14 +183,8 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                   >
                     <CardContent className="p-3">
                       <div className="text-center space-y-2">
-                        <div className="flex justify-center">
-                          <span className={`text-2xl text-${crypto.color}-500`}>
-                            {crypto.icon}
-                          </span>
-                        </div>
                         <div>
                           <p className="font-semibold text-sm text-center">{crypto.symbol}</p>
-                          <p className="text-xs text-gray-500 text-center">{crypto.name}</p>
                         </div>
                         
                         <div className="space-y-1">
