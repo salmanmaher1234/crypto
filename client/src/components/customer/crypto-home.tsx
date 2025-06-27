@@ -33,15 +33,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
     return () => clearInterval(interval);
   }, [sliderImages.length]);
 
-  // Auto-slide crypto boxes every 3 seconds
-  useEffect(() => {
-    const maxSlides = Math.ceil(cryptoData.length / 4);
-    const interval = setInterval(() => {
-      setCryptoSlideIndex((prev) => (prev + 1) % maxSlides);
-    }, 3000);
 
-    return () => clearInterval(interval);
-  }, [cryptoData.length]);
 
   const cryptoData = [
     {
@@ -105,6 +97,16 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       color: "blue"
     }
   ];
+
+  // Auto-slide crypto boxes every 3 seconds
+  useEffect(() => {
+    const maxSlides = Math.ceil(cryptoData.length / 4);
+    const interval = setInterval(() => {
+      setCryptoSlideIndex((prev) => (prev + 1) % maxSlides);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [cryptoData.length]);
 
   return (
     <div className="space-y-6">
