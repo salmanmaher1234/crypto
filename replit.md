@@ -102,6 +102,7 @@ Changelog:
 - June 27, 2025. Made home page content responsive at 1240px width with proper container max-width, responsive padding, scalable text sizes and adaptive grid layouts for crypto cards and investment banner
 - June 27, 2025. Implemented comprehensive responsive design across entire application - all components now adapt to 1240px layout with scalable text sizes, responsive icons, adaptive padding and spacing, flexible grid layouts, and mobile-optimized navigation for both customer and admin interfaces
 - June 27, 2025. Updated cryptocurrency prices to use static backend values and removed dollar signs from price display - all prices now match the provided image data with BTC at 107,314.24, ETH at 2,449.91, and other updated values without currency symbols
+- June 27, 2025. Enhanced crypto trading pages with proper cryptocurrency names in headers and dynamic volume labels - each currency shows its own symbol (e.g., "24H Volume(BTC)" for Bitcoin, "24H Volume(ETH)" for Ethereum)
 
 ## User Preferences
 

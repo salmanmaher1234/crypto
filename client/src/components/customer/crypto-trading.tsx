@@ -287,7 +287,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
                 <span className="font-medium">{currentCrypto.volume24h}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">24H Volume(BTC)</span>
+                <span className="text-gray-600">24H Volume({currency.split('/')[0]})</span>
                 <span className="font-medium">{currentCrypto.volumeBTC}</span>
               </div>
               <div className="flex justify-between">
