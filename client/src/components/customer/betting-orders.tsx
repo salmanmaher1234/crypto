@@ -4,10 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
-import { FileText, Copy, ChevronRight, ArrowLeft, Calendar } from "lucide-react";
+import { FileText, Copy, ChevronRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 // import { useToast } from "@/hooks/use-toast";
 
@@ -20,7 +19,6 @@ export function CustomerBettingOrders() {
   const [timeFilter, setTimeFilter] = useState("today");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailView, setShowDetailView] = useState(false);
-  const [showConditionalQuery, setShowConditionalQuery] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -38,41 +36,15 @@ export function CustomerBettingOrders() {
 
   // Handle time filter change
   const handleTimeFilterChange = (value: string) => {
-    if (value === "conditional") {
-      setShowConditionalQuery(true);
-    } else {
-      setTimeFilter(value);
-      // Only reset dates if switching away from conditional
-      if (timeFilter === "conditional") {
-        setStartDate("");
-        setEndDate("");
-      }
+    setTimeFilter(value);
+    // Reset dates when switching away from conditional
+    if (value !== "conditional") {
+      setStartDate("");
+      setEndDate("");
     }
   };
 
-  // Apply conditional query
-  const applyConditionalQuery = () => {
-    if (startDate && endDate) {
-      setTimeFilter("conditional");
-      setShowConditionalQuery(false);
-    }
-  };
 
-  // Cancel conditional query
-  const cancelConditionalQuery = () => {
-    setShowConditionalQuery(false);
-    // If no dates were set, revert to previous filter
-    if (!startDate || !endDate) {
-      setTimeFilter("today");
-    }
-  };
-
-  // Reset conditional query
-  const resetConditionalQuery = () => {
-    setStartDate("");
-    setEndDate("");
-    setTimeFilter("today");
-  };
 
 
 
@@ -243,9 +215,9 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
   return (
     <div className="p-4 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Order</h1>
-        <div className="flex items-center gap-2">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold">Order</h1>
           <Select value={timeFilter} onValueChange={handleTimeFilterChange}>
             <SelectTrigger className="w-32">
               <SelectValue />
@@ -260,17 +232,33 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
               <SelectItem value="conditional">Conditional Query</SelectItem>
             </SelectContent>
           </Select>
-          {timeFilter === "conditional" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetConditionalQuery}
-              className="text-xs px-3"
-            >
-              Reset
-            </Button>
-          )}
         </div>
+        
+        {/* Conditional Date Inputs */}
+        {timeFilter === "conditional" && (
+          <div className="space-y-2">
+            <div className="space-y-1">
+              <Label htmlFor="headerStartDate" className="text-sm text-gray-600">Start date</Label>
+              <Input
+                id="headerStartDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="headerEndDate" className="text-sm text-gray-600">End date</Label>
+              <Input
+                id="headerEndDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tab Navigation */}
@@ -398,62 +386,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
         )}
       </div>
 
-      {/* Conditional Query Dialog */}
-      <Dialog open={showConditionalQuery} onOpenChange={(open) => {
-        if (!open) {
-          cancelConditionalQuery();
-        }
-      }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Conditional Query
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 mb-4">
-            Select a date range to filter orders within specific time period.
-          </p>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">Start Date</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                placeholder="Select start date"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate">End Date</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                placeholder="Select end date"
-              />
-            </div>
-            <div className="flex gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={cancelConditionalQuery}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={applyConditionalQuery}
-                className="flex-1"
-                disabled={!startDate || !endDate}
-              >
-                Apply Filter
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }
