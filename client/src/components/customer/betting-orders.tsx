@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
-import { FileText, Copy, ChevronRight, ArrowLeft } from "lucide-react";
+import { FileText, Copy, ChevronRight, ArrowLeft, Calendar } from "lucide-react";
 import { format } from "date-fns";
 // import { useToast } from "@/hooks/use-toast";
 
@@ -17,6 +20,9 @@ export function CustomerBettingOrders() {
   const [timeFilter, setTimeFilter] = useState("today");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailView, setShowDetailView] = useState(false);
+  const [showConditionalQuery, setShowConditionalQuery] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   // Function to get payout percentage based on duration
   const getPayoutPercentage = (duration: number) => {
@@ -28,6 +34,25 @@ export function CustomerBettingOrders() {
       240: "60%"
     };
     return payoutMap[duration] || "30%"; // Default to 30% if duration not found
+  };
+
+  // Handle time filter change
+  const handleTimeFilterChange = (value: string) => {
+    if (value === "conditional") {
+      setShowConditionalQuery(true);
+    } else {
+      setTimeFilter(value);
+      setStartDate("");
+      setEndDate("");
+    }
+  };
+
+  // Apply conditional query
+  const applyConditionalQuery = () => {
+    if (startDate && endDate) {
+      setTimeFilter("conditional");
+      setShowConditionalQuery(false);
+    }
   };
 
 
@@ -75,6 +100,27 @@ export function CustomerBettingOrders() {
     let timeMatch = true;
     if (timeFilter === "today") {
       timeMatch = orderDate >= todayStart;
+    } else if (timeFilter === "yesterday") {
+      const yesterdayStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      yesterdayStart.setHours(0, 0, 0, 0);
+      const yesterdayEnd = new Date(yesterdayStart.getTime() + 24 * 60 * 60 * 1000);
+      timeMatch = orderDate >= yesterdayStart && orderDate < yesterdayEnd;
+    } else if (timeFilter === "week") {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      timeMatch = orderDate >= weekAgo;
+    } else if (timeFilter === "month") {
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      timeMatch = orderDate >= monthAgo;
+    } else if (timeFilter === "3months") {
+      const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      timeMatch = orderDate >= threeMonthsAgo;
+    } else if (timeFilter === "conditional" && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Include full end date
+      timeMatch = orderDate >= start && orderDate <= end;
+    } else if (timeFilter === "all") {
+      timeMatch = true;
     }
 
     return statusMatch && timeMatch;
@@ -180,14 +226,18 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Order</h1>
-        <Select value={timeFilter} onValueChange={setTimeFilter}>
-          <SelectTrigger className="w-24">
+        <Select value={timeFilter} onValueChange={handleTimeFilterChange}>
+          <SelectTrigger className="w-32">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
+            <SelectItem value="yesterday">Yesterday</SelectItem>
+            <SelectItem value="week">Last Week</SelectItem>
+            <SelectItem value="month">Last Month</SelectItem>
+            <SelectItem value="3months">Last 3 Months</SelectItem>
+            <SelectItem value="all">All Orders</SelectItem>
+            <SelectItem value="conditional">Conditional Query</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -316,6 +366,56 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
           </div>
         )}
       </div>
+
+      {/* Conditional Query Dialog */}
+      <Dialog open={showConditionalQuery} onOpenChange={setShowConditionalQuery}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Conditional Query
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="Select start date"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate">End Date</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="Select end date"
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowConditionalQuery(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={applyConditionalQuery}
+                className="flex-1"
+                disabled={!startDate || !endDate}
+              >
+                Apply Filter
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

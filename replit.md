@@ -107,6 +107,8 @@ Changelog:
 - June 27, 2025. Upgraded trading charts to professional Binance-style interface with dark theme, grid lines, price labels, OHLC candlesticks with proper high/low wicks, volume indicators at bottom, current price line markers, and real-time data visualization for both candlestick and line chart modes
 - June 27, 2025. Fixed order placement redirect issue - users now stay on the trading page after placing orders instead of being redirected to home page, allowing continuous trading on the same cryptocurrency
 - June 27, 2025. Fixed balance update display issue - frontend now properly refreshes user balance after each order placement, ensuring real-time balance changes are visible after every transaction
+- June 27, 2025. Enhanced Orders section with comprehensive time filtering system - added Today, Yesterday, Last Week, Last Month, Last 3 Months, All Orders, and Conditional Query options with date picker dialog for custom date range selection
+- June 27, 2025. Fixed navigation issue from cryptocurrency trading pages - bottom navigation tabs now properly clear crypto view state when clicked, allowing seamless navigation between all sections
 
 ## User Preferences
 
