@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateBettingOrder } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
-import { ArrowLeft, TrendingUp, TrendingDown, BarChart3, Clock } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, BarChart3, Clock, RefreshCw } from "lucide-react";
 
 interface CryptoTradingProps {
   currency: string;
@@ -29,6 +29,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   const [selectedChartPeriod, setSelectedChartPeriod] = useState("1m");
   const [chartType, setChartType] = useState<"candlestick" | "line">("candlestick");
   const [chartKey, setChartKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Real-time chart update effect
   useEffect(() => {
@@ -43,6 +44,22 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   useEffect(() => {
     setChartKey(prev => prev + 1);
   }, [selectedChartPeriod, chartType]);
+
+  // Manual refresh balance function
+  const handleManualRefresh = async () => {
+    if (user && !isRefreshing) {
+      setIsRefreshing(true);
+      try {
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        // Add a small delay to show the refresh animation
+        setTimeout(() => {
+          setIsRefreshing(false);
+        }, 500);
+      } catch (error) {
+        setIsRefreshing(false);
+      }
+    }
+  };
 
   const cryptoData: { [key: string]: any } = {
     "BTC": {
@@ -682,11 +699,23 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
             <DialogTitle>Place Order</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="text-sm">
-              <span className="text-gray-600">Real available balance: </span>
-              <span className="font-medium">
-                {parseFloat(user?.availableBalance || user?.balance || "0").toFixed(0)}
-              </span>
+            <div className="text-sm flex items-center justify-between">
+              <div>
+                <span className="text-gray-600">Real available balance: </span>
+                <span className="font-medium">
+                  {parseFloat(user?.availableBalance || user?.balance || "0").toFixed(0)}
+                </span>
+              </div>
+              <button
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                className="text-gray-500 hover:text-gray-700 p-1"
+                title="Refresh balance"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+              </button>
             </div>
 
             {/* Period Selection */}
