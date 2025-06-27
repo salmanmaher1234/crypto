@@ -118,7 +118,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Image Slider */}
       <Card className="overflow-hidden">
-        <div className="relative h-48">
+        <div className="relative h-32 sm:h-40 md:h-48 lg:h-56">
           {sliderImages.map((image, index) => (
             <div
               key={index}
@@ -129,13 +129,13 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
               <img 
                 src={image} 
                 alt={`Slide ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
               />
             </div>
           ))}
           
           {/* Slide indicators */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
             {sliderImages.map((_, index) => (
               <button
                 key={index}
