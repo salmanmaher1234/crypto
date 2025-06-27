@@ -18,6 +18,18 @@ export function CustomerBettingOrders() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailView, setShowDetailView] = useState(false);
 
+  // Function to get payout percentage based on duration
+  const getPayoutPercentage = (duration: number) => {
+    const payoutMap: { [key: number]: string } = {
+      30: "20%",
+      60: "30%", 
+      120: "40%",
+      180: "50%",
+      240: "60%"
+    };
+    return payoutMap[duration] || "30%"; // Default to 30% if duration not found
+  };
+
 
 
   // Filter orders for current user
@@ -261,7 +273,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Scale</td>
-                              <td className="font-medium text-sm py-1">{order.duration}s</td>
+                              <td className="font-medium text-sm py-1">{order.duration}s ({getPayoutPercentage(order.duration)})</td>
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Billing Time</td>
