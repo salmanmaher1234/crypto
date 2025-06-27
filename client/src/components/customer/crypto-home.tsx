@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronRight, TrendingUp, TrendingDown, RotateCcw, ChevronLeft } from "lucide-react";
+import { ChevronRight, TrendingUp, TrendingDown, RotateCcw, ChevronLeft, RefreshCw } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CryptoHomeProps {
   onSelectCurrency: (currency: string) => void;
@@ -13,10 +14,12 @@ interface CryptoHomeProps {
 }
 
 export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHomeProps) {
-  const { data: cryptoPrices, refetch } = useCryptoPrices();
+  const { data: cryptoPrices } = useCryptoPrices();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [cryptoSlideIndex, setCryptoSlideIndex] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Slider images
   const sliderImages = [
@@ -32,6 +35,33 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
     return () => clearInterval(interval);
   }, [sliderImages.length]);
+
+  // Auto-refresh balance every 2 minutes (120 seconds)
+  useEffect(() => {
+    const balanceRefreshInterval = setInterval(() => {
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      }
+    }, 120000); // 2 minutes
+
+    return () => clearInterval(balanceRefreshInterval);
+  }, [user, queryClient]);
+
+  // Manual refresh balance function
+  const handleManualRefresh = async () => {
+    if (user && !isRefreshing) {
+      setIsRefreshing(true);
+      try {
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        // Add a small delay to show the refresh animation
+        setTimeout(() => {
+          setIsRefreshing(false);
+        }, 500);
+      } catch (error) {
+        setIsRefreshing(false);
+      }
+    }
+  };
 
 
 
@@ -182,8 +212,21 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         <div className="flex-1 text-center">
           <h1 className="text-xl font-bold">Home</h1>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-600">1393050</p>
+        <div className="text-right flex items-center gap-2">
+          <p className="text-sm text-gray-600">
+            {user?.balance ? parseFloat(user.balance).toLocaleString() : '0'}
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="p-1 h-6 w-6"
+          >
+            <RefreshCw 
+              className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} 
+            />
+          </Button>
         </div>
       </div>
 
