@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,22 @@ interface CryptoHomeProps {
 export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHomeProps) {
   const { data: cryptoPrices, refetch } = useCryptoPrices();
   const { user } = useAuth();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Slider images
+  const sliderImages = [
+    "/api/placeholder/400/200",
+    "/api/placeholder/400/200"
+  ];
+
+  // Auto-slide every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [sliderImages.length]);
 
   const cryptoData = [
     {
@@ -100,33 +116,37 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </div>
 
-      {/* Crypto Exchange Banner */}
-      <Card className="bg-gradient-to-r from-purple-600 to-blue-600 text-white overflow-hidden">
-        <CardContent className="p-6 relative">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h2 className="text-lg font-bold">What is a</h2>
-              <h2 className="text-2xl font-bold">Crypto</h2>
-              <h2 className="text-2xl font-bold">Exchange</h2>
+      {/* Image Slider */}
+      <Card className="overflow-hidden">
+        <div className="relative h-48">
+          {sliderImages.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <img 
+                src={image} 
+                alt={`Slide ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <div className="flex space-x-2">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-yellow-300 text-xl">₿</span>
-              </div>
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-blue-300 text-xl">⧫</span>
-              </div>
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-blue-300 text-xl">₮</span>
-              </div>
-            </div>
+          ))}
+          
+          {/* Slide indicators */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            {sliderImages.map((_, index) => (
+              <button
+                key={index}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  index === currentSlide ? 'bg-white' : 'bg-white/50'
+                }`}
+                onClick={() => setCurrentSlide(index)}
+              />
+            ))}
           </div>
-          <div className="flex space-x-1 mt-4">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
-            <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-            <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-          </div>
-        </CardContent>
+        </div>
       </Card>
 
       {/* Quick Stats Cards */}
