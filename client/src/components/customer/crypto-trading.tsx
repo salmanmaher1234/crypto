@@ -13,9 +13,10 @@ import { ArrowLeft, TrendingUp, TrendingDown, BarChart3, Clock } from "lucide-re
 interface CryptoTradingProps {
   currency: string;
   onBack: () => void;
+  onOrderPlaced?: () => void;
 }
 
-export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
+export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTradingProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const createBettingOrder = useCreateBettingOrder();
@@ -275,7 +276,11 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         });
         setShowOrderDialog(false);
         setOrderAmount("");
-        // Stay on trading page after successful order placement
+        
+        // Redirect to Orders tab if callback is provided
+        if (onOrderPlaced) {
+          onOrderPlaced();
+        }
       },
       onError: () => {
         toast({

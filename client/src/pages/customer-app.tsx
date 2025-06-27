@@ -32,6 +32,10 @@ export default function CustomerApp() {
         <CryptoTrading 
           currency={selectedCurrency}
           onBack={() => setSelectedCurrency(null)}
+          onOrderPlaced={() => {
+            setSelectedCurrency(null);
+            setActiveSection("orders");
+          }}
         />
       );
     }
