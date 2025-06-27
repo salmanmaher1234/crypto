@@ -210,34 +210,49 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </div>
 
-      {/* Market Overview Chart Area */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium">Market Overview</h3>
-            <div className="flex space-x-2">
-              <div className="flex items-center space-x-1 text-green-600">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">+12.8</span>
+      {/* Investment Banner */}
+      <div className="relative">
+        <div 
+          className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 rounded-xl p-6 text-white relative overflow-hidden"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        >
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-32 h-32 opacity-20">
+            <svg viewBox="0 0 100 100" className="w-full h-full">
+              <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="2" fill="none" />
+              <circle cx="50" cy="50" r="25" stroke="currentColor" strokeWidth="1.5" fill="none" />
+              <circle cx="50" cy="50" r="10" stroke="currentColor" strokeWidth="1" fill="none" />
+            </svg>
+          </div>
+          
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold">SuperCoin Investment</h2>
+              <p className="text-blue-100 max-w-md">
+                Start your crypto journey with professional trading tools and real-time market data
+              </p>
+              <div className="flex items-center space-x-4 mt-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-green-100">Live Market Data</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-yellow-100">24/7 Trading</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-1 text-red-600">
-                <TrendingDown className="w-4 h-4" />
-                <span className="text-sm">-5.2</span>
+            </div>
+            
+            <div className="hidden md:block">
+              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <TrendingUp className="w-10 h-10 text-green-400" />
               </div>
             </div>
           </div>
-          <div className="h-24 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/30 to-transparent transform skew-x-12"></div>
-            <span className="text-gray-600 text-sm">Market Chart Visualization</span>
-          </div>
-          <div className="flex justify-center space-x-4 mt-4 text-sm text-gray-600">
-            <span>Litecoin</span>
-            <span>Bitcoin</span>
-            <span>Ripple</span>
-            <span>Ethereum</span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Currency List */}
       <div className="space-y-3">
