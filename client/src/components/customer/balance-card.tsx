@@ -10,19 +10,19 @@ export function BalanceCard() {
   const tradingBalance = balance - availableBalance;
 
   return (
-    <div className="bg-gradient-to-r from-primary to-accent p-6 text-white">
+    <div className="bg-gradient-to-r from-primary to-accent p-4 sm:p-6 lg:p-8 text-white">
       <div className="text-center">
-        <div className="text-sm opacity-90 mb-1">Total Balance</div>
-        <div className="text-3xl font-bold mb-4">${balance.toFixed(2)}</div>
+        <div className="text-sm sm:text-base opacity-90 mb-1 sm:mb-2">Total Balance</div>
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">${balance.toFixed(2)}</div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white bg-opacity-20 rounded-lg p-3">
-            <div className="text-xs opacity-90">Available</div>
-            <div className="text-lg font-semibold">${availableBalance.toFixed(2)}</div>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-white bg-opacity-20 rounded-lg p-3 sm:p-4">
+            <div className="text-xs sm:text-sm opacity-90">Available</div>
+            <div className="text-base sm:text-lg lg:text-xl font-semibold">${availableBalance.toFixed(2)}</div>
           </div>
-          <div className="bg-white bg-opacity-20 rounded-lg p-3">
-            <div className="text-xs opacity-90">In Trading</div>
-            <div className="text-lg font-semibold">${tradingBalance.toFixed(2)}</div>
+          <div className="bg-white bg-opacity-20 rounded-lg p-3 sm:p-4">
+            <div className="text-xs sm:text-sm opacity-90">In Trading</div>
+            <div className="text-base sm:text-lg lg:text-xl font-semibold">${tradingBalance.toFixed(2)}</div>
           </div>
         </div>
       </div>

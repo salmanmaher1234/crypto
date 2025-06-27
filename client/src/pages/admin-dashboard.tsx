@@ -47,28 +47,28 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
-        <div className="p-6 border-b">
-          <h1 className="text-xl font-bold text-gray-900">CryptoInvest Admin</h1>
-          <p className="text-sm text-gray-600">Management Dashboard</p>
+      <div className="w-48 sm:w-56 lg:w-64 bg-white shadow-lg">
+        <div className="p-4 sm:p-5 lg:p-6 border-b">
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900">SuperCoin Admin</h1>
+          <p className="text-xs sm:text-sm text-gray-600">Management Dashboard</p>
         </div>
         
         <nav className="mt-6">
-          <div className="px-4 space-y-2">
+          <div className="px-2 sm:px-3 lg:px-4 space-y-2">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                  className={`w-full flex items-center px-3 sm:px-4 py-2 sm:py-3 text-left rounded-lg transition-colors text-sm sm:text-base ${
                     activeSection === section.id
                       ? "bg-primary text-white"
                       : "text-gray-700 hover:bg-primary hover:text-white"
                   }`}
                 >
-                  <Icon className="w-5 h-5 mr-3" />
-                  {section.label}
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
+                  <span className="truncate">{section.label}</span>
                 </button>
               );
             })}
@@ -77,41 +77,45 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b p-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-900">{getSectionTitle()}</h2>
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => setLocation("/customer")}
-                className="flex items-center space-x-2"
-              >
-                <Smartphone className="w-4 h-4" />
-                <span>Customer View</span>
-              </Button>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
-                  {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </div>
-                <span className="text-gray-700">{user?.name || user?.username}</span>
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="w-full max-w-[1240px] mx-auto flex flex-col flex-1">
+          {/* Header */}
+          <div className="bg-white shadow-sm border-b p-4 sm:p-5 lg:p-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{getSectionTitle()}</h2>
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <Button
-                  variant="ghost"
+                  variant="outline"
+                  onClick={() => setLocation("/customer")}
+                  className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
                   size="sm"
-                  onClick={() => logout()}
-                  className="ml-2"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <Smartphone className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Customer View</span>
+                  <span className="sm:hidden">Customer</span>
                 </Button>
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs sm:text-sm font-medium">
+                    {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <span className="text-gray-700 text-sm sm:text-base hidden md:inline truncate">{user?.name || user?.username}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => logout()}
+                    className="ml-1 sm:ml-2"
+                  >
+                    <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-auto">
-          {renderSection()}
+          {/* Content */}
+          <div className="flex-1 overflow-auto">
+            {renderSection()}
+          </div>
         </div>
       </div>
     </div>

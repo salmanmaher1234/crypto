@@ -68,25 +68,25 @@ export default function CustomerApp() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="px-4 py-3">
+        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-3">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm sm:text-base font-medium mr-3">
                 {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-900">{user?.name || user?.username}</div>
-                <div className="text-xs text-gray-500">Welcome back</div>
+                <div className="text-sm sm:text-base font-medium text-gray-900">{user?.name || user?.username}</div>
+                <div className="text-xs sm:text-sm text-gray-500">Welcome back</div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               {user?.role === "admin" && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setLocation("/admin")}
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               )}
               <Button
@@ -94,7 +94,7 @@ export default function CustomerApp() {
                 size="sm"
                 onClick={() => logout()}
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </div>
           </div>
@@ -102,30 +102,34 @@ export default function CustomerApp() {
       </header>
 
       {/* Main Content */}
-      <main className="pb-20">
-        {renderSection()}
+      <main className="pb-20 lg:pb-24">
+        <div className="w-full max-w-[1240px] mx-auto">
+          {renderSection()}
+        </div>
       </main>
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="grid grid-cols-5 py-2">
-          {sections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={`flex flex-col items-center py-2 px-1 ${
-                  activeSection === section.id
-                    ? "text-primary"
-                    : "text-gray-500"
-                }`}
-              >
-                <Icon className="w-4 h-4 mb-1" />
-                <span className="text-xs">{section.label}</span>
-              </button>
-            );
-          })}
+        <div className="w-full max-w-[1240px] mx-auto">
+          <div className="grid grid-cols-5 py-2">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`flex flex-col items-center py-2 px-1 ${
+                    activeSection === section.id
+                      ? "text-primary"
+                      : "text-gray-500"
+                  }`}
+                >
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+                  <span className="text-xs sm:text-sm">{section.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </nav>
     </div>

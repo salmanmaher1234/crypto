@@ -56,16 +56,16 @@ export function TradingInterface() {
   const assets = prices ? Object.keys(prices) : ["BTC/USD", "ETH/USD"];
 
   return (
-    <div className="p-4">
+    <div className="p-4 sm:p-6 lg:p-8">
       <Card>
         <CardHeader>
-          <CardTitle>Quick Trade</CardTitle>
+          <CardTitle className="text-lg sm:text-xl lg:text-2xl">Quick Trade</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 sm:space-y-6">
           {/* Asset Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Select Asset</label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Select Asset</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {assets.map((asset) => {
                 const priceData = prices?.[asset];
                 const isSelected = selectedAsset === asset;
@@ -73,19 +73,19 @@ export function TradingInterface() {
                   <button
                     key={asset}
                     onClick={() => setSelectedAsset(asset)}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
+                    className={`p-3 sm:p-4 rounded-lg border-2 transition-colors ${
                       isSelected
                         ? "border-primary bg-blue-50"
                         : "border-gray-300 hover:border-gray-400"
                     }`}
                   >
-                    <div className="font-medium text-gray-900">{asset}</div>
-                    <div className={`text-sm ${
+                    <div className="font-medium text-gray-900 text-sm sm:text-base">{asset}</div>
+                    <div className={`text-sm sm:text-base ${
                       priceData?.changeType === "positive" ? "text-success" : "text-destructive"
                     }`}>
                       ${priceData?.price || "0"}
                     </div>
-                    <div className={`text-xs ${
+                    <div className={`text-xs sm:text-sm ${
                       priceData?.changeType === "positive" ? "text-success" : "text-destructive"
                     }`}>
                       {priceData?.change || "0%"}
@@ -98,7 +98,7 @@ export function TradingInterface() {
 
           {/* Amount Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Investment Amount</label>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Investment Amount</label>
             <Input
               type="number"
               placeholder="Enter amount"
@@ -106,18 +106,19 @@ export function TradingInterface() {
               onChange={(e) => setAmount(e.target.value)}
               min="1"
               step="0.01"
+              className="text-sm sm:text-base"
             />
           </div>
 
           {/* Duration Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Trading Duration</label>
-            <div className="grid grid-cols-5 gap-2">
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Trading Duration</label>
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {durations.map((d) => (
                 <button
                   key={d}
                   onClick={() => setDuration(d)}
-                  className={`py-2 px-3 text-sm rounded-lg border-2 transition-colors ${
+                  className={`py-2 px-2 sm:px-3 text-xs sm:text-sm rounded-lg border-2 transition-colors ${
                     duration === d
                       ? "border-primary bg-blue-50"
                       : "border-gray-300 hover:border-gray-400"
@@ -130,24 +131,24 @@ export function TradingInterface() {
           </div>
 
           {/* Direction Buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Button
               onClick={() => handleTrade("Buy Up")}
               disabled={createOrder.isPending}
-              className="bg-success hover:bg-success/90 text-success-foreground h-16 flex flex-col"
+              className="bg-success hover:bg-success/90 text-success-foreground h-16 sm:h-20 flex flex-col"
             >
-              <TrendingUp className="w-5 h-5 mb-1" />
-              <div className="font-medium">Buy Up</div>
-              <div className="text-xs opacity-90">Price will rise</div>
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 mb-1" />
+              <div className="font-medium text-sm sm:text-base">Buy Up</div>
+              <div className="text-xs sm:text-sm opacity-90">Price will rise</div>
             </Button>
             <Button
               onClick={() => handleTrade("Buy Down")}
               disabled={createOrder.isPending}
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-16 flex flex-col"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-16 sm:h-20 flex flex-col"
             >
-              <TrendingDown className="w-5 h-5 mb-1" />
-              <div className="font-medium">Buy Down</div>
-              <div className="text-xs opacity-90">Price will fall</div>
+              <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 mb-1" />
+              <div className="font-medium text-sm sm:text-base">Buy Down</div>
+              <div className="text-xs sm:text-sm opacity-90">Price will fall</div>
             </Button>
           </div>
         </CardContent>

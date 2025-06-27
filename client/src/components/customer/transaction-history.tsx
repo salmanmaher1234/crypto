@@ -99,35 +99,35 @@ export function TransactionHistory() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 sm:p-6 lg:p-8">
       <Card>
         <CardHeader>
-          <CardTitle>Recent Transactions</CardTitle>
+          <CardTitle className="text-lg sm:text-xl lg:text-2xl">Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent>
           {!transactions || transactions.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
-              <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>No transactions yet</p>
+              <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 opacity-50" />
+              <p className="text-sm sm:text-base">No transactions yet</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 sm:space-y-4">
               {transactions.slice(0, 10).map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between py-2">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                <div key={transaction.id} className="flex items-center justify-between py-2 sm:py-3">
+                  <div className="flex items-center min-w-0 flex-1">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                       {getTransactionIcon(transaction.type)}
                     </div>
-                    <div>
-                      <div className="font-medium text-gray-900">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900 text-sm sm:text-base truncate">
                         {getTransactionLabel(transaction.type)}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-xs sm:text-sm text-gray-500">
                         {new Date(transaction.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
-                  <div className={`font-medium ${getAmountColor(transaction.type)}`}>
+                  <div className={`font-medium text-sm sm:text-base flex-shrink-0 ml-2 ${getAmountColor(transaction.type)}`}>
                     {getAmountPrefix(transaction.type)}${parseFloat(transaction.amount).toFixed(2)}
                   </div>
                 </div>
