@@ -219,76 +219,81 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
             <div className="w-8 h-8 bg-yellow-400 rounded-full mt-4"></div>
           </div>
         ) : (
-          <div className="space-y-3">
-            {filteredOrders.map((order) => {
-              const orderNumber = `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
-              const profit = order.result === "win" ? parseFloat(order.amount) * 0.8 : 
-                           order.result === "loss" ? -parseFloat(order.amount) : 100;
-              const isProfit = profit > 0;
-              
-              return (
-                <Card key={order.id} className="bg-white border border-gray-200">
-                  <CardContent className="p-4">
-                    {/* 3-Column Layout */}
-                    <div className="grid grid-cols-3 gap-4 items-center">
-                      {/* Column 1: Labels */}
-                      <div className="space-y-3">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Currency</div>
-                          <div className="text-xs text-gray-500 mb-1">Order No.</div>
-                          <div className="text-xs text-gray-500 mb-1">Order Amount</div>
-                          <div className="text-xs text-gray-500 mb-1">Profit Amount</div>
-                          <div className="text-xs text-gray-500 mb-1">Buy Direction</div>
-                          <div className="text-xs text-gray-500 mb-1">Scale</div>
-                          <div className="text-xs text-gray-500 mb-1">Billing Time</div>
-                          <div className="text-xs text-gray-500 mb-1">Order Time</div>
-                        </div>
-                      </div>
-                      
-                      {/* Column 2: Values */}
-                      <div className="space-y-3">
-                        <div>
-                          <div className="font-medium text-sm mb-2">{order.asset}/USDT</div>
-                          <div className="font-medium text-xs mb-2">{orderNumber}</div>
-                          <div className="font-medium text-sm mb-2">{order.amount}</div>
-                          <div className={`font-medium text-sm mb-2 ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order No.</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Buy Direction</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scale</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Time</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredOrders.map((order) => {
+                    const orderNumber = `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
+                    const profit = order.result === "win" ? parseFloat(order.amount) * 0.8 : 
+                               order.result === "loss" ? -parseFloat(order.amount) : 100;
+                    const isProfit = profit > 0;
+                    
+                    return (
+                      <tr key={order.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {order.asset}/USDT
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {orderNumber}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {order.amount}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                          <span className={isProfit ? 'text-red-500' : 'text-green-500'}>
                             {isProfit ? '+' : ''}{profit.toFixed(0)}
-                          </div>
-                          <div className={`font-medium text-sm mb-2 ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm">
+                          <span className={order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}>
                             {order.direction}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {order.duration}s
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-blue-600 text-xs h-auto px-2 py-1"
+                              onClick={() => copyOrderDetails(order)}
+                            >
+                              Copy
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-gray-400 hover:text-gray-600 h-8 w-8 p-0"
+                              onClick={() => openDetailView(order)}
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </Button>
                           </div>
-                          <div className="font-medium text-sm mb-2">{order.duration}s</div>
-                          <div className="font-medium text-sm mb-2">{order.duration}s</div>
-                          <div className="font-medium text-sm">
-                            {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Column 3: Actions */}
-                      <div className="flex flex-col items-end space-y-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-blue-600 text-xs h-auto p-1"
-                          onClick={() => copyOrderDetails(order)}
-                        >
-                          Copy
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-400 hover:text-gray-600 h-6 w-6 p-0"
-                          onClick={() => openDetailView(order)}
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
