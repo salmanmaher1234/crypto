@@ -482,13 +482,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
                     onClick={() => setSelectedPeriod(period.value)}
                   >
                     <div>{period.label}</div>
-                    <div className={
-                      period.value === "120s" || period.value === "180s" 
-                        ? "text-red-500" 
-                        : period.value === "240s"
-                        ? "text-gray-600"
-                        : ""
-                    }>
+                    <div className="text-red-500">
                       {period.payout}
                     </div>
                   </Button>
