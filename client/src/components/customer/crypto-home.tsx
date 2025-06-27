@@ -82,7 +82,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center justify-between">
         <Avatar 
           className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
           onClick={onNavigateToProfile}
@@ -92,8 +92,10 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
             {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
           </AvatarFallback>
         </Avatar>
-        <div>
+        <div className="flex-1 text-center">
           <h1 className="text-xl font-bold">Home</h1>
+        </div>
+        <div className="text-right">
           <p className="text-sm text-gray-600">1393050</p>
         </div>
       </div>
