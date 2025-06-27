@@ -19,8 +19,8 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
   // Slider images
   const sliderImages = [
-    "/api/placeholder/400/200",
-    "/api/placeholder/400/200"
+    "/slider-banner-1.svg",
+    "/slider-banner-2.svg"
   ];
 
   // Auto-slide every 5 seconds
