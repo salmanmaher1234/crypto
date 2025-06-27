@@ -229,40 +229,56 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
               return (
                 <Card key={order.id} className="bg-white border border-gray-200">
                   <CardContent className="p-4">
-                    {/* 3-Column Layout */}
-                    <div className="grid grid-cols-3 gap-6">
-                      {/* Column 1: Labels */}
-                      <div className="space-y-3">
-                        <div className="text-xs text-gray-500">Currency</div>
-                        <div className="text-xs text-gray-500">Order No.</div>
-                        <div className="text-xs text-gray-500">Order Amount</div>
-                        <div className="text-xs text-gray-500">Profit Amount</div>
-                        <div className="text-xs text-gray-500">Buy Direction</div>
-                        <div className="text-xs text-gray-500">Scale</div>
-                        <div className="text-xs text-gray-500">Billing Time</div>
-                        <div className="text-xs text-gray-500">Order Time</div>
+                    {/* Table Layout without borders */}
+                    <div className="flex">
+                      {/* Left side: Data table */}
+                      <div className="flex-1">
+                        <table className="w-full">
+                          <tbody>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4 w-24">Currency</td>
+                              <td className="font-medium text-sm py-1">{order.asset}/USDT</td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Order No.</td>
+                              <td className="font-medium text-xs py-1">{orderNumber}</td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Order Amount</td>
+                              <td className="font-medium text-sm py-1">{order.amount}</td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Profit Amount</td>
+                              <td className={`font-medium text-sm py-1 ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
+                                {isProfit ? '+' : ''}{profit.toFixed(0)}
+                              </td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Buy Direction</td>
+                              <td className={`font-medium text-sm py-1 ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
+                                {order.direction}
+                              </td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Scale</td>
+                              <td className="font-medium text-sm py-1">{order.duration}s</td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Billing Time</td>
+                              <td className="font-medium text-sm py-1">{order.duration}s</td>
+                            </tr>
+                            <tr className="h-8">
+                              <td className="text-xs text-gray-500 py-1 pr-4">Order Time</td>
+                              <td className="font-medium text-sm py-1">
+                                {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                       
-                      {/* Column 2: Values */}
-                      <div className="space-y-3">
-                        <div className="font-medium text-sm">{order.asset}/USDT</div>
-                        <div className="font-medium text-xs">{orderNumber}</div>
-                        <div className="font-medium text-sm">{order.amount}</div>
-                        <div className={`font-medium text-sm ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
-                          {isProfit ? '+' : ''}{profit.toFixed(0)}
-                        </div>
-                        <div className={`font-medium text-sm ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
-                          {order.direction}
-                        </div>
-                        <div className="font-medium text-sm">{order.duration}s</div>
-                        <div className="font-medium text-sm">{order.duration}s</div>
-                        <div className="font-medium text-sm">
-                          {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
-                        </div>
-                      </div>
-                      
-                      {/* Column 3: Actions */}
-                      <div className="flex flex-col items-end space-y-2">
+                      {/* Right side: Actions */}
+                      <div className="flex flex-col items-end justify-start space-y-2 ml-4">
                         <Button
                           variant="ghost"
                           size="sm"
