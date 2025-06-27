@@ -39,62 +39,74 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
     {
       symbol: "BTC/USDT",
       name: "Bitcoin",
-      price: cryptoPrices?.["BTC/USD"]?.price || "105445.41",
-      change: cryptoPrices?.["BTC/USD"]?.change || "+0.45%",
-      changeValue: "+470.19",
-      isPositive: true,
+      price: cryptoPrices?.["BTC/USD"]?.price || "42150.00",
+      change: cryptoPrices?.["BTC/USD"]?.change || "+2.4%",
+      isPositive: cryptoPrices?.["BTC/USD"]?.change ? !cryptoPrices["BTC/USD"].change.startsWith('-') : true,
       icon: "₿",
       color: "orange"
     },
     {
       symbol: "ETH/USDT", 
       name: "Ethereum",
-      price: "2513.72",
-      change: "+0.80%",
-      changeValue: "+20.15",
-      isPositive: true,
+      price: cryptoPrices?.["ETH/USD"]?.price || "2850.00",
+      change: cryptoPrices?.["ETH/USD"]?.change || "-1.2%",
+      isPositive: cryptoPrices?.["ETH/USD"]?.change ? !cryptoPrices["ETH/USD"].change.startsWith('-') : false,
       icon: "⧫",
       color: "blue"
     },
     {
       symbol: "DOGE/USDT",
       name: "Dogecoin", 
-      price: "0.18371",
-      change: "-1.26%",
-      changeValue: "-0.0023",
-      isPositive: false,
+      price: cryptoPrices?.["DOGE/USD"]?.price || "0.18",
+      change: cryptoPrices?.["DOGE/USD"]?.change || "-1.3%",
+      isPositive: cryptoPrices?.["DOGE/USD"]?.change ? !cryptoPrices["DOGE/USD"].change.startsWith('-') : false,
       icon: "Ð",
       color: "yellow"
     },
     {
-      symbol: "CHZ/USDT",
-      name: "Chiliz",
-      price: "0.03778",
-      change: "-1.51%", 
-      changeValue: "-0.0006",
-      isPositive: false,
-      icon: "⚽",
-      color: "red"
+      symbol: "ADA/USDT",
+      name: "Cardano",
+      price: cryptoPrices?.["ADA/USD"]?.price || "0.45",
+      change: cryptoPrices?.["ADA/USD"]?.change || "+5.1%",
+      isPositive: cryptoPrices?.["ADA/USD"]?.change ? !cryptoPrices["ADA/USD"].change.startsWith('-') : true,
+      icon: "₳",
+      color: "blue"
+    },
+    {
+      symbol: "SOL/USDT",
+      name: "Solana",
+      price: cryptoPrices?.["SOL/USD"]?.price || "215.67",
+      change: cryptoPrices?.["SOL/USD"]?.change || "+3.2%",
+      isPositive: cryptoPrices?.["SOL/USD"]?.change ? !cryptoPrices["SOL/USD"].change.startsWith('-') : true,
+      icon: "◎",
+      color: "purple"
     },
     {
       symbol: "LTC/USDT",
       name: "Litecoin",
-      price: "412.89",
-      change: "+2.1%",
-      changeValue: "+8.49",
-      isPositive: true,
+      price: cryptoPrices?.["LTC/USD"]?.price || "412.89",
+      change: cryptoPrices?.["LTC/USD"]?.change || "+2.1%",
+      isPositive: cryptoPrices?.["LTC/USD"]?.change ? !cryptoPrices["LTC/USD"].change.startsWith('-') : true,
       icon: "Ł",
       color: "gray"
     },
     {
       symbol: "XRP/USDT", 
       name: "Ripple",
-      price: "1.89",
-      change: "-0.8%",
-      changeValue: "-0.015",
-      isPositive: false,
+      price: cryptoPrices?.["XRP/USD"]?.price || "1.89",
+      change: cryptoPrices?.["XRP/USD"]?.change || "-0.8%",
+      isPositive: cryptoPrices?.["XRP/USD"]?.change ? !cryptoPrices["XRP/USD"].change.startsWith('-') : false,
       icon: "◊",
       color: "blue"
+    },
+    {
+      symbol: "CHZ/USDT",
+      name: "Chiliz",
+      price: cryptoPrices?.["CHZ/USD"]?.price || "0.037",
+      change: cryptoPrices?.["CHZ/USD"]?.change || "-1.5%",
+      isPositive: cryptoPrices?.["CHZ/USD"]?.change ? !cryptoPrices["CHZ/USD"].change.startsWith('-') : false,
+      icon: "⚽",
+      color: "red"
     }
   ];
 

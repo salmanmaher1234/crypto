@@ -365,28 +365,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mock crypto prices endpoint
+  // Mock crypto prices endpoint with dynamic updates
   app.get("/api/crypto-prices", (req, res) => {
+    // Generate slightly varying prices to simulate real-time updates
+    const baseTime = Date.now();
+    const variation = (Math.sin(baseTime / 10000) * 0.02) + (Math.random() * 0.01 - 0.005);
+    
+    const generatePrice = (basePrice: number) => {
+      const newPrice = basePrice * (1 + variation);
+      return newPrice.toFixed(2);
+    };
+    
+    const generateChange = () => {
+      const changeValue = (Math.random() * 6 - 3); // Range: -3% to +3%
+      return changeValue >= 0 ? `+${changeValue.toFixed(1)}%` : `${changeValue.toFixed(1)}%`;
+    };
+    
     res.json({
       "BTC/USD": {
-        price: "42150.00",
-        change: "+2.4%",
-        changeType: "positive"
+        price: generatePrice(42150.00),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
       },
       "ETH/USD": {
-        price: "2850.00",
-        change: "-1.2%",
-        changeType: "negative"
+        price: generatePrice(2850.00),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "DOGE/USD": {
+        price: generatePrice(0.18371),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
       },
       "ADA/USD": {
-        price: "0.45",
-        change: "+5.1%",
-        changeType: "positive"
+        price: generatePrice(0.45),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
       },
-      "DOT/USD": {
-        price: "8.20",
-        change: "+3.2%",
-        changeType: "positive"
+      "SOL/USD": {
+        price: generatePrice(215.67),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "LTC/USD": {
+        price: generatePrice(412.89),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "XRP/USD": {
+        price: generatePrice(1.89),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "CHZ/USD": {
+        price: generatePrice(0.03778),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
       }
     });
   });
