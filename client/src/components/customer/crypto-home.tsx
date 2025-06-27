@@ -167,7 +167,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   }, [cryptoData.length]);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Avatar 
@@ -229,25 +229,25 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
           >
             {/* Create duplicated array for seamless infinite loop */}
             {[...cryptoData, ...cryptoData].map((crypto, index) => (
-              <div key={index} className="flex-shrink-0" style={{ width: '25%' }}>
+              <div key={index} className="flex-shrink-0 w-1/4 lg:w-1/5 xl:w-1/6">
                 <div className="px-1.5">
                   <Card 
                     className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
                     onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
                   >
-                    <CardContent className="p-3">
-                      <div className="text-center space-y-2">
+                    <CardContent className="p-2 lg:p-3">
+                      <div className="text-center space-y-1 lg:space-y-2">
                         <div>
-                          <p className="font-semibold text-sm text-center">{crypto.symbol}</p>
+                          <p className="font-semibold text-xs lg:text-sm text-center">{crypto.symbol}</p>
                         </div>
                         
                         <div className="space-y-1">
-                          <p className="text-sm font-bold text-center">${crypto.price}</p>
+                          <p className="text-xs lg:text-sm font-bold text-center">${crypto.price}</p>
                           <div className="flex items-center justify-center space-x-1">
                             {crypto.isPositive ? (
-                              <TrendingUp className="w-3 h-3 text-green-500" />
+                              <TrendingUp className="w-2 h-2 lg:w-3 lg:h-3 text-green-500" />
                             ) : (
-                              <TrendingDown className="w-3 h-3 text-red-500" />
+                              <TrendingDown className="w-2 h-2 lg:w-3 lg:h-3 text-red-500" />
                             )}
                             <span className={`text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
                               {crypto.change}
@@ -267,7 +267,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       {/* Investment Banner */}
       <div className="relative">
         <div 
-          className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-xl p-6 text-white relative overflow-hidden"
+          className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-xl p-4 lg:p-6 text-white relative overflow-hidden"
           style={{
             backgroundImage: `url('/trading-chart-bg.svg')`,
             backgroundSize: 'cover',
@@ -280,18 +280,18 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
           
           <div className="relative z-10 flex items-center justify-between">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">SuperCoin Investment</h2>
-              <p className="text-blue-100 max-w-md">
+              <h2 className="text-xl lg:text-2xl font-bold">SuperCoin Investment</h2>
+              <p className="text-blue-100 max-w-md text-sm lg:text-base">
                 Start your crypto journey with professional trading tools and real-time market data
               </p>
-              <div className="flex items-center space-x-4 mt-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-green-100">Live Market Data</span>
+                  <span className="text-xs lg:text-sm text-green-100">Live Market Data</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-yellow-100">24/7 Trading</span>
+                  <span className="text-xs lg:text-sm text-yellow-100">24/7 Trading</span>
                 </div>
               </div>
             </div>
