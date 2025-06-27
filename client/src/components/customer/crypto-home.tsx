@@ -306,12 +306,12 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       </div>
 
       {/* Currency List */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {/* Table Header */}
-        <div className="grid grid-cols-3 gap-4 py-3 px-4 bg-gray-50 rounded-lg border">
-          <div className="text-sm font-semibold text-gray-700">Currency</div>
-          <div className="text-sm font-semibold text-gray-700 text-center">Real Price</div>
-          <div className="text-sm font-semibold text-gray-700 text-center">Rise Fall</div>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 py-2 sm:py-3 px-2 sm:px-4 bg-gray-50 rounded-lg border">
+          <div className="text-xs sm:text-sm font-semibold text-gray-700">Currency</div>
+          <div className="text-xs sm:text-sm font-semibold text-gray-700 text-center">Real Price</div>
+          <div className="text-xs sm:text-sm font-semibold text-gray-700 text-center">Rise Fall</div>
         </div>
         
         {cryptoData.map((crypto) => (
@@ -320,11 +320,11 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
             className="cursor-pointer hover:shadow-md transition-shadow"
             onClick={() => onSelectCurrency(crypto.symbol)}
           >
-            <CardContent className="p-4">
-              <div className="grid grid-cols-3 gap-4 items-center">
+            <CardContent className="p-2 sm:p-3 lg:p-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
                 {/* Currency Column */}
-                <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className={`w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm lg:text-base
                     ${crypto.color === 'orange' ? 'bg-orange-500' :
                       crypto.color === 'blue' ? 'bg-blue-500' :
                       crypto.color === 'yellow' ? 'bg-yellow-500' :
@@ -332,22 +332,22 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                       'bg-gray-500'}`}>
                     {crypto.icon}
                   </div>
-                  <div>
-                    <div className="font-medium">{crypto.symbol}</div>
-                    <div className="text-sm text-gray-600">{crypto.name}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-xs sm:text-sm lg:text-base truncate">{crypto.symbol}</div>
+                    <div className="text-[10px] sm:text-xs lg:text-sm text-gray-600 truncate">{crypto.name}</div>
                   </div>
                 </div>
                 
                 {/* Real Price Column */}
                 <div className="text-center">
-                  <div className="font-medium">${crypto.price}</div>
+                  <div className="font-medium text-xs sm:text-sm lg:text-base">${crypto.price}</div>
                 </div>
                 
                 {/* Rise Fall Column */}
                 <div className="text-center">
                   <Badge 
                     variant={crypto.isPositive ? "default" : "destructive"}
-                    className={crypto.isPositive ? "bg-green-500" : "bg-red-500"}
+                    className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 ${crypto.isPositive ? "bg-green-500" : "bg-red-500"}`}
                   >
                     {crypto.change}
                   </Badge>
