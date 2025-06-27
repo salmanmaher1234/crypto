@@ -6,13 +6,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
 import { FileText, Copy } from "lucide-react";
 import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast";
 
 export function CustomerBettingOrders() {
   const { user } = useAuth();
   const { data: allBettingOrders, isLoading } = useBettingOrders();
   const updateBettingOrder = useUpdateBettingOrder();
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">("pending");
   const [timeFilter, setTimeFilter] = useState("today");
 
@@ -31,10 +31,11 @@ export function CustomerBettingOrders() {
           
           updateBettingOrder.mutate({
             id: order.id,
-            status: "completed",
-            result: isWin ? "win" : "loss",
-            exitPrice: order.entryPrice, // Using same price for simplicity
-            profitAmount: profitAmount.toFixed(2)
+            updates: {
+              status: "completed",
+              result: isWin ? "win" : "loss",
+              exitPrice: order.entryPrice, // Using same price for simplicity
+            }
           });
         }
       });
@@ -65,10 +66,7 @@ export function CustomerBettingOrders() {
 
   const copyOrderNumber = (orderNumber: string) => {
     navigator.clipboard.writeText(orderNumber);
-    toast({
-      title: "Copied",
-      description: "Order number copied to clipboard",
-    });
+    console.log("Order number copied:", orderNumber);
   };
 
   if (isLoading) {
