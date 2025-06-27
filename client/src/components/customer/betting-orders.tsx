@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
-import { FileText, Copy } from "lucide-react";
+import { FileText, Copy, ChevronRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 // import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +15,8 @@ export function CustomerBettingOrders() {
   // const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">("pending");
   const [timeFilter, setTimeFilter] = useState("today");
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showDetailView, setShowDetailView] = useState(false);
 
 
 
@@ -66,13 +68,99 @@ export function CustomerBettingOrders() {
     return statusMatch && timeMatch;
   });
 
-  const copyOrderNumber = (orderNumber: string) => {
-    navigator.clipboard.writeText(orderNumber);
-    console.log("Order number copied:", orderNumber);
+  const copyOrderDetails = (order: any) => {
+    const orderNumber = `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
+    const profit = order.result === "win" ? parseFloat(order.amount) * 0.8 : 
+                   order.result === "loss" ? -parseFloat(order.amount) : 100;
+    
+    const details = `Order No.: ${orderNumber}
+Currency: ${order.asset}/USDT
+Buy Price: ${order.entryPrice}
+Close Price: ${order.exitPrice || order.entryPrice}
+Buy Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+Close Time: ${order.status === 'completed' ? format(new Date(order.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending'}
+Billing Time: ${order.duration}s
+Order Amount: ${order.amount}
+Order Status: ${order.status === 'active' ? 'Pending' : order.status}
+Profit Amount: ${profit > 0 ? '+' : ''}${profit.toFixed(0)}
+Scale: ${order.duration}s
+Buy Direction: ${order.direction}
+Actual Rise Fall: ${order.result === 'win' ? 'Rise' : order.result === 'loss' ? 'Fall' : 'Rise'}
+Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
+    
+    navigator.clipboard.writeText(details);
+    console.log("Order details copied:", details);
+  };
+
+  const openDetailView = (order: any) => {
+    setSelectedOrder(order);
+    setShowDetailView(true);
   };
 
   if (isLoading) {
     return <div className="p-4">Loading orders...</div>;
+  }
+
+  // Detailed order view
+  if (showDetailView && selectedOrder) {
+    const orderNumber = `B${Date.now().toString().slice(-12)}${selectedOrder.id.toString().padStart(3, '0')}`;
+    const profit = selectedOrder.result === "win" ? parseFloat(selectedOrder.amount) * 0.8 : 
+                   selectedOrder.result === "loss" ? -parseFloat(selectedOrder.amount) : 1200;
+    
+    return (
+      <div className="p-4 bg-white min-h-screen">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => setShowDetailView(false)}
+            className="flex items-center text-gray-600"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => copyOrderDetails(selectedOrder)}
+            className="text-blue-600"
+          >
+            Copy
+          </Button>
+        </div>
+
+        {/* Order Details */}
+        <div className="space-y-4">
+          {[
+            { label: "Order No.", value: orderNumber },
+            { label: "Currency", value: `${selectedOrder.asset}/USDT` },
+            { label: "Buy Price", value: selectedOrder.entryPrice },
+            { label: "Close Price", value: selectedOrder.exitPrice || selectedOrder.entryPrice },
+            { label: "Buy Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') },
+            { label: "Close Time", value: selectedOrder.status === 'completed' ? format(new Date(selectedOrder.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending' },
+            { label: "Billing Time", value: `${selectedOrder.duration}s` },
+            { label: "Order Amount", value: selectedOrder.amount },
+            { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
+            { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}${profit.toFixed(0)}`, isProfit: true },
+            { label: "Scale", value: "20%" },
+            { label: "Buy Direction", value: selectedOrder.direction, isDirection: true },
+            { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
+            { label: "Order Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
+          ].map((item, index) => (
+            <div key={index} className="flex justify-between items-center py-3 border-b border-gray-100">
+              <span className="text-gray-600 text-sm">{item.label}</span>
+              <span className={`text-sm font-medium ${
+                item.isProfit ? (profit > 0 ? 'text-red-500' : 'text-green-500') :
+                item.isDirection ? (selectedOrder.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500') :
+                item.isActual ? 'text-red-500' :
+                'text-gray-900'
+              }`}>
+                {item.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -141,81 +229,60 @@ export function CustomerBettingOrders() {
               return (
                 <Card key={order.id} className="bg-white border border-gray-200">
                   <CardContent className="p-4">
-                    <div className="flex justify-end mb-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-gray-400 hover:text-gray-600 h-6 w-6 p-0"
-                      >
-                        <span className="text-lg">›</span>
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {/* Row 1: Currency and Copy */}
-                      <div className="flex justify-between items-center">
+                    {/* 3-Column Layout */}
+                    <div className="grid grid-cols-3 gap-4 items-center">
+                      {/* Column 1: Labels */}
+                      <div className="space-y-3">
                         <div>
                           <div className="text-xs text-gray-500 mb-1">Currency</div>
-                          <div className="font-medium text-sm">{order.asset}/USDT</div>
+                          <div className="text-xs text-gray-500 mb-1">Order No.</div>
+                          <div className="text-xs text-gray-500 mb-1">Order Amount</div>
+                          <div className="text-xs text-gray-500 mb-1">Profit Amount</div>
+                          <div className="text-xs text-gray-500 mb-1">Buy Direction</div>
+                          <div className="text-xs text-gray-500 mb-1">Scale</div>
+                          <div className="text-xs text-gray-500 mb-1">Billing Time</div>
+                          <div className="text-xs text-gray-500 mb-1">Order Time</div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-blue-600 text-xs h-auto p-1"
-                          onClick={() => copyOrderNumber(orderNumber)}
-                        >
-                          Copy
-                        </Button>
                       </div>
                       
-                      {/* Row 2: Order No. and Order Amount */}
-                      <div className="flex justify-between">
+                      {/* Column 2: Values */}
+                      <div className="space-y-3">
                         <div>
-                          <div className="text-xs text-gray-500 mb-1">Order No.</div>
-                          <div className="font-medium text-xs">{orderNumber}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500 mb-1">Order Amount</div>
-                          <div className="font-medium text-sm">{order.amount}</div>
-                        </div>
-                      </div>
-
-                      {/* Row 3: Profit Amount and Buy Direction */}
-                      <div className="flex justify-between">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Profit Amount</div>
-                          <div className={`font-medium text-sm ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
+                          <div className="font-medium text-sm mb-2">{order.asset}/USDT</div>
+                          <div className="font-medium text-xs mb-2">{orderNumber}</div>
+                          <div className="font-medium text-sm mb-2">{order.amount}</div>
+                          <div className={`font-medium text-sm mb-2 ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
                             {isProfit ? '+' : ''}{profit.toFixed(0)}
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500 mb-1">Buy Direction</div>
-                          <div className={`font-medium text-sm ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
+                          <div className={`font-medium text-sm mb-2 ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
                             {order.direction}
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Row 4: Scale and Billing Time */}
-                      <div className="flex justify-between">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Scale</div>
-                          <div className="font-medium text-sm">{order.duration}s</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500 mb-1">Billing Time</div>
-                          <div className="font-medium text-sm">{order.duration}s</div>
-                        </div>
-                      </div>
-
-                      {/* Row 5: Order Time */}
-                      <div className="flex justify-between">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Order Time</div>
+                          <div className="font-medium text-sm mb-2">{order.duration}s</div>
+                          <div className="font-medium text-sm mb-2">{order.duration}s</div>
                           <div className="font-medium text-sm">
                             {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
                           </div>
                         </div>
+                      </div>
+                      
+                      {/* Column 3: Actions */}
+                      <div className="flex flex-col items-end space-y-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600 text-xs h-auto p-1"
+                          onClick={() => copyOrderDetails(order)}
+                        >
+                          Copy
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-400 hover:text-gray-600 h-6 w-6 p-0"
+                          onClick={() => openDetailView(order)}
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
