@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { useCreateBettingOrder } from "@/lib/api";
+import { useCreateBettingOrder, useCryptoPrices } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { ArrowLeft, TrendingUp, TrendingDown, BarChart3, Clock, RefreshCw } from "lucide-react";
 
@@ -20,6 +20,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   const { user } = useAuth();
   const { toast } = useToast();
   const createBettingOrder = useCreateBettingOrder();
+  const { data: cryptoPrices } = useCryptoPrices();
   
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [orderType, setOrderType] = useState<"up" | "down">("up");
@@ -44,13 +45,30 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     setChartKey(prev => prev + 1);
   }, [selectedChartPeriod, chartType]);
 
+  // Get real-time crypto data with fallback to static data
+  const getCryptoPrice = (cryptoKey: string) => {
+    if (!cryptoPrices) return null;
+    
+    const symbolMap: { [key: string]: string } = {
+      "BTC": "BTC/USD",
+      "ETH": "ETH/USD", 
+      "DOGE": "DOGE/USD",
+      "LTC": "LTC/USD",
+      "CHZ": "CHZ/USD",
+      "BCH": "BCH/USD"
+    };
+    
+    const apiSymbol = symbolMap[cryptoKey];
+    return apiSymbol && cryptoPrices[apiSymbol] ? cryptoPrices[apiSymbol] : null;
+  };
+
   const cryptoData: { [key: string]: any } = {
     "BTC": {
       name: "Bitcoin",
       symbol: "BTC/USDT",
-      price: "107314.24",
-      change: "-0.41%",
-      isPositive: false,
+      price: getCryptoPrice("BTC")?.price || "107314.24",
+      change: getCryptoPrice("BTC")?.change || "-0.41%",
+      isPositive: getCryptoPrice("BTC")?.changeType === "positive" || false,
       highestPrice: "107900",
       lowestPrice: "106689.81",
       volume24h: "773548A2C",
@@ -60,9 +78,9 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     "ETH": {
       name: "Ethereum", 
       symbol: "ETH/USDT",
-      price: "2449.91",
-      change: "-1.44%",
-      isPositive: false,
+      price: getCryptoPrice("ETH")?.price || "2449.91",
+      change: getCryptoPrice("ETH")?.change || "-1.44%",
+      isPositive: getCryptoPrice("ETH")?.changeType === "positive" || false,
       highestPrice: "2580",
       lowestPrice: "2389.33",
       volume24h: "445782B1D",
@@ -72,9 +90,9 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     "DOGE": {
       name: "Dogecoin",
       symbol: "DOGE/USDT",
-      price: "0.16147", 
-      change: "-1.87%",
-      isPositive: false,
+      price: getCryptoPrice("DOGE")?.price || "0.16147", 
+      change: getCryptoPrice("DOGE")?.change || "-1.87%",
+      isPositive: getCryptoPrice("DOGE")?.changeType === "positive" || false,
       highestPrice: "0.19200",
       lowestPrice: "0.15100",
       volume24h: "156892C3E",
@@ -84,9 +102,9 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     "LTC": {
       name: "Litecoin",
       symbol: "LTC/USDT",
-      price: "85.13",
-      change: "-0.28%",
-      isPositive: false,
+      price: getCryptoPrice("LTC")?.price || "85.13",
+      change: getCryptoPrice("LTC")?.change || "-0.28%",
+      isPositive: getCryptoPrice("LTC")?.changeType === "positive" || false,
       highestPrice: "89.50",
       lowestPrice: "84.20",
       volume24h: "234567D4F",
@@ -96,9 +114,9 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     "CHZ": {
       name: "Chiliz",
       symbol: "CHZ/USDT",
-      price: "0.03457",
-      change: "-2.59%",
-      isPositive: false,
+      price: getCryptoPrice("CHZ")?.price || "0.03457",
+      change: getCryptoPrice("CHZ")?.change || "-2.59%",
+      isPositive: getCryptoPrice("CHZ")?.changeType === "positive" || false,
       highestPrice: "0.03650",
       lowestPrice: "0.03350",
       volume24h: "123456E5G",
@@ -108,9 +126,9 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     "BCH": {
       name: "Bitcoin Cash",
       symbol: "BCH/USDT",
-      price: "502.8",
-      change: "0.50%",
-      isPositive: true,
+      price: getCryptoPrice("BCH")?.price || "502.8",
+      change: getCryptoPrice("BCH")?.change || "0.50%",
+      isPositive: getCryptoPrice("BCH")?.changeType === "positive" || true,
       highestPrice: "515.20",
       lowestPrice: "498.30",
       volume24h: "345678F6H",

@@ -482,30 +482,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mock crypto prices endpoint
-  app.get("/api/crypto-prices", (req, res) => {
-    res.json({
-      "BTC/USD": {
-        price: "42150.00",
-        change: "+2.4%",
-        changeType: "positive"
-      },
-      "ETH/USD": {
-        price: "2850.00",
-        change: "-1.2%",
-        changeType: "negative"
-      },
-      "ADA/USD": {
-        price: "0.45",
-        change: "+5.1%",
-        changeType: "positive"
-      },
-      "DOT/USD": {
-        price: "8.20",
-        change: "+3.2%",
-        changeType: "positive"
+  // Real-time crypto prices endpoint using CoinGecko API
+  app.get("/api/crypto-prices", async (req, res) => {
+    try {
+      // Fetch real-time data from CoinGecko
+      const response = await fetch(
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,dogecoin,chiliz,bitcoin-cash,paris-saint-germain-fan-token,juventus-fan-token,atletico-madrid,litecoin,eos,tron,ethereum-classic,bitshares&vs_currencies=usd&include_24hr_change=true'
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch crypto prices');
       }
-    });
+      
+      const data = await response.json();
+      
+      // Transform the data to match our format
+      const transformedData = {
+        "BTC/USD": {
+          price: data.bitcoin.usd.toFixed(2),
+          change: data.bitcoin.usd_24h_change ? `${data.bitcoin.usd_24h_change >= 0 ? '+' : ''}${data.bitcoin.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.bitcoin.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "ETH/USD": {
+          price: data.ethereum.usd.toFixed(2),
+          change: data.ethereum.usd_24h_change ? `${data.ethereum.usd_24h_change >= 0 ? '+' : ''}${data.ethereum.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.ethereum.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "DOGE/USD": {
+          price: data.dogecoin.usd.toFixed(5),
+          change: data.dogecoin.usd_24h_change ? `${data.dogecoin.usd_24h_change >= 0 ? '+' : ''}${data.dogecoin.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.dogecoin.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "CHZ/USD": {
+          price: data.chiliz.usd.toFixed(5),
+          change: data.chiliz.usd_24h_change ? `${data.chiliz.usd_24h_change >= 0 ? '+' : ''}${data.chiliz.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.chiliz.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "BCH/USD": {
+          price: data['bitcoin-cash'].usd.toFixed(2),
+          change: data['bitcoin-cash'].usd_24h_change ? `${data['bitcoin-cash'].usd_24h_change >= 0 ? '+' : ''}${data['bitcoin-cash'].usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data['bitcoin-cash'].usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "PSG/USD": {
+          price: data['paris-saint-germain-fan-token'].usd.toFixed(3),
+          change: data['paris-saint-germain-fan-token'].usd_24h_change ? `${data['paris-saint-germain-fan-token'].usd_24h_change >= 0 ? '+' : ''}${data['paris-saint-germain-fan-token'].usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data['paris-saint-germain-fan-token'].usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "JUV/USD": {
+          price: data['juventus-fan-token'].usd.toFixed(3),
+          change: data['juventus-fan-token'].usd_24h_change ? `${data['juventus-fan-token'].usd_24h_change >= 0 ? '+' : ''}${data['juventus-fan-token'].usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data['juventus-fan-token'].usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "ATM/USD": {
+          price: data['atletico-madrid'].usd.toFixed(3),
+          change: data['atletico-madrid'].usd_24h_change ? `${data['atletico-madrid'].usd_24h_change >= 0 ? '+' : ''}${data['atletico-madrid'].usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data['atletico-madrid'].usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "LTC/USD": {
+          price: data.litecoin.usd.toFixed(2),
+          change: data.litecoin.usd_24h_change ? `${data.litecoin.usd_24h_change >= 0 ? '+' : ''}${data.litecoin.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.litecoin.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "EOS/USD": {
+          price: data.eos.usd.toFixed(4),
+          change: data.eos.usd_24h_change ? `${data.eos.usd_24h_change >= 0 ? '+' : ''}${data.eos.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.eos.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "TRX/USD": {
+          price: data.tron.usd.toFixed(4),
+          change: data.tron.usd_24h_change ? `${data.tron.usd_24h_change >= 0 ? '+' : ''}${data.tron.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.tron.usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "ETC/USD": {
+          price: data['ethereum-classic'].usd.toFixed(2),
+          change: data['ethereum-classic'].usd_24h_change ? `${data['ethereum-classic'].usd_24h_change >= 0 ? '+' : ''}${data['ethereum-classic'].usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data['ethereum-classic'].usd_24h_change >= 0 ? "positive" : "negative"
+        },
+        "BTS/USD": {
+          price: data.bitshares.usd.toFixed(4),
+          change: data.bitshares.usd_24h_change ? `${data.bitshares.usd_24h_change >= 0 ? '+' : ''}${data.bitshares.usd_24h_change.toFixed(2)}%` : "0.00%",
+          changeType: data.bitshares.usd_24h_change >= 0 ? "positive" : "negative"
+        }
+      };
+      
+      res.json(transformedData);
+    } catch (error) {
+      console.error('Error fetching crypto prices:', error);
+      // Fallback to static data if API fails
+      res.json({
+        "BTC/USD": {
+          price: "42150.00",
+          change: "+2.4%",
+          changeType: "positive"
+        },
+        "ETH/USD": {
+          price: "2850.00",
+          change: "-1.2%",
+          changeType: "negative"
+        },
+        "DOGE/USD": {
+          price: "0.16147",
+          change: "-1.87%",
+          changeType: "negative"
+        },
+        "CHZ/USD": {
+          price: "0.03457",
+          change: "-2.59%",
+          changeType: "negative"
+        },
+        "BCH/USD": {
+          price: "502.8",
+          change: "0.50%",
+          changeType: "positive"
+        },
+        "PSG/USD": {
+          price: "1.417",
+          change: "-2.01%",
+          changeType: "negative"
+        },
+        "JUV/USD": {
+          price: "0.901",
+          change: "-1.42%",
+          changeType: "negative"
+        },
+        "ATM/USD": {
+          price: "0.999",
+          change: "-1.87%",
+          changeType: "negative"
+        },
+        "LTC/USD": {
+          price: "85.13",
+          change: "-0.28%",
+          changeType: "negative"
+        },
+        "EOS/USD": {
+          price: "0",
+          change: "0.00%",
+          changeType: "positive"
+        },
+        "TRX/USD": {
+          price: "0.2712",
+          change: "0.15%",
+          changeType: "positive"
+        },
+        "ETC/USD": {
+          price: "16.19",
+          change: "-2.00%",
+          changeType: "negative"
+        },
+        "BTS/USD": {
+          price: "502.8",
+          change: "0.50%",
+          changeType: "positive"
+        }
+      });
+    }
   });
 
   const httpServer = createServer(app);
