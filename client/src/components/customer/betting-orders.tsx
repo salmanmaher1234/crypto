@@ -42,8 +42,11 @@ export function CustomerBettingOrders() {
       setShowConditionalQuery(true);
     } else {
       setTimeFilter(value);
-      setStartDate("");
-      setEndDate("");
+      // Only reset dates if switching away from conditional
+      if (timeFilter === "conditional") {
+        setStartDate("");
+        setEndDate("");
+      }
     }
   };
 
@@ -52,6 +55,15 @@ export function CustomerBettingOrders() {
     if (startDate && endDate) {
       setTimeFilter("conditional");
       setShowConditionalQuery(false);
+    }
+  };
+
+  // Cancel conditional query
+  const cancelConditionalQuery = () => {
+    setShowConditionalQuery(false);
+    // If no dates were set, revert to previous filter
+    if (!startDate || !endDate) {
+      setTimeFilter("today");
     }
   };
 
@@ -368,7 +380,11 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
       </div>
 
       {/* Conditional Query Dialog */}
-      <Dialog open={showConditionalQuery} onOpenChange={setShowConditionalQuery}>
+      <Dialog open={showConditionalQuery} onOpenChange={(open) => {
+        if (!open) {
+          cancelConditionalQuery();
+        }
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -376,6 +392,9 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
               Conditional Query
             </DialogTitle>
           </DialogHeader>
+          <p className="text-sm text-gray-600 mb-4">
+            Select a date range to filter orders within specific time period.
+          </p>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="startDate">Start Date</Label>
@@ -400,7 +419,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
             <div className="flex gap-2 pt-4">
               <Button
                 variant="outline"
-                onClick={() => setShowConditionalQuery(false)}
+                onClick={cancelConditionalQuery}
                 className="flex-1"
               >
                 Cancel
