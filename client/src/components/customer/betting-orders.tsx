@@ -183,22 +183,22 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
       {/* Tab Navigation */}
       <div className="flex bg-gray-100 rounded-lg p-1">
         <Button
-          variant={activeTab === "pending" ? "default" : "ghost"}
-          className={`flex-1 ${activeTab === "pending" ? "bg-white shadow-sm" : ""}`}
+          variant="ghost"
+          className={`flex-1 ${activeTab === "pending" ? "bg-white shadow-sm text-black" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
           Pending
         </Button>
         <Button
-          variant={activeTab === "closed" ? "default" : "ghost"}
-          className={`flex-1 ${activeTab === "closed" ? "bg-white shadow-sm" : ""}`}
+          variant="ghost"
+          className={`flex-1 ${activeTab === "closed" ? "bg-white shadow-sm text-black" : ""}`}
           onClick={() => setActiveTab("closed")}
         >
           Closed
         </Button>
         <Button
-          variant={activeTab === "cancelled" ? "default" : "ghost"}
-          className={`flex-1 ${activeTab === "cancelled" ? "bg-white shadow-sm" : ""}`}
+          variant="ghost"
+          className={`flex-1 ${activeTab === "cancelled" ? "bg-white shadow-sm text-black" : ""}`}
           onClick={() => setActiveTab("cancelled")}
         >
           Cancelled
