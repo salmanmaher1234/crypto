@@ -219,32 +219,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
-      console.log("Received betting order data:", req.body);
+      console.log("==== BETTING ORDER START ====");
+      console.log("User ID from session:", req.session.userId);
+      console.log("Order data:", req.body);
+      
       const dataToValidate = {
         ...req.body,
         userId: req.session.userId,
       };
-      console.log("Data to validate:", dataToValidate);
       
       const validatedData = insertBettingOrderSchema.parse(dataToValidate);
-      console.log("Validated data:", validatedData);
-      
       const order = await storage.createBettingOrder(validatedData);
+      console.log("Created order:", order);
       
       // Deduct amount from available balance
       const user = await storage.getUser(req.session.userId);
-      console.log("User before balance update:", user);
+      console.log("Current user:", user);
+      
       if (user) {
-        const amount = parseFloat(validatedData.amount);
-        const newAvailableBalance = (parseFloat(user.availableBalance) - amount).toFixed(2);
-        console.log(`Updating balance: ${user.availableBalance} - ${amount} = ${newAvailableBalance}`);
+        const orderAmount = parseFloat(validatedData.amount);
+        const currentBalance = parseFloat(user.availableBalance);
+        const newBalance = currentBalance - orderAmount;
+        
+        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} = ${newBalance}`);
         
         const updatedUser = await storage.updateUser(req.session.userId, {
-          availableBalance: newAvailableBalance,
+          availableBalance: newBalance.toFixed(2),
         });
-        console.log("Updated user:", updatedUser);
+        console.log("Balance updated successfully:", updatedUser);
       }
       
+      console.log("==== BETTING ORDER END ====");
       res.json(order);
     } catch (error) {
       console.error("Betting order error:", error);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useAnnouncements } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useAnnouncements, useCreateTransaction } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ export function Profile() {
   const { data: bankAccounts } = useBankAccounts();
   const { data: announcements } = useAnnouncements();
   const createBankAccount = useCreateBankAccount();
+  const createTransaction = useCreateTransaction();
   const { toast } = useToast();
   
   const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'digitalwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
@@ -191,16 +192,32 @@ export function Profile() {
                     <Button 
                       className="w-full bg-green-500 hover:bg-green-600"
                       onClick={() => {
-                        if (rechargeAmount && parseFloat(rechargeAmount) > 0) {
-                          toast({
-                            title: "Recharge successful",
-                            description: `$${rechargeAmount} has been added to your account`,
+                        if (rechargeAmount && parseFloat(rechargeAmount) > 0 && user) {
+                          createTransaction.mutate({
+                            userId: user.id,
+                            type: "deposit",
+                            amount: rechargeAmount,
+                            description: `Account recharge of $${rechargeAmount}`
+                          }, {
+                            onSuccess: () => {
+                              toast({
+                                title: "Recharge successful",
+                                description: `$${rechargeAmount} has been added to your account`,
+                              });
+                              setRechargeAmount("");
+                              setShowRechargeDialog(false);
+                            },
+                            onError: () => {
+                              toast({
+                                title: "Recharge failed",
+                                description: "Unable to process recharge. Please try again.",
+                                variant: "destructive",
+                              });
+                            }
                           });
-                          setRechargeAmount("");
-                          setShowRechargeDialog(false);
                         }
                       }}
-                      disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0}
+                      disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0 || createTransaction.isPending}
                     >
                       Confirm Recharge ${rechargeAmount || "0"}
                     </Button>
