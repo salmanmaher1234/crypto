@@ -27,6 +27,16 @@ export function TradingInterface() {
       return;
     }
 
+    // Minimum order validation
+    if (parseFloat(amount) < 1000) {
+      toast({
+        title: "Minimum order amount",
+        description: "Minimum order amount is 1000",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const entryPrice = prices?.[selectedAsset]?.price || "0";
     
     createOrder.mutate({
@@ -98,13 +108,13 @@ export function TradingInterface() {
 
           {/* Amount Input */}
           <div>
-            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Investment Amount</label>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Investment Amount (Min: 1000)</label>
             <Input
               type="number"
-              placeholder="Enter amount"
+              placeholder="Minimum 1000"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              min="1"
+              min="1000"
               step="0.01"
               className="text-sm sm:text-base"
             />

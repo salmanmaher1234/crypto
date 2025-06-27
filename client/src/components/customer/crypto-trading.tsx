@@ -227,8 +227,19 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
       return;
     }
 
-    const availableBalance = parseFloat(user.availableBalance || user.balance || "0");
     const amount = parseFloat(orderAmount);
+
+    // Minimum order validation
+    if (amount < 1000) {
+      toast({
+        title: "Minimum order amount",
+        description: "Minimum order amount is 1000",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const availableBalance = parseFloat(user.availableBalance || user.balance || "0");
 
     if (amount > availableBalance) {
       toast({
@@ -711,12 +722,13 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
 
             {/* Amount Input */}
             <div>
-              <h4 className="text-sm font-medium mb-2">Enter order amount</h4>
+              <h4 className="text-sm font-medium mb-2">Enter order amount (Min: 1000)</h4>
               <Input
                 type="number"
                 value={orderAmount}
                 onChange={(e) => setOrderAmount(e.target.value)}
-                placeholder="Enter amount"
+                placeholder="Minimum 1000"
+                min="1000"
                 className="text-center"
               />
             </div>

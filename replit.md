@@ -110,6 +110,7 @@ Changelog:
 - June 27, 2025. Enhanced Orders section with comprehensive time filtering system - added Today, Yesterday, Last Week, Last Month, Last 3 Months, All Orders, and Conditional Query options with date picker dialog for custom date range selection
 - June 27, 2025. Fixed navigation issue from cryptocurrency trading pages - bottom navigation tabs now properly clear crypto view state when clicked, allowing seamless navigation between all sections
 - June 27, 2025. Implemented dynamic real balance display with auto-refresh every 2 minutes and manual refresh icon - balance now shows user's actual balance from database, automatically updates every 2 minutes, includes spinning refresh icon for manual updates
+- June 27, 2025. Added minimum order validation of 1000 - users cannot place orders with amounts less than 1000, validation implemented in both crypto-trading and trading-interface components with clear error messages and input field hints
 
 ## User Preferences
 
