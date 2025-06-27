@@ -204,7 +204,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
 
   const periods = [
     { label: "30s", value: "30s", payout: "20%" },
-    { label: "60s", value: "60s", payout: "40%" },
+    { label: "60s", value: "60s", payout: "30%" },
     { label: "120s", value: "120s", payout: "40%" },
     { label: "180s", value: "180s", payout: "50%" },
     { label: "240s", value: "240s", payout: "60%" }
