@@ -369,69 +369,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/crypto-prices", (req, res) => {
     res.json({
       "BTC/USD": {
-        price: "42150.00",
-        change: "+2.5%",
-        changeType: "positive"
-      },
-      "ETH/USD": {
-        price: "2850.00",
-        change: "+1.8%",
-        changeType: "positive"
-      },
-      "DOGE/USD": {
-        price: "0.18371",
-        change: "-0.5%",
+        price: "107314.24",
+        change: "-0.41%",
         changeType: "negative"
       },
-      "LTC/USD": {
-        price: "412.89",
-        change: "+3.2%",
-        changeType: "positive"
+      "ETH/USD": {
+        price: "2449.91",
+        change: "-1.44%",
+        changeType: "negative"
+      },
+      "DOGE/USD": {
+        price: "0.16147",
+        change: "-1.87%",
+        changeType: "negative"
       },
       "CHZ/USD": {
-        price: "0.03778",
-        change: "-1.2%",
+        price: "0.03457",
+        change: "-2.59%",
         changeType: "negative"
       },
       "BCH/USD": {
-        price: "502.80",
-        change: "+0.8%",
+        price: "502.8",
+        change: "0.50%",
         changeType: "positive"
       },
       "PSG/USD": {
         price: "1.417",
-        change: "-2.1%",
+        change: "-2.01%",
         changeType: "negative"
       },
       "JUV/USD": {
         price: "0.901",
-        change: "+1.5%",
-        changeType: "positive"
+        change: "-1.42%",
+        changeType: "negative"
       },
       "ATM/USD": {
         price: "0.999",
-        change: "-0.3%",
+        change: "-1.87%",
+        changeType: "negative"
+      },
+      "LTC/USD": {
+        price: "85.13",
+        change: "-0.28%",
         changeType: "negative"
       },
       "EOS/USD": {
-        price: "0.75",
-        change: "+2.1%",
+        price: "0",
+        change: "0.00%",
         changeType: "positive"
       },
       "TRX/USD": {
         price: "0.2712",
-        change: "-1.8%",
-        changeType: "negative"
+        change: "0.15%",
+        changeType: "positive"
       },
       "ETC/USD": {
         price: "16.19",
-        change: "+0.9%",
-        changeType: "positive"
+        change: "-2.00%",
+        changeType: "negative"
       },
       "BTS/USD": {
-        price: "0.0045",
-        change: "-3.2%",
-        changeType: "negative"
+        price: "502.8",
+        change: "0.50%",
+        changeType: "positive"
       }
     });
   });

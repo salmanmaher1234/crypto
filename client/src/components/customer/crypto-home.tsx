@@ -242,7 +242,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                         </div>
                         
                         <div className="space-y-0.5 lg:space-y-1">
-                          <p className="text-[10px] sm:text-xs lg:text-sm font-bold text-center">${crypto.price}</p>
+                          <p className="text-[10px] sm:text-xs lg:text-sm font-bold text-center">{crypto.price}</p>
                           <div className="flex items-center justify-center space-x-0.5 lg:space-x-1">
                             {crypto.isPositive ? (
                               <TrendingUp className="w-2 h-2 lg:w-3 lg:h-3 text-green-500" />
@@ -340,7 +340,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                 
                 {/* Real Price Column */}
                 <div className="text-center">
-                  <div className="font-medium text-xs sm:text-sm lg:text-base">${crypto.price}</div>
+                  <div className="font-medium text-xs sm:text-sm lg:text-base">{crypto.price}</div>
                 </div>
                 
                 {/* Rise Fall Column */}
