@@ -256,8 +256,8 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         <div className="flex justify-between items-center">
           <h3 className="font-medium">Currency</h3>
           <div className="grid grid-cols-2 gap-8 text-sm font-medium text-gray-600">
-            <span>Real Price</span>
-            <span>Rise Fall</span>
+            <span className="text-center">Real Price</span>
+            <span className="text-center">Rise Fall</span>
           </div>
         </div>
         
