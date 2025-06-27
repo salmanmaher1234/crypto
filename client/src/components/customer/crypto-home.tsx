@@ -213,19 +213,16 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       {/* Investment Banner */}
       <div className="relative">
         <div 
-          className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 rounded-xl p-6 text-white relative overflow-hidden"
+          className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-xl p-6 text-white relative overflow-hidden"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            backgroundImage: `url('/trading-chart-bg.svg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         >
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-32 h-32 opacity-20">
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="2" fill="none" />
-              <circle cx="50" cy="50" r="25" stroke="currentColor" strokeWidth="1.5" fill="none" />
-              <circle cx="50" cy="50" r="10" stroke="currentColor" strokeWidth="1" fill="none" />
-            </svg>
-          </div>
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-800/60 to-slate-900/80 rounded-xl"></div>
           
           <div className="relative z-10 flex items-center justify-between">
             <div className="space-y-2">
