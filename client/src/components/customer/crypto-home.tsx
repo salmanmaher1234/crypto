@@ -253,12 +253,11 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Currency List */}
       <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <h3 className="font-medium">Currency</h3>
-          <div className="grid grid-cols-2 gap-8 text-sm font-medium text-gray-600">
-            <span className="text-center">Real Price</span>
-            <span className="text-center">Rise Fall</span>
-          </div>
+        {/* Table Header */}
+        <div className="grid grid-cols-3 gap-4 py-3 px-4 bg-gray-50 rounded-lg border">
+          <div className="text-sm font-semibold text-gray-700">Currency</div>
+          <div className="text-sm font-semibold text-gray-700 text-center">Real Price</div>
+          <div className="text-sm font-semibold text-gray-700 text-center">Rise Fall</div>
         </div>
         
         {cryptoData.map((crypto) => (
@@ -268,7 +267,8 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
             onClick={() => onSelectCurrency(crypto.symbol)}
           >
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+              <div className="grid grid-cols-3 gap-4 items-center">
+                {/* Currency Column */}
                 <div className="flex items-center space-x-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
                     ${crypto.color === 'orange' ? 'bg-orange-500' :
@@ -283,10 +283,14 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                     <div className="text-sm text-gray-600">{crypto.name}</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-medium">{crypto.price}</div>
+                
+                {/* Real Price Column */}
+                <div className="text-center">
+                  <div className="font-medium">${crypto.price}</div>
                 </div>
-                <div className="text-right">
+                
+                {/* Rise Fall Column */}
+                <div className="text-center">
                   <Badge 
                     variant={crypto.isPositive ? "default" : "destructive"}
                     className={crypto.isPositive ? "bg-green-500" : "bg-red-500"}
@@ -294,7 +298,6 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                     {crypto.change}
                   </Badge>
                 </div>
-
               </div>
             </CardContent>
           </Card>
