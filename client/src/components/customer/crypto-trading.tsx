@@ -25,42 +25,165 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
   const [orderAmount, setOrderAmount] = useState("");
 
   const cryptoData: { [key: string]: any } = {
-    "BTC/USDT": {
+    "BTC": {
       name: "Bitcoin",
-      price: "105445.42",
-      change: "+470.19 +0.45%",
-      isPositive: true,
-      highestPrice: "105900",
-      lowestPrice: "104689.81",
+      symbol: "BTC/USDT",
+      price: "107314.24",
+      change: "-0.41%",
+      isPositive: false,
+      highestPrice: "107900",
+      lowestPrice: "106689.81",
       volume24h: "773548A2C",
       volumeBTC: "7335",
       transactions: "1158259"
     },
-    "ETH/USDT": {
+    "ETH": {
       name: "Ethereum", 
-      price: "2513.72",
-      change: "+20.15 +0.80%",
-      isPositive: true,
+      symbol: "ETH/USDT",
+      price: "2449.91",
+      change: "-1.44%",
+      isPositive: false,
       highestPrice: "2580",
-      lowestPrice: "2489.33",
+      lowestPrice: "2389.33",
       volume24h: "445782B1D",
       volumeBTC: "4521",
       transactions: "892456"
     },
-    "DOGE/USDT": {
+    "DOGE": {
       name: "Dogecoin",
-      price: "0.18371", 
-      change: "-0.0023 -1.26%",
+      symbol: "DOGE/USDT",
+      price: "0.16147", 
+      change: "-1.87%",
       isPositive: false,
       highestPrice: "0.19200",
-      lowestPrice: "0.18100",
+      lowestPrice: "0.15100",
       volume24h: "156892C3E",
       volumeBTC: "1205",
       transactions: "445123"
+    },
+    "LTC": {
+      name: "Litecoin",
+      symbol: "LTC/USDT",
+      price: "85.13",
+      change: "-0.28%",
+      isPositive: false,
+      highestPrice: "89.50",
+      lowestPrice: "84.20",
+      volume24h: "234567D4F",
+      volumeBTC: "2890",
+      transactions: "567892"
+    },
+    "CHZ": {
+      name: "Chiliz",
+      symbol: "CHZ/USDT",
+      price: "0.03457",
+      change: "-2.59%",
+      isPositive: false,
+      highestPrice: "0.03650",
+      lowestPrice: "0.03350",
+      volume24h: "123456E5G",
+      volumeBTC: "456",
+      transactions: "234567"
+    },
+    "BCH": {
+      name: "Bitcoin Cash",
+      symbol: "BCH/USDT",
+      price: "502.8",
+      change: "0.50%",
+      isPositive: true,
+      highestPrice: "515.20",
+      lowestPrice: "498.30",
+      volume24h: "345678F6H",
+      volumeBTC: "3456",
+      transactions: "678901"
+    },
+    "PSG": {
+      name: "Paris Saint-Germain",
+      symbol: "PSG/USDT",
+      price: "1.417",
+      change: "-2.01%",
+      isPositive: false,
+      highestPrice: "1.520",
+      lowestPrice: "1.380",
+      volume24h: "456789G7I",
+      volumeBTC: "567",
+      transactions: "345678"
+    },
+    "JUV": {
+      name: "Juventus",
+      symbol: "JUV/USDT",
+      price: "0.901",
+      change: "-1.42%",
+      isPositive: false,
+      highestPrice: "0.950",
+      lowestPrice: "0.880",
+      volume24h: "567890H8J",
+      volumeBTC: "678",
+      transactions: "456789"
+    },
+    "ATM": {
+      name: "Atletico Madrid",
+      symbol: "ATM/USDT",
+      price: "0.999",
+      change: "-1.87%",
+      isPositive: false,
+      highestPrice: "1.050",
+      lowestPrice: "0.950",
+      volume24h: "678901I9K",
+      volumeBTC: "789",
+      transactions: "567890"
+    },
+    "EOS": {
+      name: "EOS",
+      symbol: "EOS/USDT",
+      price: "0",
+      change: "0.00%",
+      isPositive: true,
+      highestPrice: "0.80",
+      lowestPrice: "0.70",
+      volume24h: "789012J0L",
+      volumeBTC: "890",
+      transactions: "678901"
+    },
+    "TRX": {
+      name: "TRON",
+      symbol: "TRX/USDT",
+      price: "0.2712",
+      change: "0.15%",
+      isPositive: true,
+      highestPrice: "0.2850",
+      lowestPrice: "0.2650",
+      volume24h: "890123K1M",
+      volumeBTC: "901",
+      transactions: "789012"
+    },
+    "ETC": {
+      name: "Ethereum Classic",
+      symbol: "ETC/USDT",
+      price: "16.19",
+      change: "-2.00%",
+      isPositive: false,
+      highestPrice: "17.20",
+      lowestPrice: "15.80",
+      volume24h: "901234L2N",
+      volumeBTC: "1012",
+      transactions: "890123"
+    },
+    "BTS": {
+      name: "BitShares",
+      symbol: "BTS/USDT",
+      price: "502.8",
+      change: "0.50%",
+      isPositive: true,
+      highestPrice: "515.00",
+      lowestPrice: "498.00",
+      volume24h: "123450M3O",
+      volumeBTC: "1123",
+      transactions: "901234"
     }
   };
 
-  const currentCrypto = cryptoData[currency] || cryptoData["BTC/USDT"];
+  const currentCrypto = cryptoData[currency] || cryptoData["BTC"];
 
   const periods = [
     { label: "30s", value: "30s", payout: "20%" },
@@ -98,11 +221,10 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
     }
 
     createBettingOrder.mutate({
-      userId: user.id,
-      currency: currency,
-      orderType: orderType,
+      asset: currency,
       amount: orderAmount,
-      duration: selectedPeriod,
+      direction: orderType === "up" ? "Buy Up" : "Buy Down",
+      duration: selectedPeriod.replace('s', ''),
       entryPrice: currentCrypto.price,
     }, {
       onSuccess: () => {
@@ -131,7 +253,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <h1 className="text-xl font-bold">{currency}</h1>
+        <h1 className="text-xl font-bold">{currentCrypto.name}</h1>
         <div></div>
       </div>
 
