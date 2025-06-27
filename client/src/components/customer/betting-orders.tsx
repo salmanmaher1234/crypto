@@ -230,38 +230,34 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
                 <Card key={order.id} className="bg-white border border-gray-200">
                   <CardContent className="p-4">
                     {/* 3-Column Layout */}
-                    <div className="grid grid-cols-3 gap-4 items-center">
+                    <div className="grid grid-cols-3 gap-6">
                       {/* Column 1: Labels */}
                       <div className="space-y-3">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1">Currency</div>
-                          <div className="text-xs text-gray-500 mb-1">Order No.</div>
-                          <div className="text-xs text-gray-500 mb-1">Order Amount</div>
-                          <div className="text-xs text-gray-500 mb-1">Profit Amount</div>
-                          <div className="text-xs text-gray-500 mb-1">Buy Direction</div>
-                          <div className="text-xs text-gray-500 mb-1">Scale</div>
-                          <div className="text-xs text-gray-500 mb-1">Billing Time</div>
-                          <div className="text-xs text-gray-500 mb-1">Order Time</div>
-                        </div>
+                        <div className="text-xs text-gray-500">Currency</div>
+                        <div className="text-xs text-gray-500">Order No.</div>
+                        <div className="text-xs text-gray-500">Order Amount</div>
+                        <div className="text-xs text-gray-500">Profit Amount</div>
+                        <div className="text-xs text-gray-500">Buy Direction</div>
+                        <div className="text-xs text-gray-500">Scale</div>
+                        <div className="text-xs text-gray-500">Billing Time</div>
+                        <div className="text-xs text-gray-500">Order Time</div>
                       </div>
                       
                       {/* Column 2: Values */}
                       <div className="space-y-3">
-                        <div>
-                          <div className="font-medium text-sm mb-2">{order.asset}/USDT</div>
-                          <div className="font-medium text-xs mb-2">{orderNumber}</div>
-                          <div className="font-medium text-sm mb-2">{order.amount}</div>
-                          <div className={`font-medium text-sm mb-2 ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
-                            {isProfit ? '+' : ''}{profit.toFixed(0)}
-                          </div>
-                          <div className={`font-medium text-sm mb-2 ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
-                            {order.direction}
-                          </div>
-                          <div className="font-medium text-sm mb-2">{order.duration}s</div>
-                          <div className="font-medium text-sm mb-2">{order.duration}s</div>
-                          <div className="font-medium text-sm">
-                            {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
-                          </div>
+                        <div className="font-medium text-sm">{order.asset}/USDT</div>
+                        <div className="font-medium text-xs">{orderNumber}</div>
+                        <div className="font-medium text-sm">{order.amount}</div>
+                        <div className={`font-medium text-sm ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
+                          {isProfit ? '+' : ''}{profit.toFixed(0)}
+                        </div>
+                        <div className={`font-medium text-sm ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
+                          {order.direction}
+                        </div>
+                        <div className="font-medium text-sm">{order.duration}s</div>
+                        <div className="font-medium text-sm">{order.duration}s</div>
+                        <div className="font-medium text-sm">
+                          {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
                         </div>
                       </div>
                       
