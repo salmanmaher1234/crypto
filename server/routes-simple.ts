@@ -229,11 +229,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/transactions", authenticateUser, async (req, res) => {
     try {
+      console.log("==== TRANSACTION START ====");
+      console.log("Transaction data:", req.body);
+      
       const validatedData = insertTransactionSchema.parse(req.body);
       const transaction = await storage.createTransaction(validatedData);
+      console.log("Created transaction:", transaction);
       
       // Update user balance based on transaction type
       const user = await storage.getUser(validatedData.userId);
+      console.log("User before transaction update:", user);
+      
       if (user) {
         const amount = parseFloat(validatedData.amount);
         let balanceUpdate = {};
@@ -265,7 +271,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
         }
         
-        await storage.updateUser(validatedData.userId, balanceUpdate);
+        console.log("Balance update object:", balanceUpdate);
+        const updatedUser = await storage.updateUser(validatedData.userId, balanceUpdate);
+        console.log("Updated user after transaction:", updatedUser);
       }
       
       res.json(transaction);
@@ -312,25 +320,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
+      console.log("==== BETTING ORDER START ====");
+      console.log("User ID:", (req as any).userId);
+      console.log("Order data:", req.body);
+      
       const validatedData = insertBettingOrderSchema.parse({
         ...req.body,
         userId: (req as any).userId,
       });
+      console.log("Validated data:", validatedData);
       
       const order = await storage.createBettingOrder(validatedData);
+      console.log("Created order:", order);
       
       // Deduct amount from available balance
       const user = await storage.getUser((req as any).userId);
+      console.log("Current user before balance update:", user);
+      
       if (user) {
         const amount = parseFloat(validatedData.amount);
-        await storage.updateUser((req as any).userId, {
-          availableBalance: (parseFloat(user.availableBalance) - amount).toFixed(2),
+        const currentBalance = parseFloat(user.availableBalance);
+        const newBalance = currentBalance - amount;
+        
+        console.log(`BALANCE UPDATE: ${currentBalance} - ${amount} = ${newBalance}`);
+        
+        const updatedUser = await storage.updateUser((req as any).userId, {
+          availableBalance: newBalance.toFixed(2),
         });
+        console.log("Updated user:", updatedUser);
       }
       
+      console.log("==== BETTING ORDER END ====");
       res.json(order);
     } catch (error) {
-      res.status(400).json({ message: "Invalid betting order data" });
+      console.error("Betting order error:", error);
+      res.status(400).json({ message: "Invalid betting order data", error: error.message });
     }
   });
 
