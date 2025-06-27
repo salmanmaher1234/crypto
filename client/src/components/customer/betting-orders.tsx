@@ -16,11 +16,7 @@ export function CustomerBettingOrders() {
   const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">("pending");
   const [timeFilter, setTimeFilter] = useState("today");
 
-  // Debug logging
-  console.log("User:", user);
-  console.log("All betting orders:", allBettingOrders);
-  console.log("Loading:", isLoading);
-  console.log("Error:", error);
+
 
   // Filter orders for current user
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
