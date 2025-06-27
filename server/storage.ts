@@ -77,18 +77,15 @@ export class MemStorage implements IStorage {
     this.announcements = new Map();
     this.currentId = 1;
 
-    // Initialize with admin user
-    const adminUser = {
+    // Create admin user with full data
+    const adminId = this.currentId++;
+    const admin: User = {
+      id: adminId,
       username: "admin",
-      email: "admin@cryptoinvest.com",
+      email: "admin@cryptoinvest.com", 
       password: "admin123",
       name: "Administrator",
-      role: "admin" as const,
-    };
-    const admin = this.createUser(adminUser);
-    
-    // Update admin with full data
-    this.updateUser(admin.id, {
+      role: "admin",
       balance: "10000.00",
       availableBalance: "10000.00",
       frozenBalance: "0.00",
@@ -97,21 +94,22 @@ export class MemStorage implements IStorage {
       direction: "Actual",
       accountStatus: "Active",
       withdrawalStatus: "Allowed",
+      fundPassword: null,
+      invitationCode: null,
+      agentInvitationCode: null,
       isActive: true,
-    });
+    };
+    this.users.set(adminId, admin);
 
-    // Initialize with sample customer
-    const customerUser = {
+    // Create customer user with full data  
+    const customerId = this.currentId++;
+    const customer: User = {
+      id: customerId,
       username: "sarah",
       email: "sarah@email.com",
-      password: "password123",
+      password: "password123", 
       name: "Sarah Johnson",
-      role: "customer" as const,
-    };
-    const customer = this.createUser(customerUser);
-    
-    // Update customer with full data
-    this.updateUser(customer.id, {
+      role: "customer",
       balance: "10500.00",
       availableBalance: "10000.00",
       frozenBalance: "500.00",
@@ -120,8 +118,12 @@ export class MemStorage implements IStorage {
       direction: "Actual",
       accountStatus: "Active",
       withdrawalStatus: "Allowed",
+      fundPassword: null,
+      invitationCode: null,
+      agentInvitationCode: null,
       isActive: true,
-    });
+    };
+    this.users.set(customerId, customer);
 
     // Add sample betting orders for sarah - use hard-coded ID 2 since that's the second user
     this.addSampleBettingOrders(2);
@@ -252,6 +254,7 @@ export class MemStorage implements IStorage {
       withdrawalStatus: "Allowed",
       fundPassword: insertUser.fundPassword || null,
       invitationCode: insertUser.invitationCode || null,
+      agentInvitationCode: null,
       isActive: true,
     };
     this.users.set(id, user);
