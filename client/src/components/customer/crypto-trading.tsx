@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,23 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
   const [orderType, setOrderType] = useState<"up" | "down">("up");
   const [selectedPeriod, setSelectedPeriod] = useState("60s");
   const [orderAmount, setOrderAmount] = useState("");
+  const [selectedChartPeriod, setSelectedChartPeriod] = useState("1m");
+  const [chartType, setChartType] = useState<"candlestick" | "line">("candlestick");
+  const [chartKey, setChartKey] = useState(0);
+
+  // Real-time chart update effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setChartKey(prev => prev + 1); // Force chart re-render for real-time effect
+    }, 3000); // Update every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [selectedChartPeriod, chartType]);
+
+  // Update chart immediately when filters change
+  useEffect(() => {
+    setChartKey(prev => prev + 1);
+  }, [selectedChartPeriod, chartType]);
 
   const cryptoData: { [key: string]: any } = {
     "BTC": {
@@ -299,30 +316,116 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         </CardContent>
       </Card>
 
-      {/* Chart Controls */}
+      {/* Trading Chart View */}
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex space-x-2 text-sm">
-              <Button variant="outline" size="sm">1m</Button>
-              <Button variant="outline" size="sm">30m</Button>
-              <Button variant="outline" size="sm">1h</Button>
-              <Button variant="outline" size="sm">D</Button>
+            <div className="flex space-x-1">
+              {["1m", "30m", "1h", "1D"].map((period) => (
+                <Button
+                  key={period}
+                  variant={selectedChartPeriod === period ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedChartPeriod(period)}
+                  className="text-xs px-2 py-1 h-7"
+                >
+                  {period}
+                </Button>
+              ))}
             </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <BarChart3 className="w-4 h-4" />
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={chartType === "candlestick" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setChartType("candlestick")}
+                className="p-1 h-7 w-7"
+              >
+                <BarChart3 className="w-3 h-3" />
               </Button>
-              <Button variant="outline" size="sm">📈</Button>
+              <Button
+                variant={chartType === "line" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setChartType("line")}
+                className="p-1 h-7 w-7"
+              >
+                📈
+              </Button>
+              <Button variant="outline" size="sm" className="p-1 h-7 w-7">
+                <TrendingUp className="w-3 h-3" />
+              </Button>
+              <Button variant="outline" size="sm" className="p-1 h-7 w-7">
+                ⚙️
+              </Button>
             </div>
           </div>
           
-          {/* Chart Placeholder */}
-          <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-t from-green-500/10 to-transparent"></div>
-            <div className="text-center">
-              <div className="text-lg font-medium mb-2">BINANCE:{currency}</div>
-              <div className="text-sm text-gray-600">Trading Chart View</div>
+          {/* Interactive Chart */}
+          <div className="h-64 bg-gray-50 dark:bg-gray-800 rounded-lg relative overflow-hidden border">
+            {/* Chart Header */}
+            <div className="absolute top-3 left-3 z-10">
+              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                BINANCE:{currency}
+              </div>
+              <div className="text-xs text-gray-500">
+                {selectedChartPeriod} • {chartType === "candlestick" ? "Candlestick" : "Line"} Chart
+              </div>
+            </div>
+            
+            {/* Chart Area */}
+            <div className="h-full w-full relative">
+              {chartType === "candlestick" ? (
+                <div className="h-full flex items-end justify-around px-4 pb-4 pt-12">
+                  {/* Candlestick Simulation */}
+                  {Array.from({ length: 20 }, (_, i) => {
+                    const height = Math.random() * 60 + 20 + (chartKey % 10);
+                    const isGreen = (Math.random() + chartKey * 0.1) > 0.5;
+                    return (
+                      <div key={i} className="flex flex-col items-center space-y-1">
+                        <div 
+                          className={`w-1 ${isGreen ? 'bg-green-500' : 'bg-red-500'}`}
+                          style={{ height: `${height}px` }}
+                        />
+                        <div 
+                          className={`w-3 border-2 ${isGreen ? 'border-green-500 bg-green-100' : 'border-red-500 bg-red-100'}`}
+                          style={{ height: `${Math.random() * 20 + 10}px` }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="h-full relative">
+                  {/* Line Chart Simulation */}
+                  <svg className="w-full h-full" viewBox="0 0 400 200">
+                    <defs>
+                      <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: '#10b981', stopOpacity: 0.3 }} />
+                        <stop offset="100%" style={{ stopColor: '#10b981', stopOpacity: 0 }} />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d={`M 0 ${150 + (chartKey % 20)} Q 50 ${120 + (chartKey % 15)} 100 ${100 + (chartKey % 10)} T 200 ${80 + (chartKey % 25)} T 300 ${90 + (chartKey % 30)} T 400 ${70 + (chartKey % 20)}`}
+                      stroke="#10b981"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <path
+                      d={`M 0 ${150 + (chartKey % 20)} Q 50 ${120 + (chartKey % 15)} 100 ${100 + (chartKey % 10)} T 200 ${80 + (chartKey % 25)} T 300 ${90 + (chartKey % 30)} T 400 ${70 + (chartKey % 20)} L 400 200 L 0 200 Z`}
+                      fill="url(#priceGradient)"
+                    />
+                  </svg>
+                </div>
+              )}
+              
+              {/* Price Overlay */}
+              <div className="absolute bottom-3 right-3 bg-white dark:bg-gray-900 rounded px-2 py-1 text-sm border shadow-sm">
+                <span className="text-green-600 font-medium">
+                  {currentCrypto.price}
+                </span>
+                <span className="text-xs text-gray-500 ml-1">
+                  {currentCrypto.change}
+                </span>
+              </div>
             </div>
           </div>
         </CardContent>
