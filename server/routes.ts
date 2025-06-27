@@ -421,6 +421,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         price: generatePrice(0.03778),
         change: generateChange(),
         changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "BCH/USD": {
+        price: generatePrice(502.8),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "PSG/USD": {
+        price: generatePrice(1.417),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "JUV/USD": {
+        price: generatePrice(0.901),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "ATM/USD": {
+        price: generatePrice(0.999),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "EOS/USD": {
+        price: generatePrice(0.75),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "TRX/USD": {
+        price: generatePrice(0.2712),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "ETC/USD": {
+        price: generatePrice(16.19),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
+      },
+      "BTS/USD": {
+        price: generatePrice(0.0045),
+        change: generateChange(),
+        changeType: Math.random() > 0.5 ? "positive" : "negative"
       }
     });
   });
