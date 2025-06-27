@@ -82,25 +82,20 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Avatar 
-            className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
-            onClick={onNavigateToProfile}
-          >
-            <AvatarImage src={`/api/placeholder/40/40`} alt={user?.name || 'Profile'} />
-            <AvatarFallback className="bg-blue-500 text-white font-bold">
-              {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-xl font-bold">Home</h1>
-            <p className="text-sm text-gray-600">1216650</p>
-          </div>
+      <div className="flex items-center space-x-3">
+        <Avatar 
+          className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
+          onClick={onNavigateToProfile}
+        >
+          <AvatarImage src={`/api/placeholder/40/40`} alt={user?.name || 'Profile'} />
+          <AvatarFallback className="bg-blue-500 text-white font-bold">
+            {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <h1 className="text-xl font-bold">Home</h1>
+          <p className="text-sm text-gray-600">1393050</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => refetch()}>
-          <RotateCcw className="w-4 h-4" />
-        </Button>
       </div>
 
       {/* Crypto Exchange Banner */}
