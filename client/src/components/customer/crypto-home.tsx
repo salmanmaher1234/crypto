@@ -166,77 +166,46 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </Card>
 
-      {/* Crypto Market Banner */}
+      {/* Crypto Slider */}
       <div className="relative">
-        <div 
-          className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 rounded-lg p-6 relative overflow-hidden"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='20' viewBox='0 0 40 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 40 0 L 0 0 0 20' fill='none' stroke='%23475569' stroke-width='0.5' opacity='0.2'/%3E%3C/svg%3E")`
-          }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left side - Crypto listings */}
-            <div className="space-y-3">
-              {cryptoData.slice(0, 4).map((crypto, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-center justify-between text-white cursor-pointer hover:bg-slate-700/30 p-2 rounded transition-colors"
-                  onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
-                >
-                  <span className="font-semibold text-base">{crypto.name}</span>
-                  <div className="flex items-center space-x-3">
-                    <span className={`text-sm font-bold ${crypto.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                      {crypto.isPositive ? '▲' : '▼'} {crypto.change}
-                    </span>
-                    <span className="text-gray-300 font-medium min-w-[80px] text-right">
-                      ${crypto.price}
-                    </span>
-                  </div>
+        <div className="overflow-hidden">
+          <div 
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${cryptoSlideIndex * (100 / 4)}%)` }}
+          >
+            {/* Create duplicated array for seamless infinite loop */}
+            {[...cryptoData, ...cryptoData].map((crypto, index) => (
+              <div key={index} className="flex-shrink-0" style={{ width: '25%' }}>
+                <div className="px-1.5">
+                  <Card 
+                    className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
+                    onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                  >
+                    <CardContent className="p-3">
+                      <div className="text-center space-y-2">
+                        <div>
+                          <p className="font-semibold text-sm text-center">{crypto.symbol}</p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-sm font-bold text-center">${crypto.price}</p>
+                          <div className="flex items-center justify-center space-x-1">
+                            {crypto.isPositive ? (
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                            ) : (
+                              <TrendingDown className="w-3 h-3 text-red-500" />
+                            )}
+                            <span className={`text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                              {crypto.change}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              ))}
-            </div>
-            
-            {/* Right side - Chart visualization */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-slate-800/50 rounded-md p-4">
-                <svg viewBox="0 0 300 120" className="w-full h-full">
-                  {/* Grid lines */}
-                  <defs>
-                    <pattern id="chartGrid" width="30" height="15" patternUnits="userSpaceOnUse">
-                      <path d="M 30 0 L 0 0 0 15" fill="none" stroke="#475569" strokeWidth="0.5" opacity="0.3"/>
-                    </pattern>
-                  </defs>
-                  <rect width="300" height="120" fill="url(#chartGrid)"/>
-                  
-                  {/* Chart area background */}
-                  <rect x="20" y="10" width="260" height="100" fill="#1e293b" opacity="0.6" rx="4"/>
-                  
-                  {/* Price trend line */}
-                  <path 
-                    d="M 30 90 Q 80 70 130 60 Q 180 45 230 35 Q 260 30 280 25" 
-                    stroke="#22c55e" 
-                    strokeWidth="2.5" 
-                    fill="none"
-                  />
-                  
-                  {/* Area under curve */}
-                  <path 
-                    d="M 30 90 Q 80 70 130 60 Q 180 45 230 35 Q 260 30 280 25 L 280 110 L 30 110 Z" 
-                    fill="url(#chartGradient)"
-                  />
-                  
-                  <defs>
-                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style={{stopColor: '#22c55e', stopOpacity: 0.4}} />
-                      <stop offset="100%" style={{stopColor: '#22c55e', stopOpacity: 0.1}} />
-                    </linearGradient>
-                  </defs>
-                  
-                  {/* Trend arrow */}
-                  <path d="M 270 30 L 280 25 L 275 35 Z" fill="#22c55e"/>
-                </svg>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
