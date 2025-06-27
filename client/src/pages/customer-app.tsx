@@ -39,7 +39,10 @@ export default function CustomerApp() {
     switch (activeSection) {
       case "home":
         return (
-          <CryptoHome onSelectCurrency={setSelectedCurrency} />
+          <CryptoHome 
+            onSelectCurrency={setSelectedCurrency}
+            onNavigateToProfile={() => setActiveSection("profile")}
+          />
         );
       case "trade":
         return <TradingInterface />;

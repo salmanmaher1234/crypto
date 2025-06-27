@@ -2,15 +2,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRight, TrendingUp, TrendingDown, RotateCcw } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
 
 interface CryptoHomeProps {
   onSelectCurrency: (currency: string) => void;
+  onNavigateToProfile?: () => void;
 }
 
-export function CryptoHome({ onSelectCurrency }: CryptoHomeProps) {
+export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHomeProps) {
   const { data: cryptoPrices, refetch } = useCryptoPrices();
+  const { user } = useAuth();
 
   const cryptoData = [
     {
@@ -80,9 +84,15 @@ export function CryptoHome({ onSelectCurrency }: CryptoHomeProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold">$</span>
-          </div>
+          <Avatar 
+            className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
+            onClick={onNavigateToProfile}
+          >
+            <AvatarImage src={`/api/placeholder/40/40`} alt={user?.name || 'Profile'} />
+            <AvatarFallback className="bg-blue-500 text-white font-bold">
+              {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
           <div>
             <h1 className="text-xl font-bold">Home</h1>
             <p className="text-sm text-gray-600">1216650</p>
