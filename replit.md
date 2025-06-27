@@ -105,6 +105,7 @@ Changelog:
 - June 27, 2025. Enhanced crypto trading pages with proper cryptocurrency names in headers and dynamic volume labels - each currency shows its own symbol (e.g., "24H Volume(BTC)" for Bitcoin, "24H Volume(ETH)" for Ethereum)
 - June 27, 2025. Implemented real-time trading chart filters with time period selection (1m, 30m, 1h, 1D) and chart type toggles (candlestick/line) that dynamically update chart display - includes simulated real-time data changes every 3 seconds for authentic trading experience
 - June 27, 2025. Upgraded trading charts to professional Binance-style interface with dark theme, grid lines, price labels, OHLC candlesticks with proper high/low wicks, volume indicators at bottom, current price line markers, and real-time data visualization for both candlestick and line chart modes
+- June 27, 2025. Fixed order placement redirect issue - users now stay on the trading page after placing orders instead of being redirected to home page, allowing continuous trading on the same cryptocurrency
 
 ## User Preferences
 

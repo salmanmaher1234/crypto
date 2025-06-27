@@ -251,7 +251,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         });
         setShowOrderDialog(false);
         setOrderAmount("");
-        onBack(); // Return to home after successful order
+        // Stay on trading page after successful order placement
       },
       onError: () => {
         toast({
