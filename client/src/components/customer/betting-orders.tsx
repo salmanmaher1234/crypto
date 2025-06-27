@@ -1,25 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
-import { useBettingOrders } from "@/lib/api";
-import { FileText, TrendingUp, TrendingDown, Clock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
+import { FileText, Copy } from "lucide-react";
+import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 export function CustomerBettingOrders() {
   const { user } = useAuth();
   const { data: allBettingOrders, isLoading } = useBettingOrders();
+  const updateBettingOrder = useUpdateBettingOrder();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">("pending");
   const [timeFilter, setTimeFilter] = useState("today");
 
   // Filter orders for current user
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
 
+  // Auto-expire orders when their duration is reached
+  useEffect(() => {
+    const checkExpiredOrders = () => {
+      const now = new Date();
+      userBettingOrders.forEach(order => {
+        if (order.status === "active" && order.expiresAt && new Date(order.expiresAt) <= now) {
+          // Calculate profit based on direction and random outcome
+          const isWin = Math.random() > 0.5; // 50% win rate simulation
+          const profitAmount = isWin ? parseFloat(order.amount) * 0.8 : -parseFloat(order.amount);
+          
+          updateBettingOrder.mutate({
+            id: order.id,
+            status: "completed",
+            result: isWin ? "win" : "loss",
+            exitPrice: order.entryPrice, // Using same price for simplicity
+            profitAmount: profitAmount.toFixed(2)
+          });
+        }
+      });
+    };
+
+    const interval = setInterval(checkExpiredOrders, 1000); // Check every second
+    return () => clearInterval(interval);
+  }, [userBettingOrders, updateBettingOrder]);
+
   // Filter by status and time
   const filteredOrders = userBettingOrders.filter(order => {
-    const statusMatch = activeTab === "pending" ? order.status === "pending" :
+    const statusMatch = activeTab === "pending" ? order.status === "active" :
                        activeTab === "closed" ? order.status === "completed" :
                        order.status === "cancelled";
 
@@ -32,39 +59,20 @@ export function CustomerBettingOrders() {
     if (timeFilter === "today") {
       timeMatch = orderDate >= todayStart;
     }
-    // Add more time filters as needed
 
     return statusMatch && timeMatch;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-500";
-      case "completed":
-        return "bg-green-500";
-      case "cancelled":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
-  const getOrderTypeIcon = (orderType: string) => {
-    return orderType === "up" ? 
-      <TrendingUp className="w-4 h-4 text-green-600" /> : 
-      <TrendingDown className="w-4 h-4 text-red-600" />;
+  const copyOrderNumber = (orderNumber: string) => {
+    navigator.clipboard.writeText(orderNumber);
+    toast({
+      title: "Copied",
+      description: "Order number copied to clipboard",
+    });
   };
 
   if (isLoading) {
-    return (
-      <div className="p-6">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading orders...</p>
-        </div>
-      </div>
-    );
+    return <div className="p-4">Loading orders...</div>;
   }
 
   return (
@@ -123,109 +131,97 @@ export function CustomerBettingOrders() {
             <div className="w-8 h-8 bg-yellow-400 rounded-full mt-4"></div>
           </div>
         ) : (
-          <div className="space-y-4">
-            {filteredOrders.map((order) => (
-              <Card key={order.id} className="bg-gray-50 border border-gray-200">
-                <CardContent className="p-4">
-                  <div className="flex justify-end mb-3">
-                    <button className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                      <span className="text-xs">›</span>
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-3 text-sm">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-gray-500 text-xs">Currency</span>
-                        <div className="font-medium">{order.currency}</div>
-                      </div>
-                      <div className="text-right">
-                        <button className="text-blue-600 text-xs font-medium">Copy</button>
-                      </div>
+          <div className="space-y-3">
+            {filteredOrders.map((order) => {
+              const orderNumber = `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
+              const profit = order.result === "win" ? parseFloat(order.amount) * 0.8 : 
+                           order.result === "loss" ? -parseFloat(order.amount) : 100;
+              const isProfit = profit > 0;
+              
+              return (
+                <Card key={order.id} className="bg-white border border-gray-200">
+                  <CardContent className="p-4">
+                    <div className="flex justify-end mb-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-gray-600 h-6 w-6 p-0"
+                      >
+                        <span className="text-lg">›</span>
+                      </Button>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-gray-500 text-xs">Order No.</span>
-                        <div className="font-medium text-xs">B{order.id.toString().padStart(15, '0')}</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 text-xs">Order Amount</span>
-                        <div className="font-medium">{parseFloat(order.amount).toFixed(0)}</div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-gray-500 text-xs">Profit Amount</span>
-                        <div className="font-medium text-red-600">
-                          {order.profit ? parseFloat(order.profit).toFixed(0) : "0"}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 text-xs">Buy Direction</span>
-                        <div className={`font-medium ${order.orderType === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                          {order.orderType === 'up' ? 'Buy Up' : 'Buy Down'}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-gray-500 text-xs">Scale</span>
-                        <div className="font-medium">{order.duration.replace('s', '%')}</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 text-xs">Billing Time</span>
-                        <div className="font-medium">{order.duration}</div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-gray-500 text-xs">Order Time</span>
-                      <div className="font-medium text-xs">
-                        {new Date(order.createdAt).toLocaleString('en-GB', {
-                          year: 'numeric',
-                          month: '2-digit', 
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  {order.status === "pending" && (
-                    <div className="mt-3 pt-3 border-t">
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <Clock className="w-4 h-4" />
-                        <span>Order is being processed...</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {order.status === "completed" && (
-                    <div className="mt-3 pt-3 border-t">
+                    <div className="space-y-3">
+                      {/* Row 1: Currency and Copy */}
                       <div className="flex justify-between items-center">
-                        <div className="text-sm">
-                          <span className="text-gray-600">Exit Price:</span>
-                          <span className="font-medium ml-1">{order.exitPrice || "N/A"}</span>
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Currency</div>
+                          <div className="font-medium text-sm">{order.asset}/USDT</div>
                         </div>
-                        <div className="text-sm">
-                          <span className="text-gray-600">Profit/Loss:</span>
-                          <span className={`font-medium ml-1 ${
-                            order.profit && parseFloat(order.profit) > 0 ? "text-green-600" : "text-red-600"
-                          }`}>
-                            {order.profit ? `$${parseFloat(order.profit).toFixed(2)}` : "$0.00"}
-                          </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600 text-xs h-auto p-1"
+                          onClick={() => copyOrderNumber(orderNumber)}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                      
+                      {/* Row 2: Order No. and Order Amount */}
+                      <div className="flex justify-between">
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Order No.</div>
+                          <div className="font-medium text-xs">{orderNumber}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500 mb-1">Order Amount</div>
+                          <div className="font-medium text-sm">{order.amount}</div>
+                        </div>
+                      </div>
+
+                      {/* Row 3: Profit Amount and Buy Direction */}
+                      <div className="flex justify-between">
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Profit Amount</div>
+                          <div className={`font-medium text-sm ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
+                            {isProfit ? '+' : ''}{profit.toFixed(0)}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500 mb-1">Buy Direction</div>
+                          <div className={`font-medium text-sm ${order.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
+                            {order.direction}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Row 4: Scale and Billing Time */}
+                      <div className="flex justify-between">
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Scale</div>
+                          <div className="font-medium text-sm">{order.duration}s</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500 mb-1">Billing Time</div>
+                          <div className="font-medium text-sm">{order.duration}s</div>
+                        </div>
+                      </div>
+
+                      {/* Row 5: Order Time */}
+                      <div className="flex justify-between">
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Order Time</div>
+                          <div className="font-medium text-sm">
+                            {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
