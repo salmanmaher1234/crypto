@@ -98,7 +98,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
     }
   ];
 
-  // Auto-slide crypto boxes every 2 seconds (one box at a time)
+  // Auto-slide crypto boxes every 30 seconds (one box at a time)
   useEffect(() => {
     const interval = setInterval(() => {
       setCryptoSlideIndex((prev) => {
@@ -106,7 +106,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         // Reset to 0 when we reach the length of original array for seamless loop
         return nextIndex >= cryptoData.length ? 0 : nextIndex;
       });
-    }, 2000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [cryptoData.length]);
