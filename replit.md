@@ -98,6 +98,7 @@ SuperCoin is a full-stack cryptocurrency investment platform built with React, E
 Changelog:
 - June 24, 2025. Initial setup
 - June 24, 2025. Updated application name to SuperCoin and removed demo credentials from login page
+- June 27, 2025. Enhanced crypto boxes slider with automatic infinite loop - one box slides every 2 seconds, seamless transition with duplicated array, manual navigation removed, automatically adapts to new cryptocurrencies
 
 ## User Preferences
 

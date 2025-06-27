@@ -98,7 +98,18 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
     }
   ];
 
+  // Auto-slide crypto boxes every 2 seconds (one box at a time)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCryptoSlideIndex((prev) => {
+        const nextIndex = prev + 1;
+        // Reset to 0 when we reach the length of original array for seamless loop
+        return nextIndex >= cryptoData.length ? 0 : nextIndex;
+      });
+    }, 2000);
 
+    return () => clearInterval(interval);
+  }, [cryptoData.length]);
 
   return (
     <div className="space-y-6">
@@ -156,73 +167,51 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Crypto Slider */}
       <div className="relative">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4">
           <h3 className="text-lg font-semibold">Cryptocurrencies</h3>
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCryptoSlideIndex(Math.max(0, cryptoSlideIndex - 1))}
-              disabled={cryptoSlideIndex === 0}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCryptoSlideIndex(Math.min(Math.ceil(cryptoData.length / 4) - 1, cryptoSlideIndex + 1))}
-              disabled={cryptoSlideIndex >= Math.ceil(cryptoData.length / 4) - 1}
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
         </div>
         
         <div className="overflow-hidden">
           <div 
-            className="flex transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${cryptoSlideIndex * 100}%)` }}
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${cryptoSlideIndex * (100 / 4)}%)` }}
           >
-            {Array.from({ length: Math.ceil(cryptoData.length / 4) }).map((_, slideIndex) => (
-              <div key={slideIndex} className="w-full flex-shrink-0">
-                <div className="grid grid-cols-4 gap-3">
-                  {cryptoData.slice(slideIndex * 4, (slideIndex + 1) * 4).map((crypto, index) => (
-                    <Card 
-                      key={slideIndex * 4 + index} 
-                      className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
-                      onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
-                    >
-                      <CardContent className="p-3">
-                        <div className="text-center space-y-2">
-                          <div className="flex justify-center">
-                            <span className={`text-2xl text-${crypto.color}-500`}>
-                              {crypto.icon}
+            {/* Create duplicated array for seamless infinite loop */}
+            {[...cryptoData, ...cryptoData].map((crypto, index) => (
+              <div key={index} className="flex-shrink-0" style={{ width: '25%' }}>
+                <div className="px-1.5">
+                  <Card 
+                    className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
+                    onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                  >
+                    <CardContent className="p-3">
+                      <div className="text-center space-y-2">
+                        <div className="flex justify-center">
+                          <span className={`text-2xl text-${crypto.color}-500`}>
+                            {crypto.icon}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm text-center">{crypto.symbol}</p>
+                          <p className="text-xs text-gray-500 text-center">{crypto.name}</p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <p className="text-sm font-bold text-center">${crypto.price}</p>
+                          <div className="flex items-center justify-center space-x-1">
+                            {crypto.isPositive ? (
+                              <TrendingUp className="w-3 h-3 text-green-500" />
+                            ) : (
+                              <TrendingDown className="w-3 h-3 text-red-500" />
+                            )}
+                            <span className={`text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                              {crypto.change}
                             </span>
                           </div>
-                          <div>
-                            <p className="font-semibold text-sm text-center">{crypto.symbol}</p>
-                            <p className="text-xs text-gray-500 text-center">{crypto.name}</p>
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <p className="text-sm font-bold text-center">${crypto.price}</p>
-                            <div className="flex items-center justify-center space-x-1">
-                              {crypto.isPositive ? (
-                                <TrendingUp className="w-3 h-3 text-green-500" />
-                              ) : (
-                                <TrendingDown className="w-3 h-3 text-red-500" />
-                              )}
-                              <span className={`text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                                {crypto.change}
-                              </span>
-                            </div>
-                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             ))}
