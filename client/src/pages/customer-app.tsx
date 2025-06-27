@@ -13,8 +13,8 @@ import { useLocation } from "wouter";
 
 const sections = [
   { id: "home", label: "Home", icon: Home },
-  { id: "trade", label: "Trade", icon: TrendingUp },
   { id: "orders", label: "Orders", icon: FileText },
+  { id: "trade", label: "Trade", icon: TrendingUp },
   { id: "wallet", label: "Wallet", icon: Wallet },
   { id: "profile", label: "Profile", icon: User },
 ];
