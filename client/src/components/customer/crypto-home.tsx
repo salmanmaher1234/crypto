@@ -235,21 +235,21 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                     className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
                     onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
                   >
-                    <CardContent className="p-2 lg:p-3">
-                      <div className="text-center space-y-1 lg:space-y-2">
+                    <CardContent className="p-1.5 sm:p-2 lg:p-3">
+                      <div className="text-center space-y-0.5 sm:space-y-1 lg:space-y-2">
                         <div>
-                          <p className="font-semibold text-xs lg:text-sm text-center">{crypto.symbol}</p>
+                          <p className="font-semibold text-[10px] sm:text-xs lg:text-sm text-center">{crypto.symbol}</p>
                         </div>
                         
-                        <div className="space-y-1">
-                          <p className="text-xs lg:text-sm font-bold text-center">${crypto.price}</p>
-                          <div className="flex items-center justify-center space-x-1">
+                        <div className="space-y-0.5 lg:space-y-1">
+                          <p className="text-[10px] sm:text-xs lg:text-sm font-bold text-center">${crypto.price}</p>
+                          <div className="flex items-center justify-center space-x-0.5 lg:space-x-1">
                             {crypto.isPositive ? (
                               <TrendingUp className="w-2 h-2 lg:w-3 lg:h-3 text-green-500" />
                             ) : (
                               <TrendingDown className="w-2 h-2 lg:w-3 lg:h-3 text-red-500" />
                             )}
-                            <span className={`text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                            <span className={`text-[9px] sm:text-[10px] lg:text-xs ${crypto.isPositive ? 'text-green-500' : 'text-red-500'}`}>
                               {crypto.change}
                             </span>
                           </div>
