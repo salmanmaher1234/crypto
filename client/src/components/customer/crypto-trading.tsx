@@ -245,15 +245,18 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       duration: parseInt(selectedPeriod.replace('s', '')),
       entryPrice: currentCrypto.price,
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
+        // Force refresh user data to show updated balance immediately
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+        
         toast({
           title: "Order submitted",
           description: `${orderType.toUpperCase()} order for ${currency} submitted successfully`,
         });
         setShowOrderDialog(false);
         setOrderAmount("");
-        // Manually refresh user data to show updated balance
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         // Stay on trading page after successful order placement
       },
       onError: () => {

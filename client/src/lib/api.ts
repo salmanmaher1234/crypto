@@ -68,7 +68,9 @@ export function useCreateBettingOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/betting-orders/active"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
   });
 }
