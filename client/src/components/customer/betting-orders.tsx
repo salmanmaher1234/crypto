@@ -10,11 +10,17 @@ import { format } from "date-fns";
 
 export function CustomerBettingOrders() {
   const { user } = useAuth();
-  const { data: allBettingOrders, isLoading } = useBettingOrders();
+  const { data: allBettingOrders, isLoading, error } = useBettingOrders();
   const updateBettingOrder = useUpdateBettingOrder();
   // const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">("pending");
   const [timeFilter, setTimeFilter] = useState("today");
+
+  // Debug logging
+  console.log("User:", user);
+  console.log("All betting orders:", allBettingOrders);
+  console.log("Loading:", isLoading);
+  console.log("Error:", error);
 
   // Filter orders for current user
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
