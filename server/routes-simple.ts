@@ -114,12 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser({
         ...result.data,
-        role: "customer",
-        isActive: true,
-        balance: "0",
-        availableBalance: "0",
-        frozenBalance: "0",
-        reputation: 85
+        role: "customer"
       });
 
       const { password: _, ...userWithoutPassword } = user;
@@ -354,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(order);
     } catch (error) {
       console.error("Betting order error:", error);
-      res.status(400).json({ message: "Invalid betting order data", error: error.message });
+      res.status(400).json({ message: "Invalid betting order data", error: String(error) });
     }
   });
 
