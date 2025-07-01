@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useAnnouncements, useCreateTransaction } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +32,7 @@ export function Profile() {
   const { data: announcements } = useAnnouncements();
   const createBankAccount = useCreateBankAccount();
   const createTransaction = useCreateTransaction();
+  const createWithdrawalRequest = useCreateWithdrawalRequest();
   const { toast } = useToast();
   
   const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'digitalwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
@@ -77,7 +78,6 @@ export function Profile() {
     
     createBankAccount.mutate({
       ...bankFormData,
-      userId: user.id,
     }, {
       onSuccess: () => {
         toast({
@@ -103,7 +103,7 @@ export function Profile() {
   };
 
   const handleLogout = () => {
-    logout.mutate();
+    logout();
   };
 
   if (!user) return null;
@@ -267,22 +267,60 @@ export function Profile() {
                       onClick={() => {
                         const amount = parseFloat(withdrawAmount);
                         const available = parseFloat(user?.availableBalance || user?.balance || "0");
-                        if (withdrawAmount && amount > 0 && amount <= available) {
+                        
+                        if (!withdrawAmount || amount <= 0) {
                           toast({
-                            title: "Withdrawal requested",
-                            description: `$${withdrawAmount} withdrawal request submitted`,
+                            title: "Invalid amount",
+                            description: "Please enter a valid withdrawal amount",
+                            variant: "destructive",
                           });
-                          setWithdrawAmount("");
-                          setShowWithdrawDialog(false);
-                        } else if (amount > available) {
+                          return;
+                        }
+                        
+                        if (amount > available) {
                           toast({
                             title: "Insufficient funds",
                             description: "Amount exceeds available balance",
                             variant: "destructive",
                           });
+                          return;
                         }
+                        
+                        // Check if user has a bank account
+                        if (!userBankAccounts || userBankAccounts.length === 0) {
+                          toast({
+                            title: "No bank account",
+                            description: "Please add a bank account first to process withdrawals",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        // Use the first bank account for withdrawal
+                        const bankAccountId = userBankAccounts[0].id;
+                        
+                        createWithdrawalRequest.mutate({
+                          bankAccountId,
+                          amount: withdrawAmount
+                        }, {
+                          onSuccess: () => {
+                            toast({
+                              title: "Withdrawal requested",
+                              description: `$${withdrawAmount} withdrawal request submitted successfully`,
+                            });
+                            setWithdrawAmount("");
+                            setShowWithdrawDialog(false);
+                          },
+                          onError: () => {
+                            toast({
+                              title: "Withdrawal failed",
+                              description: "Unable to process withdrawal request. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        });
                       }}
-                      disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0}
+                      disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || createWithdrawalRequest.isPending}
                     >
                       Confirm Withdrawal ${withdrawAmount || "0"}
                     </Button>
