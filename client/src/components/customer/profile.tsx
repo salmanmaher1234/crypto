@@ -295,16 +295,73 @@ export function Profile() {
                       </Select>
                     </div>
 
-                    {/* Recharge Prompt Message */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="text-sm text-blue-800">
-                        <div className="font-semibold mb-2">Recharge Instructions:</div>
-                        <div className="space-y-1">
-                          <div>• Minimum recharge amount: 1 USDT</div>
-                          <div>• Maximum recharge amount: 100,000 USDT</div>
-                          <div>• Processing time: 1-10 minutes</div>
-                          <div>• Please ensure you select the correct wallet</div>
-                          <div>• Contact support if you encounter any issues</div>
+                    {/* Recharge Prompt Message - Live Validation */}
+                    <div className="border rounded-lg p-4">
+                      <div className="text-sm">
+                        <div className="font-semibold mb-2">Recharge Status:</div>
+                        <div className="space-y-2">
+                          {/* Amount Validation */}
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              rechargeAmount && parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
+                                ? 'bg-green-500' 
+                                : rechargeAmount 
+                                  ? 'bg-red-500' 
+                                  : 'bg-gray-300'
+                            }`}></div>
+                            <span className={
+                              rechargeAmount && parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
+                                ? 'text-green-600' 
+                                : rechargeAmount 
+                                  ? 'text-red-600' 
+                                  : 'text-gray-500'
+                            }>
+                              Amount: {rechargeAmount ? 
+                                (parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 ? 
+                                  `${rechargeAmount} USDT (Valid)` : 
+                                  `${rechargeAmount} USDT (Invalid - Range: 1-100,000)`) : 
+                                'Enter amount (1-100,000 USDT)'}
+                            </span>
+                          </div>
+                          
+                          {/* Wallet Validation */}
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-2 h-2 rounded-full ${selectedWallet ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <span className={selectedWallet ? 'text-green-600' : 'text-gray-500'}>
+                              Wallet: {selectedWallet ? 
+                                selectedWallet.charAt(0).toUpperCase() + selectedWallet.slice(1) + ' Selected' : 
+                                'Select wallet category'}
+                            </span>
+                          </div>
+                          
+                          {/* Ready Status */}
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              rechargeAmount && selectedWallet && 
+                              parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
+                                ? 'bg-green-500' 
+                                : 'bg-gray-300'
+                            }`}></div>
+                            <span className={
+                              rechargeAmount && selectedWallet && 
+                              parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
+                                ? 'text-green-600 font-medium' 
+                                : 'text-gray-500'
+                            }>
+                              {rechargeAmount && selectedWallet && 
+                               parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
+                                ? '✓ Ready to process recharge' 
+                                : 'Complete all fields to proceed'}
+                            </span>
+                          </div>
+                          
+                          {/* Processing Status */}
+                          {createTransaction.isPending && (
+                            <div className="flex items-center space-x-2">
+                              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                              <span className="text-blue-600 font-medium">Processing recharge...</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
