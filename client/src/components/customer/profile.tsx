@@ -812,7 +812,7 @@ export function Profile() {
     );
   }
 
-  // Bank Wallet View
+  // Bank Wallet View (Blank for now)
   if (currentView === 'bankwallet') {
     return (
       <div className="min-h-screen bg-gray-100 p-4">
@@ -822,86 +822,9 @@ export function Profile() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <CardTitle className="flex-1 text-center text-lg font-medium">Bank Wallet</CardTitle>
-            <Button variant="ghost" size="sm">
-              <Plus className="w-4 h-4" />
-            </Button>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Bank Account Details */}
-            <div className="space-y-3">
-              {/* Holder's name */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600 text-sm">Holder's name</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">1</span>
-                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
-                    Copy
-                  </Button>
-                </div>
-              </div>
-
-              {/* Bank Name */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600 text-sm">Bank Name</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">1</span>
-                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
-                    Copy
-                  </Button>
-                </div>
-              </div>
-
-              {/* A/c No */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600 text-sm">A/c No</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">1</span>
-                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
-                    Copy
-                  </Button>
-                </div>
-              </div>
-
-              {/* IFSC Code */}
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600 text-sm">IFSC Code</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">1</span>
-                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
-                    Copy
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3 mt-6">
-              <Button 
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-                onClick={() => {
-                  // Handle modify functionality
-                  toast({
-                    title: "Modify",
-                    description: "Bank account modification feature coming soon."
-                  });
-                }}
-              >
-                Modify
-              </Button>
-              <Button 
-                variant="destructive" 
-                className="flex-1"
-                onClick={() => {
-                  // Handle delete functionality
-                  toast({
-                    title: "Delete",
-                    description: "Bank account deletion feature coming soon."
-                  });
-                }}
-              >
-                Delete
-              </Button>
-            </div>
+          <CardContent className="p-8 text-center">
+            <p className="text-gray-500">Bank wallet options will be available soon.</p>
           </CardContent>
         </Card>
       </div>
