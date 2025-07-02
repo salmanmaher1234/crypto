@@ -86,6 +86,9 @@ export function Profile() {
   const [showSignatureDialog, setShowSignatureDialog] = useState(false);
   const [selectedGender, setSelectedGender] = useState('Confidential');
   const [signatureData, setSignatureData] = useState<string | null>(null);
+  const [signatureName, setSignatureName] = useState('');
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
 
@@ -149,9 +152,93 @@ export function Profile() {
     });
   };
 
+  // Drawing functions for signature canvas
+  const getEventPos = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!canvasRef) return { x: 0, y: 0 };
+    const rect = canvasRef.getBoundingClientRect();
+    
+    if ('touches' in e) {
+      // Touch event
+      const touch = e.touches[0] || e.changedTouches[0];
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+    } else {
+      // Mouse event
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!canvasRef) return;
+    e.preventDefault();
+    setIsDrawing(true);
+    const { x, y } = getEventPos(e);
+    
+    const ctx = canvasRef.getContext('2d');
+    if (ctx) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !canvasRef) return;
+    e.preventDefault();
+    const { x, y } = getEventPos(e);
+    
+    const ctx = canvasRef.getContext('2d');
+    if (ctx) {
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+  };
+
+  const stopDrawing = (e?: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (e) e.preventDefault();
+    setIsDrawing(false);
+  };
+
+  const clearSignature = () => {
+    if (!canvasRef) return;
+    const ctx = canvasRef.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvasRef.width, canvasRef.height);
+    }
+  };
+
   // Signature save handler
   const handleSignatureSave = () => {
+    if (!canvasRef) {
+      toast({
+        title: "Error",
+        description: "No signature to save",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!signatureName.trim()) {
+      toast({
+        title: "Error", 
+        description: "Please enter a name for the signature",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Convert canvas to base64 image
+    const signatureImage = canvasRef.toDataURL();
+    setSignatureData(signatureImage);
+    
     setShowSignatureDialog(false);
+    setSignatureName('');
+    clearSignature();
+    
     toast({
       title: "Success", 
       description: "Signature saved successfully!"
@@ -1604,19 +1691,67 @@ export function Profile() {
               <DialogTitle className="text-center">Create Signature</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {/* Simple drawing area placeholder */}
-              <div className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-                <div className="text-center text-gray-500">
-                  <PenTool className="w-8 h-8 mx-auto mb-2" />
-                  <p className="text-sm">Drawing area coming soon</p>
-                  <p className="text-xs">Tap and drag to create signature</p>
-                </div>
+              {/* Canvas drawing area */}
+              <div className="w-full">
+                <canvas
+                  ref={(el) => {
+                    setCanvasRef(el);
+                    if (el) {
+                      const ctx = el.getContext('2d');
+                      if (ctx) {
+                        ctx.strokeStyle = '#000000';
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                      }
+                    }
+                  }}
+                  width={280}
+                  height={120}
+                  className="w-full h-30 border-2 border-gray-300 rounded-lg bg-white cursor-crosshair"
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                  onTouchStart={startDrawing}
+                  onTouchMove={draw}
+                  onTouchEnd={stopDrawing}
+                />
+                <p className="text-xs text-gray-500 mt-1 text-center">Draw your signature above</p>
               </div>
+
+              {/* Name input field */}
+              <div>
+                <Label htmlFor="signature-name" className="text-sm font-medium">
+                  Signature Name
+                </Label>
+                <Input
+                  id="signature-name"
+                  type="text"
+                  placeholder="Enter signature name..."
+                  value={signatureName}
+                  onChange={(e) => setSignatureName(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              {/* Action buttons */}
               <div className="flex space-x-3">
                 <Button 
                   variant="outline" 
                   className="flex-1"
-                  onClick={() => setShowSignatureDialog(false)}
+                  onClick={clearSignature}
+                >
+                  Clear
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => {
+                    setShowSignatureDialog(false);
+                    setSignatureName('');
+                    clearSignature();
+                  }}
                 >
                   Cancel
                 </Button>
