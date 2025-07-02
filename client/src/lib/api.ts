@@ -174,6 +174,20 @@ export function useCreateBankAccount() {
   });
 }
 
+export function useUpdateBankAccount() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: { id: number; accountHolderName?: string; bankName?: string; accountNumber?: string; ifscCode?: string }) => {
+      const response = await apiRequest("PATCH", `/api/bank-accounts/${id}`, updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
+    },
+  });
+}
+
 // Crypto Prices API
 export function useCryptoPrices() {
   return useQuery({

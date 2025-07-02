@@ -204,6 +204,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/bank-accounts/:id", authenticateUser, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = (req as any).userId;
+      
+      // First check if the bank account belongs to the user
+      const existingAccount = await storage.getBankAccount(id);
+      if (!existingAccount || existingAccount.userId !== userId) {
+        return res.status(404).json({ message: "Bank account not found" });
+      }
+      
+      const validatedData = insertBankAccountSchema.partial().parse(req.body);
+      const updatedAccount = await storage.updateBankAccount(id, validatedData);
+      
+      if (!updatedAccount) {
+        return res.status(404).json({ message: "Bank account not found" });
+      }
+      
+      res.json(updatedAccount);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid bank account data" });
+    }
+  });
+
   // Transaction routes
   app.get("/api/transactions", authenticateUser, async (req, res) => {
     try {

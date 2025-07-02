@@ -69,6 +69,14 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async updateBankAccount(id: number, updates: Partial<BankAccount>): Promise<BankAccount | undefined> {
+    const result = await db.update(bankAccounts)
+      .set(updates)
+      .where(eq(bankAccounts.id, id))
+      .returning();
+    return result[0];
+  }
+
   // Transactions
   async getTransactionsByUserId(userId: number): Promise<Transaction[]> {
     return await db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(desc(transactions.createdAt));

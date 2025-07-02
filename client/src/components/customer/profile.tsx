@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +33,7 @@ export function Profile() {
   const { data: bankAccounts } = useBankAccounts();
   const { data: announcements } = useAnnouncements();
   const createBankAccount = useCreateBankAccount();
+  const updateBankAccount = useUpdateBankAccount();
   const createTransaction = useCreateTransaction();
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const { toast } = useToast();
@@ -999,10 +1000,18 @@ export function Profile() {
 
       try {
         if (editingAccountId) {
-          // Update existing bank account (for now, show message that it will be implemented)
+          // Update existing bank account
+          await updateBankAccount.mutateAsync({
+            id: editingAccountId,
+            accountHolderName: newBankWallet.holderName,
+            bankName: newBankWallet.bankName,
+            accountNumber: newBankWallet.accountNumber,
+            ifscCode: newBankWallet.ifscCode
+          });
+
           toast({
-            title: "Modify",
-            description: "Bank account modification feature will be implemented soon."
+            title: "Success",
+            description: "Bank wallet updated successfully!"
           });
         } else {
           // Create new bank account using existing API
