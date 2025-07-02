@@ -7,13 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Copy } from "lucide-react";
-import { useTransactions } from "@/lib/api";
+import { useTransactions, useUpdateTransactionDetails } from "@/lib/api";
 
 export function RechargeDetail() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const { data: transactions } = useTransactions();
   const { toast } = useToast();
+  const updateTransactionMutation = useUpdateTransactionDetails();
   
   const [formData, setFormData] = useState({
     transactionNo: "",
@@ -49,23 +50,36 @@ export function RechargeDetail() {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.transactionNo.trim()) {
       setShowErrorDialog(true);
       return;
     }
 
-    // Here you would typically submit the form data
-    toast({
-      title: "Success",
-      description: "Recharge information submitted successfully",
-    });
+    try {
+      await updateTransactionMutation.mutateAsync({
+        id: transaction!.id,
+        transactionNo: formData.transactionNo,
+        rechargeInfo: formData.rechargeInfo || undefined
+      });
 
-    // Clear the form after successful submission
-    setFormData({
-      transactionNo: "",
-      rechargeInfo: ""
-    });
+      toast({
+        title: "Success",
+        description: "Transaction details saved successfully",
+      });
+
+      // Clear the form after successful submission
+      setFormData({
+        transactionNo: "",
+        rechargeInfo: ""
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save transaction details",
+        variant: "destructive",
+      });
+    }
   };
 
   // Generate a mock order number for display
@@ -153,9 +167,10 @@ export function RechargeDetail() {
           {/* Submit Button */}
           <Button 
             onClick={handleSubmit}
-            className="w-full bg-green-500 hover:bg-green-600 text-white"
+            disabled={updateTransactionMutation.isPending}
+            className="w-full bg-green-500 hover:bg-green-600 text-white disabled:opacity-50"
           >
-            Supply Recharge Info.
+            {updateTransactionMutation.isPending ? "Saving..." : "Supply Recharge Info."}
           </Button>
         </div>
       </div>

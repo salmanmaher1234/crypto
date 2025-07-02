@@ -358,6 +358,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update transaction with additional details (like transaction number)
+  app.patch("/api/transactions/:id/details", authenticateUser, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { transactionNo, rechargeInfo } = req.body;
+      
+      // Find the transaction and verify it belongs to the user
+      const transaction = await storage.getAllTransactions();
+      const userTransaction = transaction.find(t => t.id === id && t.userId === (req as any).userId);
+      
+      if (!userTransaction) {
+        return res.status(404).json({ message: "Transaction not found" });
+      }
+      
+      // Update the transaction description with the additional details
+      const updatedDescription = `${userTransaction.description} | Transaction No: ${transactionNo}${rechargeInfo ? ` | Info: ${rechargeInfo}` : ''}`;
+      
+      const updatedTransaction = await storage.updateTransaction(id, {
+        description: updatedDescription
+      });
+      
+      if (!updatedTransaction) {
+        return res.status(404).json({ message: "Failed to update transaction" });
+      }
+      
+      res.json(updatedTransaction);
+    } catch (error) {
+      console.error("Transaction update error:", error);
+      res.status(500).json({ message: "Failed to update transaction details" });
+    }
+  });
+
   // Betting order routes
   app.get("/api/betting-orders", authenticateUser, async (req, res) => {
     try {

@@ -45,6 +45,23 @@ export function useCreateTransaction() {
   });
 }
 
+export function useUpdateTransactionDetails() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, transactionNo, rechargeInfo }: { id: number; transactionNo: string; rechargeInfo?: string }) => {
+      const response = await apiRequest("PATCH", `/api/transactions/${id}/details`, {
+        transactionNo,
+        rechargeInfo
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+    },
+  });
+}
+
 // Betting Orders API
 export function useBettingOrders() {
   return useQuery<BettingOrder[]>({
