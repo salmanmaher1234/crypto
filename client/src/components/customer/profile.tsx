@@ -20,6 +20,7 @@ import {
   LogOut,
   Copy,
   Eye,
+  EyeOff,
   ChevronRight,
   ArrowLeft,
   Plus,
@@ -45,6 +46,7 @@ export function Profile() {
   const [rechargeAmount, setRechargeAmount] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [hideBalance, setHideBalance] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -129,7 +131,7 @@ export function Profile() {
     if (user?.username) {
       navigator.clipboard.writeText(user.username);
       toast({
-        title: "Copied",
+        title: "Copy Successful",
         description: "Username copied to clipboard",
       });
     }
@@ -205,17 +207,21 @@ export function Profile() {
                   </Button>
                 </div>
                 <div className="text-sm text-gray-600 mb-1">
-                  Real Balance: {parseFloat(user.balance || "0").toFixed(0)}
+                  Real Balance: {hideBalance ? "****" : parseFloat(user.balance || "0").toFixed(0)}
                 </div>
                 <div className="text-sm text-gray-600 mb-1">
-                  Frozen Amount: {parseFloat(user.frozenBalance || "0").toFixed(0)}
+                  Frozen Amount: {hideBalance ? "****" : parseFloat(user.frozenBalance || "0").toFixed(0)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  Credit Score: {user.reputation || 80}
+                  Credit Score: {hideBalance ? "**" : user.reputation || 80}
                 </div>
               </div>
-              <Button variant="ghost" size="sm">
-                <Eye className="w-4 h-4 text-gray-500" />
+              <Button variant="ghost" size="sm" onClick={() => setHideBalance(!hideBalance)}>
+                {hideBalance ? (
+                  <EyeOff className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <Eye className="w-4 h-4 text-gray-500" />
+                )}
               </Button>
             </div>
 
