@@ -130,6 +130,7 @@ Changelog:
 - July 2, 2025. Enhanced Personal Information section with modern card-based layout - redesigned to match provided UI with Avatar, UserName, Gender (Confidential), and Signature fields, each with appropriate icons and navigation arrows
 - July 2, 2025. Implemented interactive Personal Information functionality - Avatar click opens image upload with 5MB limit and validation, Gender click shows Male/Female/Confidential selection dialog, Signature click opens drawing area dialog for future signature creation, all with proper state management and toast notifications
 - July 2, 2025. Enhanced signature functionality with canvas drawing area - added full drawing canvas with mouse and touch support, signature name input field, Clear/Cancel/Save buttons, converts signature to base64 image data for storage, includes drawing validation and success notifications
+- July 2, 2025. Fixed recharge detail navigation - removed redirect after form submission, now uses back navigation to Assets tab, cleaned up debug logging, confirmed Transaction No. modification functionality working correctly
 
 ## User Preferences
 

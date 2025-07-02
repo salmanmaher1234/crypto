@@ -29,14 +29,10 @@ export function RechargeDetail() {
   // Load existing transaction details when transaction data is available
   useEffect(() => {
     if (transaction?.description?.includes('Transaction No:')) {
-      console.log('Transaction description:', transaction.description);
       const existingTransactionNo = transaction.description.split('Transaction No:')[1]?.split('|')[0]?.trim();
       const existingRechargeInfo = transaction.description.includes('Info:') 
         ? transaction.description.split('Info:')[1]?.trim() 
         : '';
-      
-      console.log('Parsed Transaction No:', existingTransactionNo);
-      console.log('Parsed Recharge Info:', existingRechargeInfo);
       
       if (existingTransactionNo) {
         setFormData({
@@ -44,8 +40,6 @@ export function RechargeDetail() {
           rechargeInfo: existingRechargeInfo || ""
         });
       }
-    } else {
-      console.log('No Transaction No found in description:', transaction?.description);
     }
   }, [transaction]);
 
@@ -91,11 +85,10 @@ export function RechargeDetail() {
         description: "Transaction details updated successfully",
       });
 
-      // Redirect back to Assets tab after successful submission
+      // Go back to previous page after successful submission
       setTimeout(() => {
-        // Navigate to customer page and set assets tab
-        window.location.href = "/customer#assets";
-      }, 1500);
+        setLocation("/customer#assets");
+      }, 1000);
     } catch (error) {
       toast({
         title: "Error",
