@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { LoginModal } from "@/components/auth/login-modal";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CustomerApp from "@/pages/customer-app";
+import { RechargeDetail } from "@/components/customer/recharge-detail";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -29,6 +30,7 @@ function AppContent() {
       <Route path="/" component={user.role === "admin" ? AdminDashboard : CustomerApp} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/customer" component={CustomerApp} />
+      <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />
     </Switch>
   );

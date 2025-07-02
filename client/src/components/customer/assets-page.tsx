@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useTransactions } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { ClipboardList, ChevronDown } from "lucide-react";
 export function AssetsPage() {
   const [activeTab, setActiveTab] = useState("recharges");
   const [timeFilter, setTimeFilter] = useState("today");
+  const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
 
@@ -115,16 +117,28 @@ export function AssetsPage() {
                         </div>
                         
                         {/* Apply Time - full width below */}
-                        <div className="mt-2 text-xs text-gray-500">
-                          Apply Time: {new Date(deposit.createdAt).toLocaleString('en-CA', {
-                            year: 'numeric',
-                            month: '2-digit', 
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: false
-                          }).replace(',', '')}
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="text-xs text-gray-500">
+                            Apply Time: {new Date(deposit.createdAt).toLocaleString('en-CA', {
+                              year: 'numeric',
+                              month: '2-digit', 
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: false
+                            }).replace(',', '')}
+                          </div>
+                          <button 
+                            className="text-gray-400 hover:text-gray-600"
+                            onClick={() => {
+                              setLocation(`/recharge-detail/${deposit.id}`);
+                            }}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
                         </div>
                       </div>
                     ))}
