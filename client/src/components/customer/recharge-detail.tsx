@@ -29,10 +29,14 @@ export function RechargeDetail() {
   // Load existing transaction details when transaction data is available
   useEffect(() => {
     if (transaction?.description?.includes('Transaction No:')) {
+      console.log('Transaction description:', transaction.description);
       const existingTransactionNo = transaction.description.split('Transaction No:')[1]?.split('|')[0]?.trim();
       const existingRechargeInfo = transaction.description.includes('Info:') 
         ? transaction.description.split('Info:')[1]?.trim() 
         : '';
+      
+      console.log('Parsed Transaction No:', existingTransactionNo);
+      console.log('Parsed Recharge Info:', existingRechargeInfo);
       
       if (existingTransactionNo) {
         setFormData({
@@ -40,6 +44,8 @@ export function RechargeDetail() {
           rechargeInfo: existingRechargeInfo || ""
         });
       }
+    } else {
+      console.log('No Transaction No found in description:', transaction?.description);
     }
   }, [transaction]);
 

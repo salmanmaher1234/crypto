@@ -375,17 +375,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove any existing Transaction No and Info from description, then add new ones
       let baseDescription = userTransaction.description || '';
       
-      // Remove existing Transaction No and Info if they exist
-      if (baseDescription.includes(' | Transaction No:')) {
-        baseDescription = baseDescription.split(' | Transaction No:')[0];
+      console.log("Original description:", baseDescription);
+      
+      // Remove existing Transaction No and Info if they exist (handle multiple formats)
+      if (baseDescription.includes('Transaction No:')) {
+        baseDescription = baseDescription.split('Transaction No:')[0].replace(/\s*\|\s*$/, '');
       }
+      
+      console.log("Base description after cleanup:", baseDescription);
       
       // Create new description with updated details
       const updatedDescription = `${baseDescription} | Transaction No: ${transactionNo}${rechargeInfo ? ` | Info: ${rechargeInfo}` : ''}`;
       
+      console.log("New description:", updatedDescription);
+      
       const updatedTransaction = await storage.updateTransaction(id, {
         description: updatedDescription
       });
+      
+      console.log("Updated transaction result:", updatedTransaction);
       
       if (!updatedTransaction) {
         return res.status(404).json({ message: "Failed to update transaction" });
