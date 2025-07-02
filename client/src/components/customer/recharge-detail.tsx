@@ -16,8 +16,6 @@ export function RechargeDetail() {
   
   const [formData, setFormData] = useState({
     transactionNo: "",
-    approveAmt: "",
-    comment: "",
     rechargeInfo: ""
   });
 
@@ -134,33 +132,7 @@ export function RechargeDetail() {
             </span>
           </div>
 
-          {/* Review Time */}
-          <div className="flex items-center justify-between py-2 border-b border-gray-100">
-            <span className="text-sm text-gray-600">Review Time</span>
-            <span className="text-sm text-gray-700">-</span>
-          </div>
 
-          {/* Approve Amt. */}
-          <div className="mt-4 mb-4">
-            <Label className="text-sm text-gray-600">Approve Amt.</Label>
-            <Input 
-              value={formData.approveAmt}
-              onChange={(e) => setFormData({...formData, approveAmt: e.target.value})}
-              placeholder="Enter approve amount"
-              className="mt-1"
-            />
-          </div>
-
-          {/* Comment */}
-          <div className="mb-4">
-            <Label className="text-sm text-gray-600">Comment</Label>
-            <Textarea 
-              value={formData.comment}
-              onChange={(e) => setFormData({...formData, comment: e.target.value})}
-              placeholder="Enter comment"
-              className="mt-1 min-h-[60px]"
-            />
-          </div>
 
           {/* Recharge Info */}
           <div className="mb-6">
