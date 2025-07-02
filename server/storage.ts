@@ -100,6 +100,8 @@ export class MemStorage implements IStorage {
       invitationCode: null,
       agentInvitationCode: null,
       profileImage: null,
+      signatureData: null,
+      signatureName: null,
       isActive: true,
     };
     this.users.set(adminId, admin);
@@ -125,6 +127,8 @@ export class MemStorage implements IStorage {
       invitationCode: null,
       agentInvitationCode: null,
       profileImage: null,
+      signatureData: null,
+      signatureName: null,
       isActive: true,
     };
     this.users.set(customerId, customer);
@@ -260,6 +264,8 @@ export class MemStorage implements IStorage {
       invitationCode: insertUser.invitationCode || null,
       agentInvitationCode: null,
       profileImage: null,
+      signatureData: null,
+      signatureName: null,
       isActive: true,
     };
     this.users.set(id, user);

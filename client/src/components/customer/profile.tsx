@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,6 +39,7 @@ export function Profile() {
   const deleteBankAccount = useDeleteBankAccount();
   const createTransaction = useCreateTransaction();
   const createWithdrawalRequest = useCreateWithdrawalRequest();
+  const updateProfile = useUpdateProfile();
   const { toast } = useToast();
   
   const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'bankwallet' | 'addbankwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
@@ -233,15 +234,30 @@ export function Profile() {
 
     // Convert canvas to base64 image
     const signatureImage = canvasRef.toDataURL();
-    setSignatureData(signatureImage);
     
-    setShowSignatureDialog(false);
-    setSignatureName('');
-    clearSignature();
-    
-    toast({
-      title: "Success", 
-      description: "Signature saved successfully!"
+    // Save to database via API
+    updateProfile.mutate({
+      signatureData: signatureImage,
+      signatureName: signatureName.trim()
+    }, {
+      onSuccess: () => {
+        setSignatureData(signatureImage);
+        setShowSignatureDialog(false);
+        setSignatureName('');
+        clearSignature();
+        
+        toast({
+          title: "Success", 
+          description: "Signature saved successfully!"
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to save signature. Please try again.",
+          variant: "destructive"
+        });
+      }
     });
   };
 

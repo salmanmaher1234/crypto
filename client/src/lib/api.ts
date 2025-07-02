@@ -202,6 +202,21 @@ export function useDeleteBankAccount() {
   });
 }
 
+// Profile Update API
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (updates: { signatureData?: string; signatureName?: string; profileImage?: string }) => {
+      const response = await apiRequest("PATCH", "/api/profile", updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+  });
+}
+
 // Crypto Prices API
 export function useCryptoPrices() {
   return useQuery({

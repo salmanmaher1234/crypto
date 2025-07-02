@@ -180,6 +180,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer profile update endpoint
+  app.patch("/api/profile", authenticateUser, async (req, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const updates = req.body;
+      const updatedUser = await storage.updateUser(userId, updates);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
