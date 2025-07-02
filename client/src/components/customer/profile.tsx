@@ -926,10 +926,10 @@ export function Profile() {
                           return;
                         }
                         
-                        if (amount < 10) {
+                        if (amount < 1000) {
                           toast({
                             title: "Minimum withdrawal",
-                            description: "Minimum withdrawal amount is 10 USDT",
+                            description: "Minimum withdrawal amount is 1000 USDT",
                             variant: "destructive",
                           });
                           return;
@@ -955,10 +955,20 @@ export function Profile() {
                         }
                         
                         // Check fund password
-                        if (!withdrawFundPassword) {
+                        if (!withdrawFundPassword || withdrawFundPassword.trim() === "") {
                           toast({
                             title: "Fund password required",
                             description: "Please enter your fund password",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                        // Check fund password length (minimum 4 characters)
+                        if (withdrawFundPassword.trim().length < 4) {
+                          toast({
+                            title: "Invalid fund password",
+                            description: "Fund password must be at least 4 characters long",
                             variant: "destructive",
                           });
                           return;
@@ -1022,7 +1032,18 @@ export function Profile() {
                           }, 1000); // 1 second for submitting stage
                         }, 800); // 800ms for validation stage
                       }}
-                      disabled={!withdrawAmount || !selectedBankWallet || !withdrawFundPassword || createWithdrawalRequest.isPending || isProcessingWithdraw}
+                      disabled={
+                        !withdrawAmount || 
+                        withdrawAmount.trim() === "" ||
+                        parseFloat(withdrawAmount) < 1000 ||
+                        !selectedBankWallet || 
+                        selectedBankWallet.trim() === "" ||
+                        !withdrawFundPassword || 
+                        withdrawFundPassword.trim() === "" ||
+                        withdrawFundPassword.trim().length < 4 ||
+                        createWithdrawalRequest.isPending || 
+                        isProcessingWithdraw
+                      }
                     >
                       {withdrawStep === 'idle' ? (
                         'Submit'
