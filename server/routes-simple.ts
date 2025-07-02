@@ -372,8 +372,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Transaction not found" });
       }
       
-      // Update the transaction description with the additional details
-      const updatedDescription = `${userTransaction.description} | Transaction No: ${transactionNo}${rechargeInfo ? ` | Info: ${rechargeInfo}` : ''}`;
+      // Remove any existing Transaction No and Info from description, then add new ones
+      let baseDescription = userTransaction.description || '';
+      
+      // Remove existing Transaction No and Info if they exist
+      if (baseDescription.includes(' | Transaction No:')) {
+        baseDescription = baseDescription.split(' | Transaction No:')[0];
+      }
+      
+      // Create new description with updated details
+      const updatedDescription = `${baseDescription} | Transaction No: ${transactionNo}${rechargeInfo ? ` | Info: ${rechargeInfo}` : ''}`;
       
       const updatedTransaction = await storage.updateTransaction(id, {
         description: updatedDescription

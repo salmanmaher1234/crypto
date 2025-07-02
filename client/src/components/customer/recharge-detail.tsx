@@ -85,8 +85,12 @@ export function RechargeDetail() {
         description: "Transaction details updated successfully",
       });
 
-      // Don't clear the form since user might want to modify again
-      // Form will be updated with latest values when transactions refresh
+      // Redirect back to Assets tab after successful submission
+      setTimeout(() => {
+        setLocation("/customer");
+        // Trigger the assets tab to be selected
+        window.location.hash = "assets";
+      }, 1000);
     } catch (error) {
       toast({
         title: "Error",
