@@ -91,7 +91,6 @@ export function Profile() {
   const [editingAccountId, setEditingAccountId] = useState<number | null>(null);
   const [showGenderDialog, setShowGenderDialog] = useState(false);
   const [showSignatureDialog, setShowSignatureDialog] = useState(false);
-  const [showRechargeConfirmDialog, setShowRechargeConfirmDialog] = useState(false);
   const [selectedGender, setSelectedGender] = useState('Confidential');
   const [signatureData, setSignatureData] = useState<string | null>(null);
   const [signatureName, setSignatureName] = useState('');
@@ -652,9 +651,30 @@ export function Profile() {
                           return;
                         }
                         
-                        // Close recharge dialog and show confirmation popup
-                        setShowRechargeDialog(false);
-                        setShowRechargeConfirmDialog(true);
+                        if (user) {
+                          createTransaction.mutate({
+                            userId: user.id,
+                            type: "deposit",
+                            amount: rechargeAmount,
+                            description: `Account recharge of ${rechargeAmount} USDT via bank wallet`
+                          }, {
+                            onSuccess: () => {
+                              toast({
+                                title: "Recharge successful",
+                                description: `${rechargeAmount} USDT has been added to your account via bank wallet`,
+                              });
+                              setRechargeAmount("");
+                              setShowRechargeDialog(false);
+                            },
+                            onError: () => {
+                              toast({
+                                title: "Recharge failed",
+                                description: "Unable to process recharge. Please try again.",
+                                variant: "destructive",
+                              });
+                            }
+                          });
+                        }
                       }}
                       disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0 || createTransaction.isPending}
                     >
@@ -2142,33 +2162,5 @@ export function Profile() {
     ));
   }
 
-  return (
-    <>
-      {/* Main component returns null for unknown views */}
-      
-      {/* Global Recharge Confirmation Dialog - Always available */}
-      <Dialog open={showRechargeConfirmDialog} onOpenChange={setShowRechargeConfirmDialog}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Recharge Information</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 text-center">
-            <p className="text-sm text-gray-700 leading-relaxed">
-              Hello, Please contact teacher to get the latest channels for recharging. 
-              Thank you for your support and trust. Please return to the previous page.
-            </p>
-            <Button 
-              className="w-full bg-blue-500 hover:bg-blue-600"
-              onClick={() => {
-                setShowRechargeConfirmDialog(false);
-                setRechargeAmount("");
-              }}
-            >
-              OK
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+  return null;
 }
