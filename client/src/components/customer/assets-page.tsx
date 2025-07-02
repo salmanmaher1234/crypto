@@ -108,8 +108,12 @@ export function AssetsPage() {
                             <div className="text-sm text-gray-600 mb-1">&nbsp;</div>
                             <div>
                               {(deposit.status === 'completed' || deposit.status === 'pending') && (
-                                <div className="bg-green-500 text-white text-xs px-2 py-1 rounded inline-block">
-                                  Checkout
+                                <div className={`text-white text-xs px-2 py-1 rounded inline-block ${
+                                  deposit.description?.includes('Transaction No:') 
+                                    ? 'bg-blue-500' 
+                                    : 'bg-green-500'
+                                }`}>
+                                  {deposit.description?.includes('Transaction No:') ? 'Processed' : 'Checkout'}
                                 </div>
                               )}
                             </div>
@@ -128,6 +132,15 @@ export function AssetsPage() {
                               second: '2-digit',
                               hour12: false
                             }).replace(',', '')}
+                            
+                            {/* Show Transaction Number if it exists */}
+                            {deposit.description?.includes('Transaction No:') && (
+                              <div className="mt-1 text-xs text-green-600 font-medium">
+                                {deposit.description?.split('Transaction No:')[1]?.split('|')[0]?.trim() && (
+                                  <>✓ Transaction No: {deposit.description?.split('Transaction No:')[1]?.split('|')[0]?.trim()}</>
+                                )}
+                              </div>
+                            )}
                           </div>
                           <button 
                             className="text-gray-400 hover:text-gray-600"
