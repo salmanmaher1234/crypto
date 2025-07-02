@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useTransactions, useWithdrawalRequests } from "@/lib/api";
+import { useTransactions } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,11 +23,9 @@ import {
 } from "lucide-react";
 
 export function AssetsPage() {
+  const [activeTab, setActiveTab] = useState("overview");
   const { user } = useAuth();
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
-  const { data: withdrawalRequests, isLoading: withdrawalsLoading } = useWithdrawalRequests();
-  
-  const [activeTab, setActiveTab] = useState("overview");
 
   // Balance overview
   const totalBalance = parseFloat(user?.balance || "0");
@@ -70,7 +68,7 @@ export function AssetsPage() {
     }
   };
 
-  if (transactionsLoading || withdrawalsLoading) {
+  if (transactionsLoading) {
     return (
       <div className="p-4 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -349,35 +347,11 @@ export function AssetsPage() {
             
             <TabsContent value="requests" className="space-y-4">
               <h3 className="font-medium">Withdrawal Requests</h3>
-              {withdrawalRequests && withdrawalRequests.length > 0 ? (
-                <div className="space-y-2">
-                  {withdrawalRequests.map((request) => (
-                    <div key={request.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                      <div className="flex items-center">
-                        <CreditCard className="w-5 h-5 text-blue-500" />
-                        <div className="ml-3">
-                          <p className="font-medium">Withdrawal Request</p>
-                          <p className="text-sm text-gray-500">
-                            Amount: ${parseFloat(request.amount).toFixed(2)}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(request.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {getStatusBadge(request.status)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <CreditCard className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">No withdrawal requests</p>
-                  <p className="text-sm text-gray-500">Your withdrawal requests will appear here</p>
-                </div>
-              )}
+              <div className="text-center py-8">
+                <CreditCard className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600">No withdrawal requests</p>
+                <p className="text-sm text-gray-500">Your withdrawal requests will appear here</p>
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
