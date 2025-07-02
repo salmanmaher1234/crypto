@@ -543,7 +543,7 @@ export function Profile() {
                           className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
                           onClick={() => {
                             setShowRechargeDialog(false);
-                            setCurrentView('walletselection');
+                            setCurrentView('wallet');
                           }}
                         >
                           My wallet
@@ -559,74 +559,7 @@ export function Profile() {
                       </Select>
                     </div>
 
-                    {/* Recharge Prompt Message - Live Validation */}
-                    <div className="border rounded-lg p-4">
-                      <div className="text-sm">
-                        <div className="font-semibold mb-2">Recharge Status:</div>
-                        <div className="space-y-2">
-                          {/* Amount Validation */}
-                          <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              rechargeAmount && parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
-                                ? 'bg-green-500' 
-                                : rechargeAmount 
-                                  ? 'bg-red-500' 
-                                  : 'bg-gray-300'
-                            }`}></div>
-                            <span className={
-                              rechargeAmount && parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
-                                ? 'text-green-600' 
-                                : rechargeAmount 
-                                  ? 'text-red-600' 
-                                  : 'text-gray-500'
-                            }>
-                              Amount: {rechargeAmount ? 
-                                (parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 ? 
-                                  `${rechargeAmount} USDT (Valid)` : 
-                                  `${rechargeAmount} USDT (Invalid - Range: 1-100,000)`) : 
-                                'Enter amount (1-100,000 USDT)'}
-                            </span>
-                          </div>
-                          
-                          {/* Wallet Validation */}
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                            <span className="text-green-600">
-                              Wallet: 1:1 Selected
-                            </span>
-                          </div>
-                          
-                          {/* Ready Status */}
-                          <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              rechargeAmount && 
-                              parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
-                                ? 'bg-green-500' 
-                                : 'bg-gray-300'
-                            }`}></div>
-                            <span className={
-                              rechargeAmount && 
-                              parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
-                                ? 'text-green-600 font-medium' 
-                                : 'text-gray-500'
-                            }>
-                              {rechargeAmount && 
-                               parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
-                                ? '✓ Ready to process recharge' 
-                                : 'Enter valid amount to proceed'}
-                            </span>
-                          </div>
-                          
-                          {/* Processing Status */}
-                          {createTransaction.isPending && (
-                            <div className="flex items-center space-x-2">
-                              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                              <span className="text-blue-600 font-medium">Processing recharge...</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+
 
                     <Button 
                       className="w-full bg-green-500 hover:bg-green-600"
@@ -662,10 +595,9 @@ export function Profile() {
                             onSuccess: () => {
                               toast({
                                 title: "Recharge successful",
-                                description: `${rechargeAmount} USDT has been added to your account via ${walletNames[selectedWallet as keyof typeof walletNames]}`,
+                                description: `${rechargeAmount} USDT has been added to your account via bank wallet`,
                               });
                               setRechargeAmount("");
-                              setSelectedWallet("");
                               setShowRechargeDialog(false);
                             },
                             onError: () => {
