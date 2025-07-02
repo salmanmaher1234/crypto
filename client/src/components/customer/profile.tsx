@@ -568,11 +568,11 @@ export function Profile() {
                     Recharge
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
+                <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Recharge Account</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
                       <Label>Current Balance: ${parseFloat(user?.balance || "0").toFixed(2)}</Label>
                     </div>
@@ -793,8 +793,8 @@ export function Profile() {
                     Withdraw
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm">
-                  <div className="space-y-4 p-2">
+                <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
+                  <div className="space-y-3 p-2">
                     {/* Current available balance */}
                     <div>
                       <Label className="text-sm text-gray-600">Current available balance</Label>
@@ -1000,6 +1000,9 @@ export function Profile() {
                                   setWithdrawStep('idle');
                                   setIsProcessingWithdraw(false);
                                   
+                                  // Invalidate withdrawal requests cache to refresh Assets page
+                                  queryClient.invalidateQueries({ queryKey: ["/api/withdrawal-requests"] });
+                                  
                                   toast({
                                     title: "Withdrawal requested",
                                     description: `${withdrawAmount} USDT withdrawal request submitted successfully via Digital Wallet`,
@@ -1034,6 +1037,9 @@ export function Profile() {
                                   setWithdrawStep('idle');
                                   setIsProcessingWithdraw(false);
                                   
+                                  // Invalidate withdrawal requests cache to refresh Assets page
+                                  queryClient.invalidateQueries({ queryKey: ["/api/withdrawal-requests"] });
+                                  
                                   toast({
                                     title: "Withdrawal requested",
                                     description: `${withdrawAmount} USDT withdrawal request submitted successfully via Bank Wallet`,
@@ -1062,7 +1068,7 @@ export function Profile() {
                       disabled={
                         !withdrawAmount || 
                         withdrawAmount.trim() === "" ||
-                        parseFloat(withdrawAmount) < 1 ||
+                        parseFloat(withdrawAmount) < 10 ||
                         !selectedBankWallet || 
                         selectedBankWallet.trim() === "" ||
                         createWithdrawalRequest.isPending || 

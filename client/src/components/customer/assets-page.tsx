@@ -43,10 +43,52 @@ export function AssetsPage() {
     });
   };
 
-  // Filter transactions by type
-  const deposits = transactions?.filter(t => t.type === "deposit") || [];
-  const withdrawals = withdrawalRequests || [];
-  const allFunds = [...(transactions || []), ...(withdrawalRequests || [])];
+  // Time filtering logic
+  const applyTimeFilter = (items: any[]) => {
+    if (!items || items.length === 0) return [];
+    
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    return items.filter(item => {
+      const itemDate = new Date(item.createdAt);
+      
+      switch (timeFilter) {
+        case "today":
+          return itemDate >= todayStart;
+        case "yesterday":
+          const yesterdayStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          yesterdayStart.setHours(0, 0, 0, 0);
+          const yesterdayEnd = new Date(yesterdayStart.getTime() + 24 * 60 * 60 * 1000);
+          return itemDate >= yesterdayStart && itemDate < yesterdayEnd;
+        case "week":
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return itemDate >= weekAgo;
+        case "month":
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          return itemDate >= monthAgo;
+        case "3months":
+          const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          return itemDate >= threeMonthsAgo;
+        case "conditional":
+          if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999); // Include the entire end date
+            return itemDate >= start && itemDate <= end;
+          }
+          return true;
+        case "all":
+        default:
+          return true;
+      }
+    });
+  };
+
+  // Filter transactions by type and time
+  const deposits = applyTimeFilter(transactions?.filter(t => t.type === "deposit") || []);
+  const withdrawals = applyTimeFilter(withdrawalRequests || []);
+  const allFunds = applyTimeFilter([...(transactions || []), ...(withdrawalRequests || [])]);
 
   if (transactionsLoading || withdrawalsLoading) {
     return (
