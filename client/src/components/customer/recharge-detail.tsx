@@ -87,10 +87,9 @@ export function RechargeDetail() {
 
       // Redirect back to Assets tab after successful submission
       setTimeout(() => {
-        setLocation("/customer");
-        // Trigger the assets tab to be selected
-        window.location.hash = "assets";
-      }, 1000);
+        // Navigate to customer page and set assets tab
+        window.location.href = "/customer#assets";
+      }, 1500);
     } catch (error) {
       toast({
         title: "Error",

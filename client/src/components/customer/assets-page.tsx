@@ -108,12 +108,8 @@ export function AssetsPage() {
                             <div className="text-sm text-gray-600 mb-1">&nbsp;</div>
                             <div>
                               {(deposit.status === 'completed' || deposit.status === 'pending') && (
-                                <div className={`text-white text-xs px-2 py-1 rounded inline-block ${
-                                  deposit.description?.includes('Transaction No:') 
-                                    ? 'bg-blue-500' 
-                                    : 'bg-green-500'
-                                }`}>
-                                  {deposit.description?.includes('Transaction No:') ? 'Processed' : 'Checkout'}
+                                <div className="bg-green-500 text-white text-xs px-2 py-1 rounded inline-block">
+                                  Checkout
                                 </div>
                               )}
                             </div>
