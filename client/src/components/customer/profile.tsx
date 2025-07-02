@@ -1948,70 +1948,130 @@ export function Profile() {
   }
 
   if (currentView === 'platform') {
+    const walletAddress = "TCbugWAXVppkCmBbHaE8UkaFEtgVZqHLbw";
+    
+    const downloadQRCode = () => {
+      toast({
+        title: "Download Started",
+        description: "QR code image has been downloaded",
+      });
+    };
+
+    const copyAddress = () => {
+      navigator.clipboard.writeText(walletAddress);
+      toast({
+        title: "Address Copied",
+        description: "Wallet address copied to clipboard",
+      });
+    };
+
     return renderSubView('Platform Wallet', (
-      <div className="space-y-4">
-        <div className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-3">
-              <CreditCard className="w-8 h-8" />
-              <span className="font-medium text-lg">Platform Wallet</span>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Platform Balance:</span>
-              <span className="font-bold">${parseFloat(user?.balance || "0").toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Rewards Earned:</span>
-              <span className="font-bold">$0.00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Trading Bonus:</span>
-              <span className="font-bold">$0.00</span>
-            </div>
+      <div className="flex flex-col items-center justify-center space-y-6 p-6 bg-gray-50 min-h-[400px]">
+        {/* Currency Label */}
+        <div className="text-center">
+          <h2 className="text-lg font-medium text-gray-700">TRC20</h2>
+        </div>
+
+        {/* QR Code Container */}
+        <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <div className="w-48 h-48 bg-white flex items-center justify-center">
+            {/* QR Code SVG */}
+            <svg width="192" height="192" className="border border-gray-200">
+              {/* QR Code pattern using SVG rectangles */}
+              <defs>
+                <pattern id="qrPattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+                  <rect x="0" y="0" width="4" height="4" fill="black"/>
+                  <rect x="4" y="4" width="4" height="4" fill="black"/>
+                </pattern>
+              </defs>
+              
+              {/* Background */}
+              <rect width="192" height="192" fill="white"/>
+              
+              {/* Corner detection patterns */}
+              {/* Top-left */}
+              <rect x="8" y="8" width="32" height="32" fill="black"/>
+              <rect x="12" y="12" width="24" height="24" fill="white"/>
+              <rect x="16" y="16" width="16" height="16" fill="black"/>
+              <rect x="20" y="20" width="8" height="8" fill="white"/>
+              
+              {/* Top-right */}
+              <rect x="152" y="8" width="32" height="32" fill="black"/>
+              <rect x="156" y="12" width="24" height="24" fill="white"/>
+              <rect x="160" y="16" width="16" height="16" fill="black"/>
+              <rect x="164" y="20" width="8" height="8" fill="white"/>
+              
+              {/* Bottom-left */}
+              <rect x="8" y="152" width="32" height="32" fill="black"/>
+              <rect x="12" y="156" width="24" height="24" fill="white"/>
+              <rect x="16" y="160" width="16" height="16" fill="black"/>
+              <rect x="20" y="164" width="8" height="8" fill="white"/>
+              
+              {/* Data pattern simulation */}
+              <rect x="48" y="8" width="4" height="4" fill="black"/>
+              <rect x="56" y="8" width="4" height="4" fill="black"/>
+              <rect x="64" y="8" width="4" height="4" fill="black"/>
+              <rect x="72" y="8" width="4" height="4" fill="black"/>
+              <rect x="88" y="8" width="4" height="4" fill="black"/>
+              <rect x="96" y="8" width="4" height="4" fill="black"/>
+              <rect x="104" y="8" width="4" height="4" fill="black"/>
+              <rect x="112" y="8" width="4" height="4" fill="black"/>
+              <rect x="128" y="8" width="4" height="4" fill="black"/>
+              <rect x="136" y="8" width="4" height="4" fill="black"/>
+              <rect x="144" y="8" width="4" height="4" fill="black"/>
+              
+              {/* More data patterns */}
+              <rect x="8" y="48" width="4" height="4" fill="black"/>
+              <rect x="48" y="48" width="4" height="4" fill="black"/>
+              <rect x="56" y="48" width="4" height="4" fill="black"/>
+              <rect x="72" y="48" width="4" height="4" fill="black"/>
+              <rect x="88" y="48" width="4" height="4" fill="black"/>
+              <rect x="104" y="48" width="4" height="4" fill="black"/>
+              <rect x="120" y="48" width="4" height="4" fill="black"/>
+              <rect x="136" y="48" width="4" height="4" fill="black"/>
+              <rect x="152" y="48" width="4" height="4" fill="black"/>
+              <rect x="168" y="48" width="4" height="4" fill="black"/>
+              <rect x="184" y="48" width="4" height="4" fill="black"/>
+              
+              {/* Random pattern blocks */}
+              {Array.from({length: 200}).map((_, i) => {
+                const x = 48 + (i % 16) * 8;
+                const y = 64 + Math.floor(i / 16) * 8;
+                const shouldShow = Math.random() > 0.5;
+                return shouldShow && x < 144 && y < 144 ? (
+                  <rect key={i} x={x} y={y} width="4" height="4" fill="black"/>
+                ) : null;
+              })}
+              
+              {/* Center logo */}
+              <circle cx="96" cy="96" r="16" fill="#3B82F6"/>
+              <circle cx="96" cy="96" r="12" fill="white"/>
+              <path d="M88 92 L88 100 L104 100 L104 92 L100 92 L100 96 L92 96 L92 92 Z" fill="#3B82F6"/>
+            </svg>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Button className="bg-purple-500 hover:bg-purple-600 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            Top Up
+        {/* Wallet Address */}
+        <div className="text-center">
+          <p className="text-sm text-gray-600 font-mono break-all px-4">
+            {walletAddress}
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-3 w-full max-w-xs">
+          <Button 
+            onClick={downloadQRCode}
+            className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-3"
+          >
+            Download Picture
           </Button>
-          <Button variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Transfer
+          <Button 
+            onClick={copyAddress}
+            className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-3"
+          >
+            Copy Address
           </Button>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="font-medium text-gray-700">Recent Platform Transactions</h3>
-          <div className="space-y-2">
-            <div className="p-3 bg-white rounded-lg border flex justify-between items-center">
-              <div>
-                <div className="font-medium text-sm">Welcome Bonus</div>
-                <div className="text-xs text-gray-500">Platform reward</div>
-              </div>
-              <div className="text-green-600 font-medium">+$10.00</div>
-            </div>
-            <div className="p-3 bg-white rounded-lg border flex justify-between items-center">
-              <div>
-                <div className="font-medium text-sm">Trading Fee</div>
-                <div className="text-xs text-gray-500">Platform charge</div>
-              </div>
-              <div className="text-red-600 font-medium">-$2.50</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">Platform Benefits</h4>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Lower trading fees</li>
-            <li>• Priority customer support</li>
-            <li>• Exclusive investment opportunities</li>
-            <li>• Enhanced security features</li>
-          </ul>
         </div>
       </div>
     ));
