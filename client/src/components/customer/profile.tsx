@@ -487,21 +487,47 @@ export function Profile() {
                           variant="outline" 
                           size="sm" 
                           className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
-                          onClick={() => setSelectedBankWallet("my-wallet")}
+                          onClick={() => setSelectedBankWallet("digital-wallet")}
                         >
                           My wallet
                         </Button>
                       </div>
                       <Select value={selectedBankWallet} onValueChange={setSelectedBankWallet}>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Choose bank wallet" />
+                          <SelectValue placeholder="1:1" />
                         </SelectTrigger>
                         <SelectContent>
-                          {userBankAccounts.map((account) => (
-                            <SelectItem key={account.id} value={account.id.toString()}>
-                              {account.bankName} - {account.accountNumber}
-                            </SelectItem>
-                          ))}
+                          {/* Digital Wallet Option */}
+                          <SelectItem value="digital-wallet" className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs">$</span>
+                              </div>
+                              <span>Digital Wallet</span>
+                            </div>
+                          </SelectItem>
+                          
+                          {/* Bank Wallet Option */}
+                          <SelectItem value="bank-wallet" className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs">🏦</span>
+                              </div>
+                              <span>Bank Wallet</span>
+                            </div>
+                          </SelectItem>
+                          
+                          {/* User Bank Accounts if any exist */}
+                          {userBankAccounts.length > 0 && (
+                            <>
+                              <div className="px-2 py-1 text-xs text-gray-500 font-medium">Your Bank Accounts:</div>
+                              {userBankAccounts.map((account) => (
+                                <SelectItem key={account.id} value={account.id.toString()}>
+                                  {account.bankName} - {account.accountNumber}
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
