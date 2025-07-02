@@ -5,6 +5,7 @@ import {
   bettingOrders,
   withdrawalRequests,
   announcements,
+  messages,
   type User,
   type InsertUser,
   type BankAccount,
@@ -17,6 +18,8 @@ import {
   type InsertWithdrawalRequest,
   type Announcement,
   type InsertAnnouncement,
+  type Message,
+  type InsertMessage,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -59,6 +62,12 @@ export interface IStorage {
   createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
   updateAnnouncement(id: number, updates: Partial<Announcement>): Promise<Announcement | undefined>;
   getAllAnnouncements(): Promise<Announcement[]>;
+  
+  // Messages
+  getMessagesByUserId(userId: number): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  updateMessage(id: number, updates: Partial<Message>): Promise<Message | undefined>;
+  markMessageAsRead(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -68,6 +77,7 @@ export class MemStorage implements IStorage {
   private bettingOrders: Map<number, BettingOrder>;
   private withdrawalRequests: Map<number, WithdrawalRequest>;
   private announcements: Map<number, Announcement>;
+  private messages: Map<number, Message>;
   private currentId: number;
 
   constructor() {
@@ -77,6 +87,7 @@ export class MemStorage implements IStorage {
     this.bettingOrders = new Map();
     this.withdrawalRequests = new Map();
     this.announcements = new Map();
+    this.messages = new Map();
     this.currentId = 1;
 
     // Create admin user with full data
@@ -135,6 +146,9 @@ export class MemStorage implements IStorage {
 
     // Add sample betting orders for sarah - use hard-coded ID 2 since that's the second user
     this.addSampleBettingOrders(2);
+    
+    // Add sample messages from admin to customer
+    this.addSampleMessages(adminId, customerId);
     
     // Debug: Log the created orders
     console.log(`Created ${this.bettingOrders.size} betting orders for user 2`);
@@ -470,6 +484,84 @@ export class MemStorage implements IStorage {
   async getAllAnnouncements(): Promise<Announcement[]> {
     return Array.from(this.announcements.values())
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  private addSampleMessages(adminId: number, customerId: number) {
+    const message1: Message = {
+      id: this.currentId++,
+      fromUserId: adminId,
+      toUserId: customerId,
+      title: "Welcome to SuperCoin",
+      content: "Welcome to SuperCoin platform! Your account has been successfully activated. You can now start trading cryptocurrencies.",
+      type: "General",
+      isRead: false,
+      createdAt: new Date('2025-07-01T10:00:00.000Z'),
+    };
+    this.messages.set(message1.id, message1);
+
+    const message2: Message = {
+      id: this.currentId++,
+      fromUserId: adminId,
+      toUserId: customerId,
+      title: "Trading Tips",
+      content: "Remember to always do your research before making any trades. Use stop-loss orders to manage your risk effectively.",
+      type: "Important",
+      isRead: false,
+      createdAt: new Date('2025-07-02T09:30:00.000Z'),
+    };
+    this.messages.set(message2.id, message2);
+
+    const message3: Message = {
+      id: this.currentId++,
+      fromUserId: adminId,
+      toUserId: customerId,
+      title: "System Maintenance Notice",
+      content: "Our system will undergo maintenance on Sunday from 2:00 AM to 4:00 AM UTC. Trading will be temporarily unavailable during this time.",
+      type: "System",
+      isRead: true,
+      createdAt: new Date('2025-06-30T15:00:00.000Z'),
+    };
+    this.messages.set(message3.id, message3);
+  }
+
+  // Message methods
+  async getMessagesByUserId(userId: number): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(message => message.toUserId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const message: Message = {
+      id: this.currentId++,
+      fromUserId: insertMessage.fromUserId,
+      toUserId: insertMessage.toUserId,
+      title: insertMessage.title,
+      content: insertMessage.content,
+      type: insertMessage.type || "General",
+      isRead: false,
+      createdAt: new Date(),
+    };
+    this.messages.set(message.id, message);
+    return message;
+  }
+
+  async updateMessage(id: number, updates: Partial<Message>): Promise<Message | undefined> {
+    const message = this.messages.get(id);
+    if (!message) return undefined;
+    
+    const updatedMessage = { ...message, ...updates };
+    this.messages.set(id, updatedMessage);
+    return updatedMessage;
+  }
+
+  async markMessageAsRead(id: number): Promise<boolean> {
+    const message = this.messages.get(id);
+    if (!message) return false;
+    
+    const updatedMessage = { ...message, isRead: true };
+    this.messages.set(id, updatedMessage);
+    return true;
   }
 }
 

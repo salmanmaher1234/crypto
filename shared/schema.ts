@@ -81,6 +81,17 @@ export const announcements = pgTable("announcements", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  fromUserId: integer("from_user_id").notNull().references(() => users.id), // Admin user ID
+  toUserId: integer("to_user_id").notNull().references(() => users.id), // Customer user ID
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  type: text("type").notNull().default("General"), // General, Important, Support, System
+  isRead: boolean("is_read").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   balance: true,
@@ -127,6 +138,12 @@ export const insertAnnouncementSchema = createInsertSchema(announcements).omit({
   createdAt: true,
 });
 
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  isRead: true,
+  createdAt: true,
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type BankAccount = typeof bankAccounts.$inferSelect;
@@ -139,3 +156,5 @@ export type WithdrawalRequest = typeof withdrawalRequests.$inferSelect;
 export type InsertWithdrawalRequest = z.infer<typeof insertWithdrawalRequestSchema>;
 export type Announcement = typeof announcements.$inferSelect;
 export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;

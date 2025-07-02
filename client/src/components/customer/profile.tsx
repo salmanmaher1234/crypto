@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile, useChangePassword, useChangeFundPassword } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile, useChangePassword, useChangeFundPassword, useMessages, useMarkMessageAsRead } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,7 @@ export function Profile() {
   const { user, logout } = useAuth();
   const { data: bankAccounts } = useBankAccounts();
   const { data: announcements } = useAnnouncements();
+  const { data: messages } = useMessages();
   const createBankAccount = useCreateBankAccount();
   const updateBankAccount = useUpdateBankAccount();
   const deleteBankAccount = useDeleteBankAccount();
@@ -43,6 +44,7 @@ export function Profile() {
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
   const changeFundPassword = useChangeFundPassword();
+  const markMessageAsRead = useMarkMessageAsRead();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
@@ -2094,11 +2096,49 @@ export function Profile() {
   if (currentView === 'message') {
     return renderSubView('Site Messages', (
       <div className="space-y-4">
-        <div className="text-center py-8">
-          <MessageSquare className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600">No messages</p>
-          <p className="text-sm text-gray-500">You'll see important messages here</p>
-        </div>
+        {messages && messages.length > 0 ? (
+          messages.map((message) => (
+            <div key={message.id} className="p-4 bg-white rounded-lg border">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-medium">{message.title}</h3>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    message.type === 'Important' ? 'bg-red-100 text-red-700' :
+                    message.type === 'System' ? 'bg-blue-100 text-blue-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {message.type}
+                  </span>
+                  {!message.isRead && (
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  )}
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">{message.content}</p>
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-gray-400">
+                  {new Date(message.createdAt).toLocaleDateString()}
+                </div>
+                {!message.isRead && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => markMessageAsRead.mutate(message.id)}
+                    className="text-xs"
+                  >
+                    Mark as Read
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-8">
+            <MessageSquare className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-600">No messages</p>
+            <p className="text-sm text-gray-500">Admin messages will appear here</p>
+          </div>
+        )}
       </div>
     ));
   }

@@ -554,6 +554,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Message routes
+  app.get("/api/messages", authenticateUser, async (req, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const messages = await storage.getMessagesByUserId(userId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get messages" });
+    }
+  });
+
+  app.post("/api/messages", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const message = await storage.createMessage(req.body);
+      res.json(message);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create message" });
+    }
+  });
+
+  app.patch("/api/messages/:id/read", authenticateUser, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.markMessageAsRead(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark message as read" });
+    }
+  });
+
   // Real-time crypto prices endpoint using CoinGecko API
   app.get("/api/crypto-prices", async (req, res) => {
     try {

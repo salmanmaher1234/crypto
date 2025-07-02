@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import type { User, Transaction, BettingOrder, WithdrawalRequest, Announcement, BankAccount } from "@shared/schema";
+import type { User, Transaction, BettingOrder, WithdrawalRequest, Announcement, BankAccount, Message } from "@shared/schema";
 
 // Users API
 export function useUsers() {
@@ -149,6 +149,27 @@ export function useCreateAnnouncement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/announcements"] });
       queryClient.invalidateQueries({ queryKey: ["/api/announcements/all"] });
+    },
+  });
+}
+
+// Messages API
+export function useMessages() {
+  return useQuery<Message[]>({
+    queryKey: ["/api/messages"],
+  });
+}
+
+export function useMarkMessageAsRead() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (messageId: number) => {
+      const response = await apiRequest("PATCH", `/api/messages/${messageId}/read`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
   });
 }
