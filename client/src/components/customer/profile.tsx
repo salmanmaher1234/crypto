@@ -1292,74 +1292,38 @@ export function Profile() {
             <Button variant="ghost" size="sm" onClick={() => setCurrentView('main')}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <CardTitle className="flex-1 text-center text-lg font-medium">My Wallet</CardTitle>
+            <CardTitle className="flex-1 text-center text-lg font-medium">Select Wallet</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="p-4 bg-white rounded-lg border">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 font-bold">$</span>
-                    </div>
-                    <span className="font-medium">Digital Wallet</span>
-                  </div>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Balance:</span>
-                    <span className="font-medium">${parseFloat(user?.balance || "0").toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Available:</span>
-                    <span className="font-medium text-green-600">${parseFloat(user?.availableBalance || "0").toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Frozen:</span>
-                    <span className="font-medium text-red-600">${parseFloat(user?.frozenBalance || "0").toFixed(2)}</span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mt-4">
-                  <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => setCurrentView('digitalwallet')}>
-                    View Details
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => setShowWithdrawDialog(true)}>
-                    Withdraw
-                  </Button>
-                </div>
-              </div>
-            </div>
-
+            {/* Digital Wallet */}
             <Button 
               variant="ghost" 
-              className="w-full justify-between h-12 bg-white"
-              onClick={() => setShowBankDialog(true)}
+              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
+              onClick={() => setCurrentView('digitalwallet')}
             >
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <CreditCard className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">$</span>
                 </div>
-                <span>Bank Wallet</span>
+                <span className="text-left font-medium">Digital Wallet</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 bg-yellow-400 rounded-full"></div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </Button>
 
-            {/* Show existing bank accounts */}
-            {userBankAccounts.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-600">Your Bank Accounts</h3>
-                {userBankAccounts.map((account) => (
-                  <div key={account.id} className="p-3 bg-white rounded-lg border">
-                    <div className="font-medium">{account.bankName}</div>
-                    <div className="text-sm text-gray-600">{account.accountHolderName}</div>
-                    <div className="text-sm text-gray-600">****{account.accountNumber.slice(-4)}</div>
-                  </div>
-                ))}
+            {/* Bank Wallet */}
+            <Button 
+              variant="ghost" 
+              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
+              onClick={() => setCurrentView('bankwallet')}
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">🏦</span>
+                </div>
+                <span className="text-left font-medium">Bank Wallet</span>
               </div>
-            )}
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </Button>
           </CardContent>
         </Card>
 
