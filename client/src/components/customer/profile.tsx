@@ -60,6 +60,7 @@ export function Profile() {
   const [selectedBankWallet, setSelectedBankWallet] = useState("");
   const [selectedChannel, setSelectedChannel] = useState("");
   const [showRechargeConfirmDialog, setShowRechargeConfirmDialog] = useState(false);
+  const [isProcessingRecharge, setIsProcessingRecharge] = useState(false);
   const [withdrawFundPassword, setWithdrawFundPassword] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -628,8 +629,22 @@ export function Profile() {
                     {/* Recharge prompt message */}
                     <div>
                       <Label className="text-sm text-red-500">Recharge prompt message</Label>
-                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border text-sm text-gray-600">
-                        Live processing: Please ensure you select the correct channel and enter the exact amount for successful recharge processing.
+                      <div className={`mt-1 p-3 rounded-lg border text-sm transition-all duration-300 ${
+                        isProcessingRecharge 
+                          ? 'bg-blue-50 border-blue-200 animate-pulse' 
+                          : 'bg-gray-50 border-gray-200'
+                      }`}>
+                        <div className="flex items-center space-x-2">
+                          {isProcessingRecharge && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                          )}
+                          <span className={isProcessingRecharge ? 'text-blue-600 font-medium' : 'text-gray-600'}>
+                            {isProcessingRecharge 
+                              ? 'Processing recharge... Please wait while we verify your transaction.'
+                              : 'Live processing: Please ensure you select the correct channel and enter the exact amount for successful recharge processing.'
+                            }
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -660,6 +675,9 @@ export function Profile() {
                         }
                         
                         if (user) {
+                          // Start processing animation
+                          setIsProcessingRecharge(true);
+                          
                           createTransaction.mutate({
                             userId: user.id,
                             type: "deposit",
@@ -667,6 +685,9 @@ export function Profile() {
                             description: `Account recharge of ${rechargeAmount} USDT via bank wallet`
                           }, {
                             onSuccess: () => {
+                              // Stop processing animation
+                              setIsProcessingRecharge(false);
+                              
                               toast({
                                 title: "Recharge successful",
                                 description: `${rechargeAmount} USDT has been added to your account via ${selectedChannel || 'bank wallet'}`,
@@ -680,6 +701,9 @@ export function Profile() {
                               }, 500);
                             },
                             onError: () => {
+                              // Stop processing animation on error
+                              setIsProcessingRecharge(false);
+                              
                               toast({
                                 title: "Recharge failed",
                                 description: "Unable to process recharge. Please try again.",
@@ -689,9 +713,16 @@ export function Profile() {
                           });
                         }
                       }}
-                      disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0 || createTransaction.isPending}
+                      disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0 || createTransaction.isPending || isProcessingRecharge}
                     >
-                      Submit
+                      {isProcessingRecharge ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Processing...</span>
+                        </div>
+                      ) : (
+                        'Submit'
+                      )}
                     </Button>
                   </div>
                 </DialogContent>
