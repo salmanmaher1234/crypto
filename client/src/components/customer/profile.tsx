@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -93,6 +93,16 @@ export function Profile() {
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
 
+  // Initialize signature data from user profile
+  useEffect(() => {
+    if (user?.signatureData) {
+      setSignatureData(user.signatureData);
+    }
+    if (user?.profileImage) {
+      setProfileImage(user.profileImage);
+    }
+  }, [user]);
+
   // File upload handler for avatar
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -125,12 +135,28 @@ export function Profile() {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        setProfileImage(base64String);
-        toast({
-          title: "Success",
-          description: "Profile image updated successfully!"
+        
+        // Save to database via API
+        updateProfile.mutate({
+          profileImage: base64String
+        }, {
+          onSuccess: () => {
+            setProfileImage(base64String);
+            toast({
+              title: "Success",
+              description: "Profile image updated successfully!"
+            });
+            setUploadingImage(false);
+          },
+          onError: () => {
+            toast({
+              title: "Error",
+              description: "Failed to save profile image. Please try again.",
+              variant: "destructive"
+            });
+            setUploadingImage(false);
+          }
         });
-        setUploadingImage(false);
       };
       reader.readAsDataURL(file);
     } catch (error) {
@@ -1655,6 +1681,16 @@ export function Profile() {
                 <span className="text-sm font-medium">Signature</span>
               </div>
               <div className="flex items-center space-x-2">
+                {user?.signatureData ? (
+                  <div className="text-right">
+                    <div className="text-xs text-green-600 font-medium">✓ Saved</div>
+                    {user?.signatureName && (
+                      <div className="text-xs text-gray-500">{user.signatureName}</div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-400">Not set</div>
+                )}
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
