@@ -188,6 +188,20 @@ export function useUpdateBankAccount() {
   });
 }
 
+export function useDeleteBankAccount() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/bank-accounts/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
+    },
+  });
+}
+
 // Crypto Prices API
 export function useCryptoPrices() {
   return useQuery({

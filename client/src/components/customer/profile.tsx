@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +34,7 @@ export function Profile() {
   const { data: announcements } = useAnnouncements();
   const createBankAccount = useCreateBankAccount();
   const updateBankAccount = useUpdateBankAccount();
+  const deleteBankAccount = useDeleteBankAccount();
   const createTransaction = useCreateTransaction();
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const { toast } = useToast();
@@ -849,15 +850,15 @@ export function Profile() {
 
     const handleDeleteBankAccount = async (accountId: number) => {
       try {
-        // Note: You may need to implement delete API endpoint
+        await deleteBankAccount.mutateAsync(accountId);
         toast({
-          title: "Delete",
-          description: "Bank account deletion feature will be implemented soon."
+          title: "Success",
+          description: "Bank wallet deleted successfully!"
         });
       } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to delete bank account.",
+          description: "Failed to delete bank wallet. Please try again.",
           variant: "destructive"
         });
       }

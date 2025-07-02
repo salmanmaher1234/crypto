@@ -77,6 +77,13 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async deleteBankAccount(id: number): Promise<boolean> {
+    const result = await db.delete(bankAccounts)
+      .where(eq(bankAccounts.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
   // Transactions
   async getTransactionsByUserId(userId: number): Promise<Transaction[]> {
     return await db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(desc(transactions.createdAt));

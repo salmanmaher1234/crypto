@@ -33,6 +33,7 @@ export interface IStorage {
   createBankAccount(bankAccount: InsertBankAccount): Promise<BankAccount>;
   getBankAccount(id: number): Promise<BankAccount | undefined>;
   updateBankAccount(id: number, updates: Partial<BankAccount>): Promise<BankAccount | undefined>;
+  deleteBankAccount(id: number): Promise<boolean>;
   
   // Transactions
   getTransactionsByUserId(userId: number): Promise<Transaction[]>;
@@ -304,6 +305,10 @@ export class MemStorage implements IStorage {
     const updatedAccount = { ...existingAccount, ...updates };
     this.bankAccounts.set(id, updatedAccount);
     return updatedAccount;
+  }
+
+  async deleteBankAccount(id: number): Promise<boolean> {
+    return this.bankAccounts.delete(id);
   }
 
   // Transactions

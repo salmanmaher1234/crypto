@@ -228,6 +228,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/bank-accounts/:id", authenticateUser, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = (req as any).userId;
+      
+      // First check if the bank account belongs to the user
+      const existingAccount = await storage.getBankAccount(id);
+      if (!existingAccount || existingAccount.userId !== userId) {
+        return res.status(404).json({ message: "Bank account not found" });
+      }
+      
+      const deleted = await storage.deleteBankAccount(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Bank account not found" });
+      }
+      
+      res.json({ message: "Bank account deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete bank account" });
+    }
+  });
+
   // Transaction routes
   app.get("/api/transactions", authenticateUser, async (req, res) => {
     try {
