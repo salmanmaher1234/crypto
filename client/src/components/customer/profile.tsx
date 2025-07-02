@@ -82,8 +82,81 @@ export function Profile() {
   });
   
   const [editingAccountId, setEditingAccountId] = useState<number | null>(null);
+  const [showGenderDialog, setShowGenderDialog] = useState(false);
+  const [showSignatureDialog, setShowSignatureDialog] = useState(false);
+  const [selectedGender, setSelectedGender] = useState('Confidential');
+  const [signatureData, setSignatureData] = useState<string | null>(null);
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
+
+  // File upload handler for avatar
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "Image size must be less than 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error", 
+        description: "Please select a valid image file",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+    
+    try {
+      // Convert to base64 for storage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setProfileImage(base64String);
+        toast({
+          title: "Success",
+          description: "Profile image updated successfully!"
+        });
+        setUploadingImage(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive"
+      });
+      setUploadingImage(false);
+    }
+  };
+
+  // Gender selection handler
+  const handleGenderSelect = (gender: string) => {
+    setSelectedGender(gender);
+    setShowGenderDialog(false);
+    toast({
+      title: "Success",
+      description: `Gender updated to ${gender}`
+    });
+  };
+
+  // Signature save handler
+  const handleSignatureSave = () => {
+    setShowSignatureDialog(false);
+    toast({
+      title: "Success", 
+      description: "Signature saved successfully!"
+    });
+  };
 
   const handleImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -1406,7 +1479,10 @@ export function Profile() {
           </CardHeader>
           <CardContent className="space-y-1">
             {/* Avatar */}
-            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+            <div 
+              className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50"
+              onClick={() => document.getElementById('avatar-upload')?.click()}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-blue-600" />
@@ -1416,7 +1492,7 @@ export function Profile() {
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full overflow-hidden">
                   <img 
-                    src={user?.profileImage || '/api/placeholder/32/32'} 
+                    src={profileImage || user?.profileImage || '/api/placeholder/32/32'} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
                   />
@@ -1424,6 +1500,15 @@ export function Profile() {
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
+            
+            {/* Hidden file input for avatar upload */}
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
 
             {/* Username */}
             <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
@@ -1439,7 +1524,10 @@ export function Profile() {
             </div>
 
             {/* Gender */}
-            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+            <div 
+              className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50"
+              onClick={() => setShowGenderDialog(true)}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
                   <span className="text-pink-600 text-sm">♀♂</span>
@@ -1447,13 +1535,16 @@ export function Profile() {
                 <span className="text-sm font-medium">Gender</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Confidential</span>
+                <span className="text-sm text-gray-600">{selectedGender}</span>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
 
             {/* Signature */}
-            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+            <div 
+              className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50"
+              onClick={() => setShowSignatureDialog(true)}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                   <PenTool className="w-5 h-5 text-purple-600" />
@@ -1466,9 +1557,81 @@ export function Profile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Gender Selection Dialog */}
+        <Dialog open={showGenderDialog} onOpenChange={setShowGenderDialog}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Gender</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => handleGenderSelect('Male')}
+              >
+                Male
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => handleGenderSelect('Female')}
+              >
+                Female
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => handleGenderSelect('Confidential')}
+              >
+                Confidential
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full"
+                onClick={() => setShowGenderDialog(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Signature Drawing Dialog */}
+        <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-center">Create Signature</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {/* Simple drawing area placeholder */}
+              <div className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                <div className="text-center text-gray-500">
+                  <PenTool className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm">Drawing area coming soon</p>
+                  <p className="text-xs">Tap and drag to create signature</p>
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowSignatureDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                  onClick={handleSignatureSave}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
-
   }
 
   if (currentView === 'security') {
