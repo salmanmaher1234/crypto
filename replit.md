@@ -132,6 +132,7 @@ Changelog:
 - July 2, 2025. Enhanced signature functionality with canvas drawing area - added full drawing canvas with mouse and touch support, signature name input field, Clear/Cancel/Save buttons, converts signature to base64 image data for storage, includes drawing validation and success notifications
 - July 2, 2025. Fixed recharge detail navigation - removed redirect after form submission, now uses back navigation to Assets tab, cleaned up debug logging, confirmed Transaction No. modification functionality working correctly
 - July 2, 2025. Enhanced recharge form with channel selection - added "Select recharge wallet category" dropdown with Channel 01-04 options, recharge prompt message section, changed button text to "Submit", maintains same layout as provided design
+- July 2, 2025. Reorganized recharge form layout - restructured order to: fast amount buttons, manual amount input with proper heading, channel selection, live processing prompt message, removed bank wallet selection from recharge dialog
 
 ## User Preferences
 

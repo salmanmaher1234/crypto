@@ -564,40 +564,48 @@ export function Profile() {
                     <div>
                       <Label>Current Balance: ${parseFloat(user?.balance || "0").toFixed(2)}</Label>
                     </div>
+                    
+                    {/* Select a fast amount of USDT */}
                     <div>
-                      <Label>Select a fast amount of USDT</Label>
+                      <Label className="text-sm text-gray-600">Select a fast amount of USDT</Label>
+                      <div className="grid grid-cols-4 gap-2 mt-2">
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("100")}>
+                          100
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("300")}>
+                          300
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("500")}>
+                          500
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("700")}>
+                          700
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1000")}>
+                          1000
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1500")}>
+                          1500
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("3000")}>
+                          3000
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setRechargeAmount("5000")}>
+                          5000
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Enter recharge amount of USDT */}
+                    <div>
+                      <Label className="text-sm text-gray-600">Enter recharge amount of USDT</Label>
                       <Input 
-                        placeholder="Enter amount" 
+                        placeholder="500" 
                         type="number" 
                         value={rechargeAmount}
                         onChange={(e) => setRechargeAmount(e.target.value)}
+                        className="mt-1"
                       />
-                    </div>
-                    <div className="grid grid-cols-4 gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("100")}>
-                        100
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("300")}>
-                        300
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("500")}>
-                        500
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("700")}>
-                        700
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1000")}>
-                        1000
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1500")}>
-                        1500
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("3000")}>
-                        3000
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("5000")}>
-                        5000
-                      </Button>
                     </div>
                     
                     {/* Select recharge wallet category */}
@@ -620,34 +628,8 @@ export function Profile() {
                     <div>
                       <Label className="text-sm text-red-500">Recharge prompt message</Label>
                       <div className="mt-1 p-3 bg-gray-50 rounded-lg border text-sm text-gray-600">
-                        Please ensure you select the correct channel and enter the exact amount for successful recharge processing.
+                        Live processing: Please ensure you select the correct channel and enter the exact amount for successful recharge processing.
                       </div>
-                    </div>
-                    
-                    {/* Select bank wallet */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <Label className="text-sm text-gray-600">Select bank wallet</Label>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
-                          onClick={() => {
-                            setShowRechargeDialog(false);
-                            setCurrentView('wallet');
-                          }}
-                        >
-                          My wallet
-                        </Button>
-                      </div>
-                      <Select value="1:1" disabled>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="1:1" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1:1">1:1</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
 
 
