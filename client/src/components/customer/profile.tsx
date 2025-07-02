@@ -568,11 +568,11 @@ export function Profile() {
                     Recharge
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
+                <DialogContent className="max-w-sm">
                   <DialogHeader>
                     <DialogTitle>Recharge Account</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div>
                       <Label>Current Balance: ${parseFloat(user?.balance || "0").toFixed(2)}</Label>
                     </div>
@@ -639,7 +639,7 @@ export function Profile() {
                     {/* Dynamic Recharge prompt message */}
                     <div>
                       <Label className="text-sm text-red-500">Recharge prompt message</Label>
-                      <div className={`mt-1 p-3 rounded-lg border text-sm transition-all duration-500 ${
+                      <div className={`mt-1 p-2 rounded-lg border text-xs transition-all duration-500 ${
                         rechargeStep === 'idle' 
                           ? 'bg-gray-50 border-gray-200' 
                           : rechargeStep === 'validating'
@@ -663,12 +663,12 @@ export function Profile() {
                             'text-blue-600 font-semibold'
                           }`}>
                             {rechargeStep === 'idle' 
-                              ? 'Live processing: Please ensure you select the correct channel and enter the exact amount for successful recharge processing.'
+                              ? 'Select correct channel and enter exact amount for successful processing.'
                               : rechargeStep === 'validating'
-                              ? 'Validating recharge details... Checking amount and channel information.'
+                              ? 'Validating details...'
                               : rechargeStep === 'submitting'
-                              ? 'Recharge account form is submitting... Please wait while we process your request.'
-                              : 'Processing transaction... Your recharge is being verified and added to your account.'
+                              ? 'Submitting form...'
+                              : 'Processing transaction...'
                             }
                           </span>
                         </div>
@@ -689,7 +689,7 @@ export function Profile() {
 
 
                     <Button 
-                      className="w-full bg-green-500 hover:bg-green-600"
+                      className="w-full bg-green-500 hover:bg-green-600 mt-3"
                       onClick={() => {
                         const amount = parseFloat(rechargeAmount);
                         
@@ -793,12 +793,12 @@ export function Profile() {
                     Withdraw
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
-                  <div className="space-y-3 p-2">
+                <DialogContent className="max-w-sm">
+                  <div className="space-y-2 p-2">
                     {/* Current available balance */}
                     <div>
                       <Label className="text-sm text-gray-600">Current available balance</Label>
-                      <div className="bg-gray-50 rounded p-3 mt-1">
+                      <div className="bg-gray-50 rounded p-2 mt-1">
                         <span className="text-lg font-medium">{parseFloat(user?.availableBalance || user?.balance || "0").toFixed(0)}</span>
                       </div>
                     </div>
@@ -863,63 +863,9 @@ export function Profile() {
                       />
                     </div>
 
-                    {/* Dynamic Withdraw prompt information */}
-                    <div>
-                      <Label className="text-sm text-red-600">Withdraw prompt information</Label>
-                      <div className={`mt-1 p-4 rounded-lg text-sm transition-all duration-500 ${
-                        withdrawStep === 'idle' 
-                          ? 'bg-gray-100' 
-                          : withdrawStep === 'validating'
-                          ? 'bg-yellow-50 border border-yellow-200 animate-pulse'
-                          : withdrawStep === 'submitting'
-                          ? 'bg-orange-50 border border-orange-200'
-                          : 'bg-blue-50 border border-blue-200 animate-pulse'
-                      }`}>
-                        <div className="flex items-center space-x-2 mb-2">
-                          {withdrawStep !== 'idle' && (
-                            <div className={`w-2 h-2 rounded-full ${
-                              withdrawStep === 'validating' ? 'bg-yellow-500 animate-ping' :
-                              withdrawStep === 'submitting' ? 'bg-orange-500 animate-bounce' :
-                              'bg-blue-500 animate-spin'
-                            }`}></div>
-                          )}
-                          <span className={`font-medium transition-colors duration-300 ${
-                            withdrawStep === 'idle' ? 'text-gray-600' :
-                            withdrawStep === 'validating' ? 'text-yellow-700' :
-                            withdrawStep === 'submitting' ? 'text-orange-700' :
-                            'text-blue-600'
-                          }`}>
-                            {withdrawStep === 'idle' 
-                              ? 'Withdrawal Guidelines:'
-                              : withdrawStep === 'validating'
-                              ? 'Validating withdrawal details... Checking amount and wallet information.'
-                              : withdrawStep === 'submitting'
-                              ? 'Withdraw form is submitting... Please wait while we process your request.'
-                              : 'Processing withdrawal... Your request is being verified and submitted.'
-                            }
-                          </span>
-                        </div>
-                        
-                        {withdrawStep === 'idle' ? (
-                          <div className="space-y-1 text-gray-600">
-                            <div>• Minimum withdrawal: 10 USDT</div>
-                            <div>• Processing time: 1-24 hours</div>
-                            <div>• Withdrawal fee: 2 USDT</div>
-                            <div>• Ensure bank details are correct</div>
-                          </div>
-                        ) : (
-                          <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
-                            <div className={`h-1.5 rounded-full transition-all duration-1000 ${
-                              withdrawStep === 'validating' ? 'w-1/4 bg-yellow-500' :
-                              withdrawStep === 'submitting' ? 'w-2/3 bg-orange-500' :
-                              'w-full bg-blue-500'
-                            }`}></div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+
                     <Button 
-                      className="w-full bg-green-500 hover:bg-green-600 text-white mt-6"
+                      className="w-full bg-green-500 hover:bg-green-600 text-white mt-3"
                       onClick={() => {
                         const amount = parseFloat(withdrawAmount);
                         const available = parseFloat(user?.availableBalance || user?.balance || "0");
@@ -934,10 +880,10 @@ export function Profile() {
                           return;
                         }
                         
-                        if (amount < 1000) {
+                        if (amount < 10) {
                           toast({
                             title: "Minimum withdrawal",
-                            description: "Minimum withdrawal amount is 1000 USDT",
+                            description: "Minimum withdrawal amount is $10",
                             variant: "destructive",
                           });
                           return;
