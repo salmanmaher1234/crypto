@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUsers, useUpdateUser, useCreateTransaction } from "@/lib/api";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +49,9 @@ export function MemberManagement() {
 
     updateUser.mutate({ id: selectedUser.id, updates }, {
       onSuccess: () => {
+        // Invalidate users cache to refresh data instantly
+        queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+        
         toast({
           title: "User updated",
           description: "User information has been updated successfully",
@@ -67,6 +71,9 @@ export function MemberManagement() {
   const handleQuickUpdate = (user: User, updates: Partial<User>) => {
     updateUser.mutate({ id: user.id, updates }, {
       onSuccess: () => {
+        // Invalidate users cache to refresh data instantly
+        queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+        
         toast({
           title: "Updated successfully",
           description: "User setting has been updated",
@@ -92,6 +99,9 @@ export function MemberManagement() {
       description: `Admin ${action}: $${amount}`,
     }, {
       onSuccess: () => {
+        // Invalidate users cache to refresh balance instantly
+        queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+        
         toast({
           title: "Transaction successful",
           description: `${action} of $${amount} processed successfully`,

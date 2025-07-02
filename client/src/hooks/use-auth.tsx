@@ -63,8 +63,8 @@ export function useAuth() {
     refetchOnMount: false,
     refetchInterval: false,
     refetchIntervalInBackground: false,
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours
-    gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
+    staleTime: 7 * 24 * 60 * 60 * 1000, // 7 days  
+    gcTime: 30 * 24 * 60 * 60 * 1000, // 30 days
     enabled: false, // Will be enabled programmatically
   });
 

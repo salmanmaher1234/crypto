@@ -30,7 +30,7 @@ function createSession(userId: number): string {
   const sessionId = generateSessionId();
   sessions.set(sessionId, {
     userId,
-    expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
+    expires: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 days
   });
   return sessionId;
 }
@@ -38,7 +38,7 @@ function createSession(userId: number): string {
 function refreshSession(sessionId: string): void {
   const session = sessions.get(sessionId);
   if (session) {
-    session.expires = Date.now() + (7 * 24 * 60 * 60 * 1000); // Extend for 7 days
+    session.expires = Date.now() + (30 * 24 * 60 * 60 * 1000); // Extend for 30 days
   }
 }
 
@@ -80,7 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = createSession(user.id);
       res.cookie('sessionId', sessionId, { 
         httpOnly: true, 
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         sameSite: 'lax',
         secure: false // Allow HTTP for development
       });
