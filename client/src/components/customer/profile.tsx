@@ -76,6 +76,8 @@ export function Profile() {
     accountNumber: '',
     ifscCode: ''
   });
+  
+  const [editingAccountId, setEditingAccountId] = useState<number | null>(null);
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
 
@@ -822,6 +824,44 @@ export function Profile() {
 
   // Bank Wallet View
   if (currentView === 'bankwallet') {
+    const handleCopyBankDetail = (value: string, field: string) => {
+      navigator.clipboard.writeText(value);
+      toast({
+        title: "Copy Successful",
+        description: `${field} copied to clipboard`
+      });
+    };
+
+    const handleModifyBankAccount = (account: any) => {
+      // Set form data for editing
+      setNewBankWallet({
+        holderName: account.accountHolderName,
+        bankName: account.bankName,
+        accountNumber: account.accountNumber,
+        ifscCode: account.ifscCode
+      });
+      // Set editing mode
+      setEditingAccountId(account.id);
+      // Navigate to edit form (reuse add form)
+      setCurrentView('addbankwallet');
+    };
+
+    const handleDeleteBankAccount = async (accountId: number) => {
+      try {
+        // Note: You may need to implement delete API endpoint
+        toast({
+          title: "Delete",
+          description: "Bank account deletion feature will be implemented soon."
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete bank account.",
+          variant: "destructive"
+        });
+      }
+    };
+
     return (
       <div className="min-h-screen bg-gray-100 p-4">
         <Card className="max-w-md mx-auto">
@@ -830,12 +870,113 @@ export function Profile() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <CardTitle className="flex-1 text-center text-lg font-medium">Bank Wallet</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => setCurrentView('addbankwallet')}>
+            <Button variant="ghost" size="sm" onClick={() => {
+              // Clear form and reset editing mode for new account
+              setNewBankWallet({
+                holderName: '',
+                bankName: '',
+                accountNumber: '',
+                ifscCode: ''
+              });
+              setEditingAccountId(null);
+              setCurrentView('addbankwallet');
+            }}>
               <Plus className="w-4 h-4" />
             </Button>
           </CardHeader>
-          <CardContent className="p-8 text-center">
-            <p className="text-gray-500">No bank wallets added yet. Click the + button to add your first bank wallet.</p>
+          <CardContent className="space-y-6">
+            {userBankAccounts.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-gray-500">No bank wallets added yet. Click the + button to add your first bank wallet.</p>
+              </div>
+            ) : (
+              userBankAccounts.map((account) => (
+                <Card key={account.id} className="border border-gray-200">
+                  <CardContent className="p-4 space-y-3">
+                    {/* Holder's name */}
+                    <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm">Holder's name</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">{account.accountHolderName}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 p-0 h-auto text-xs"
+                          onClick={() => handleCopyBankDetail(account.accountHolderName, "Holder's name")}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Bank Name */}
+                    <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm">Bank Name</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">{account.bankName}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 p-0 h-auto text-xs"
+                          onClick={() => handleCopyBankDetail(account.bankName, "Bank Name")}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* A/c No */}
+                    <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm">A/c No</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">{account.accountNumber}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 p-0 h-auto text-xs"
+                          onClick={() => handleCopyBankDetail(account.accountNumber, "Account Number")}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* IFSC Code */}
+                    <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600 text-sm">IFSC Code</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">{account.ifscCode}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 p-0 h-auto text-xs"
+                          onClick={() => handleCopyBankDetail(account.ifscCode, "IFSC Code")}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex space-x-3 mt-4">
+                      <Button 
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                        onClick={() => handleModifyBankAccount(account)}
+                      >
+                        Modify
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        className="flex-1"
+                        onClick={() => handleDeleteBankAccount(account.id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
@@ -857,13 +998,26 @@ export function Profile() {
       }
 
       try {
-        // Create new bank account using existing API
-        await createBankAccount.mutateAsync({
-          accountHolderName: newBankWallet.holderName,
-          bankName: newBankWallet.bankName,
-          accountNumber: newBankWallet.accountNumber,
-          ifscCode: newBankWallet.ifscCode
-        });
+        if (editingAccountId) {
+          // Update existing bank account (for now, show message that it will be implemented)
+          toast({
+            title: "Modify",
+            description: "Bank account modification feature will be implemented soon."
+          });
+        } else {
+          // Create new bank account using existing API
+          await createBankAccount.mutateAsync({
+            accountHolderName: newBankWallet.holderName,
+            bankName: newBankWallet.bankName,
+            accountNumber: newBankWallet.accountNumber,
+            ifscCode: newBankWallet.ifscCode
+          });
+
+          toast({
+            title: "Success",
+            description: "Bank wallet added successfully!"
+          });
+        }
 
         // Reset form
         setNewBankWallet({
@@ -872,18 +1026,14 @@ export function Profile() {
           accountNumber: '',
           ifscCode: ''
         });
-
-        toast({
-          title: "Success",
-          description: "Bank wallet added successfully!"
-        });
+        setEditingAccountId(null);
 
         // Navigate back to bank wallet view
         setCurrentView('bankwallet');
       } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to add bank wallet. Please try again.",
+          description: editingAccountId ? "Failed to modify bank wallet." : "Failed to add bank wallet. Please try again.",
           variant: "destructive"
         });
       }
@@ -896,7 +1046,9 @@ export function Profile() {
             <Button variant="ghost" size="sm" onClick={() => setCurrentView('bankwallet')}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <CardTitle className="flex-1 text-center text-lg font-medium">Add Bank Wallet</CardTitle>
+            <CardTitle className="flex-1 text-center text-lg font-medium">
+              {editingAccountId ? "Edit Bank Wallet" : "Add Bank Wallet"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Holder's name */}

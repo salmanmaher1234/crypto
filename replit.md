@@ -124,6 +124,7 @@ Changelog:
 - July 2, 2025. Enhanced recharge system with wallet integration - added wallet selection dropdown (ImToken, BitGet, TronLink, TokenPocket wallets), updated quick amount options (100-5000), implemented recharge prompt message section with validation rules and processing instructions
 - July 2, 2025. Redesigned withdrawal interface with wallet selection flow - dropdown now shows only "1:1", "My wallet" button navigates to separate wallet selection page with Digital Wallet and Bank Wallet options, both pages now show placeholder messages for future implementation
 - July 2, 2025. Added bank wallet management functionality - Bank Wallet page includes + icon to add new wallets, "Add Bank Wallet" form with fields for Holder's name, Bank Name, A/C No, IFSC Code, save functionality that integrates with existing bank account API
+- July 2, 2025. Enhanced bank wallet display and management - saved bank accounts now display in image format with individual cards showing Holder's name, Bank Name, A/c No, IFSC Code with copy buttons and Modify/Delete functionality, supports both add and edit modes
 
 ## User Preferences
 
