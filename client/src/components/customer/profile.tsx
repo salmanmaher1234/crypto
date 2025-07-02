@@ -58,6 +58,7 @@ export function Profile() {
   const [rechargeAmount, setRechargeAmount] = useState("");
   const [selectedWallet, setSelectedWallet] = useState("");
   const [selectedBankWallet, setSelectedBankWallet] = useState("");
+  const [selectedChannel, setSelectedChannel] = useState("");
   const [withdrawFundPassword, setWithdrawFundPassword] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -599,6 +600,30 @@ export function Profile() {
                       </Button>
                     </div>
                     
+                    {/* Select recharge wallet category */}
+                    <div>
+                      <Label className="text-sm text-gray-600">Select recharge wallet category</Label>
+                      <Select value={selectedChannel} onValueChange={setSelectedChannel}>
+                        <SelectTrigger className="w-full mt-1">
+                          <SelectValue placeholder="ImToken Wallet (1-100000)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="channel01">Channel 01</SelectItem>
+                          <SelectItem value="channel02">Channel 02</SelectItem>
+                          <SelectItem value="channel03">Channel 03</SelectItem>
+                          <SelectItem value="channel04">Channel 04</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {/* Recharge prompt message */}
+                    <div>
+                      <Label className="text-sm text-red-500">Recharge prompt message</Label>
+                      <div className="mt-1 p-3 bg-gray-50 rounded-lg border text-sm text-gray-600">
+                        Please ensure you select the correct channel and enter the exact amount for successful recharge processing.
+                      </div>
+                    </div>
+                    
                     {/* Select bank wallet */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
@@ -661,9 +686,10 @@ export function Profile() {
                             onSuccess: () => {
                               toast({
                                 title: "Recharge successful",
-                                description: `${rechargeAmount} USDT has been added to your account via bank wallet`,
+                                description: `${rechargeAmount} USDT has been added to your account via ${selectedChannel || 'bank wallet'}`,
                               });
                               setRechargeAmount("");
+                              setSelectedChannel("");
                               setShowRechargeDialog(false);
                             },
                             onError: () => {
@@ -678,7 +704,7 @@ export function Profile() {
                       }}
                       disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0 || createTransaction.isPending}
                     >
-                      Confirm Recharge ${rechargeAmount || "0"}
+                      Submit
                     </Button>
                   </div>
                 </DialogContent>
