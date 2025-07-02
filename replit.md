@@ -122,7 +122,6 @@ Changelog:
 - July 2, 2025. Added profile image upload functionality - customers can now click on their avatar in the Profile section to upload a custom profile image, supports common image formats with 5MB size limit, provides visual feedback during upload process
 - July 2, 2025. Enhanced profile privacy controls - added eye icon toggle to hide/show sensitive information (Real Balance, Frozen Amount, Credit Score) with visual asterisks masking, updated copy functionality to show "Copy Successful" confirmation message
 - July 2, 2025. Enhanced recharge system with wallet integration - added wallet selection dropdown (ImToken, BitGet, TronLink, TokenPocket wallets), updated quick amount options (100-5000), implemented recharge prompt message section with validation rules and processing instructions
-- July 2, 2025. Created dedicated wallet selection page - added separate view for Digital Wallet and Bank Wallet selection accessible via "My wallet" button in withdrawal dialog, implements proper navigation flow and wallet type selection functionality
 
 ## User Preferences
 

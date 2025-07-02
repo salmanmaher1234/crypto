@@ -37,7 +37,7 @@ export function Profile() {
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const { toast } = useToast();
   
-  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'digitalwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showBankDialog, setShowBankDialog] = useState(false);
@@ -487,10 +487,7 @@ export function Profile() {
                           variant="outline" 
                           size="sm" 
                           className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
-                          onClick={() => {
-                            setShowWithdrawDialog(false);
-                            setCurrentView('walletselection');
-                          }}
+                          onClick={() => setSelectedBankWallet("digital-wallet")}
                         >
                           My wallet
                         </Button>
@@ -769,61 +766,6 @@ export function Profile() {
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Wallet Selection View
-  if (currentView === 'walletselection') {
-    return (
-      <div className="min-h-screen bg-gray-100 p-4">
-        <Card className="max-w-md mx-auto">
-          <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-            <Button variant="ghost" size="sm" onClick={() => setCurrentView('main')}>
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <CardTitle className="flex-1 text-center text-lg font-medium">Select Wallet</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {/* Digital Wallet */}
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                setSelectedBankWallet("digital-wallet");
-                setCurrentView('main');
-                setShowWithdrawDialog(true);
-              }}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">$</span>
-                </div>
-                <span className="text-left font-medium">Digital Wallet</span>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </Button>
-
-            {/* Bank Wallet */}
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                setSelectedBankWallet("bank-wallet");
-                setCurrentView('main');
-                setShowWithdrawDialog(true);
-              }}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">🏦</span>
-                </div>
-                <span className="text-left font-medium">Bank Wallet</span>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
             </Button>
           </CardContent>
         </Card>
