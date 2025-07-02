@@ -189,6 +189,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const updates = req.body;
+      
+      // Convert empty strings to null for signature fields
+      if (updates.signatureData === "") {
+        updates.signatureData = null;
+      }
+      if (updates.signatureName === "") {
+        updates.signatureName = null;
+      }
+      
       const updatedUser = await storage.updateUser(userId, updates);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });

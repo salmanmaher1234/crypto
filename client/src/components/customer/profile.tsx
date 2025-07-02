@@ -242,6 +242,35 @@ export function Profile() {
     }
   };
 
+  // Delete saved signature from database
+  const deleteSavedSignature = () => {
+    updateProfile.mutate({
+      signatureData: "",
+      signatureName: ""
+    }, {
+      onSuccess: () => {
+        setSignatureData(null);
+        setSignatureName('');
+        clearSignature();
+        
+        // Force refresh user data to show removed signature
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        
+        toast({
+          title: "Success", 
+          description: "Signature deleted successfully!"
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to delete signature. Please try again.",
+          variant: "destructive"
+        });
+      }
+    });
+  };
+
   // Signature save handler
   const handleSignatureSave = () => {
     if (!canvasRef) {
@@ -1799,9 +1828,9 @@ export function Profile() {
                 <Button 
                   variant="outline" 
                   className="flex-1"
-                  onClick={clearSignature}
+                  onClick={user?.signatureData ? deleteSavedSignature : clearSignature}
                 >
-                  Clear
+                  {user?.signatureData ? 'Delete Saved' : 'Clear'}
                 </Button>
                 <Button 
                   variant="outline" 

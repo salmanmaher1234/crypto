@@ -207,7 +207,7 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (updates: { signatureData?: string; signatureName?: string; profileImage?: string }) => {
+    mutationFn: async (updates: { signatureData?: string | null; signatureName?: string | null; profileImage?: string }) => {
       const response = await apiRequest("PATCH", "/api/profile", updates);
       return response.json();
     },
