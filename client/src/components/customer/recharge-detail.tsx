@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,23 @@ export function RechargeDetail() {
 
   // Find the specific transaction
   const transaction = transactions?.find(t => t.id === parseInt(id || "0") && t.type === "deposit");
+
+  // Load existing transaction details when transaction data is available
+  useEffect(() => {
+    if (transaction?.description?.includes('Transaction No:')) {
+      const existingTransactionNo = transaction.description.split('Transaction No:')[1]?.split('|')[0]?.trim();
+      const existingRechargeInfo = transaction.description.includes('Info:') 
+        ? transaction.description.split('Info:')[1]?.trim() 
+        : '';
+      
+      if (existingTransactionNo) {
+        setFormData({
+          transactionNo: existingTransactionNo,
+          rechargeInfo: existingRechargeInfo || ""
+        });
+      }
+    }
+  }, [transaction]);
 
   if (!transaction) {
     return (
@@ -65,14 +82,11 @@ export function RechargeDetail() {
 
       toast({
         title: "Success",
-        description: "Transaction details saved successfully",
+        description: "Transaction details updated successfully",
       });
 
-      // Clear the form after successful submission
-      setFormData({
-        transactionNo: "",
-        rechargeInfo: ""
-      });
+      // Don't clear the form since user might want to modify again
+      // Form will be updated with latest values when transactions refresh
     } catch (error) {
       toast({
         title: "Error",
