@@ -1988,29 +1988,6 @@ export function Profile() {
           </DialogContent>
         </Dialog>
 
-        {/* Recharge Confirmation Dialog */}
-        <Dialog open={showRechargeConfirmDialog} onOpenChange={setShowRechargeConfirmDialog}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Recharge Information</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 text-center">
-              <p className="text-sm text-gray-700 leading-relaxed">
-                Hello, Please contact teacher to get the latest channels for recharging. 
-                Thank you for your support and trust. Please return to the previous page.
-              </p>
-              <Button 
-                className="w-full bg-blue-500 hover:bg-blue-600"
-                onClick={() => {
-                  setShowRechargeConfirmDialog(false);
-                  setRechargeAmount("");
-                }}
-              >
-                OK
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     ));
   }
@@ -2165,5 +2142,33 @@ export function Profile() {
     ));
   }
 
-  return null;
+  return (
+    <>
+      {/* Main component returns null for unknown views */}
+      
+      {/* Global Recharge Confirmation Dialog - Always available */}
+      <Dialog open={showRechargeConfirmDialog} onOpenChange={setShowRechargeConfirmDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Recharge Information</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-center">
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Hello, Please contact teacher to get the latest channels for recharging. 
+              Thank you for your support and trust. Please return to the previous page.
+            </p>
+            <Button 
+              className="w-full bg-blue-500 hover:bg-blue-600"
+              onClick={() => {
+                setShowRechargeConfirmDialog(false);
+                setRechargeAmount("");
+              }}
+            >
+              OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
