@@ -127,7 +127,7 @@ export function AssetsPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-medium text-gray-900">Asset</h1>
           <Select value={timeFilter} onValueChange={setTimeFilter}>
-            <SelectTrigger className="w-32 h-10 text-sm border-gray-300">
+            <SelectTrigger className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 w-32">
               <SelectValue />
               <ChevronDown className="w-4 h-4" />
             </SelectTrigger>

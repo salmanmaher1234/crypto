@@ -147,6 +147,13 @@ export function Profile() {
     }
   }, [currentView, walletAddress]);
 
+  // Auto-select first bank wallet when available
+  useEffect(() => {
+    if (userBankAccounts && userBankAccounts.length > 0 && !selectedBankWallet) {
+      setSelectedBankWallet(userBankAccounts[0].id.toString());
+    }
+  }, [userBankAccounts, selectedBankWallet]);
+
   // File upload handler for avatar
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -833,12 +840,22 @@ export function Profile() {
                           My wallet
                         </Button>
                       </div>
-                      <Select value="1:1" disabled>
+                      <Select value={selectedBankWallet} onValueChange={setSelectedBankWallet}>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="1:1" />
+                          <SelectValue placeholder="Select bank wallet" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1:1">1:1</SelectItem>
+                          {userBankAccounts && userBankAccounts.length > 0 ? (
+                            userBankAccounts.map((account) => (
+                              <SelectItem key={account.id} value={account.id.toString()}>
+                                {account.bankName} - {account.accountNumber}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-accounts" disabled>
+                              No bank accounts available
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -954,25 +971,7 @@ export function Profile() {
                           return;
                         }
                         
-                        // Check fund password
-                        if (!withdrawFundPassword || withdrawFundPassword.trim() === "") {
-                          toast({
-                            title: "Fund password required",
-                            description: "Please enter your fund password",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-
-                        // Check fund password length (minimum 4 characters)
-                        if (withdrawFundPassword.trim().length < 4) {
-                          toast({
-                            title: "Invalid fund password",
-                            description: "Fund password must be at least 4 characters long",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
+                        // Fund password is optional - no validation needed
                         
                         // Check if user has a bank account
                         if (!userBankAccounts || userBankAccounts.length === 0) {
@@ -1038,9 +1037,6 @@ export function Profile() {
                         parseFloat(withdrawAmount) < 1000 ||
                         !selectedBankWallet || 
                         selectedBankWallet.trim() === "" ||
-                        !withdrawFundPassword || 
-                        withdrawFundPassword.trim() === "" ||
-                        withdrawFundPassword.trim().length < 4 ||
                         createWithdrawalRequest.isPending || 
                         isProcessingWithdraw
                       }
