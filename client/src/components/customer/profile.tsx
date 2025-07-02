@@ -533,18 +533,28 @@ export function Profile() {
                       </Button>
                     </div>
                     
-                    {/* Wallet Selection */}
+                    {/* Select bank wallet */}
                     <div>
-                      <Label>Select recharge wallet category</Label>
-                      <Select value={selectedWallet} onValueChange={setSelectedWallet}>
+                      <div className="flex items-center justify-between mb-1">
+                        <Label className="text-sm text-gray-600">Select bank wallet</Label>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
+                          onClick={() => {
+                            setShowRechargeDialog(false);
+                            setCurrentView('walletselection');
+                          }}
+                        >
+                          My wallet
+                        </Button>
+                      </div>
+                      <Select value="1:1" disabled>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Choose your wallet" />
+                          <SelectValue placeholder="1:1" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="imtoken">ImToken Wallet (1-100000)</SelectItem>
-                          <SelectItem value="bitget">BitGet Wallet (1-100000)</SelectItem>
-                          <SelectItem value="tronlink">TronLink Wallet (1-100000)</SelectItem>
-                          <SelectItem value="tokenpocket">TokenPocket Wallet (1-100000)</SelectItem>
+                          <SelectItem value="1:1">1:1</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -580,32 +590,30 @@ export function Profile() {
                           
                           {/* Wallet Validation */}
                           <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${selectedWallet ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                            <span className={selectedWallet ? 'text-green-600' : 'text-gray-500'}>
-                              Wallet: {selectedWallet ? 
-                                selectedWallet.charAt(0).toUpperCase() + selectedWallet.slice(1) + ' Selected' : 
-                                'Select wallet category'}
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span className="text-green-600">
+                              Wallet: 1:1 Selected
                             </span>
                           </div>
                           
                           {/* Ready Status */}
                           <div className="flex items-center space-x-2">
                             <div className={`w-2 h-2 rounded-full ${
-                              rechargeAmount && selectedWallet && 
+                              rechargeAmount && 
                               parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
                                 ? 'bg-green-500' 
                                 : 'bg-gray-300'
                             }`}></div>
                             <span className={
-                              rechargeAmount && selectedWallet && 
+                              rechargeAmount && 
                               parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
                                 ? 'text-green-600 font-medium' 
                                 : 'text-gray-500'
                             }>
-                              {rechargeAmount && selectedWallet && 
+                              {rechargeAmount && 
                                parseFloat(rechargeAmount) >= 1 && parseFloat(rechargeAmount) <= 100000 
                                 ? '✓ Ready to process recharge' 
-                                : 'Complete all fields to proceed'}
+                                : 'Enter valid amount to proceed'}
                             </span>
                           </div>
                           
@@ -644,28 +652,12 @@ export function Profile() {
                           return;
                         }
                         
-                        if (!selectedWallet) {
-                          toast({
-                            title: "Select wallet",
-                            description: "Please select a recharge wallet category",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        
                         if (user) {
-                          const walletNames = {
-                            imtoken: "ImToken Wallet",
-                            bitget: "BitGet Wallet", 
-                            tronlink: "TronLink Wallet",
-                            tokenpocket: "TokenPocket Wallet"
-                          };
-                          
                           createTransaction.mutate({
                             userId: user.id,
                             type: "deposit",
                             amount: rechargeAmount,
-                            description: `Account recharge of ${rechargeAmount} USDT via ${walletNames[selectedWallet as keyof typeof walletNames]}`
+                            description: `Account recharge of ${rechargeAmount} USDT via bank wallet`
                           }, {
                             onSuccess: () => {
                               toast({
