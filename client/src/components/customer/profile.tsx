@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,7 @@ export function Profile() {
   const createTransaction = useCreateTransaction();
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const updateProfile = useUpdateProfile();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   
   const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'bankwallet' | 'addbankwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
@@ -142,6 +144,8 @@ export function Profile() {
         }, {
           onSuccess: () => {
             setProfileImage(base64String);
+            // Force refresh user data to show updated profile image
+            queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
             toast({
               title: "Success",
               description: "Profile image updated successfully!"
@@ -271,6 +275,9 @@ export function Profile() {
         setShowSignatureDialog(false);
         setSignatureName('');
         clearSignature();
+        
+        // Force refresh user data to show updated signature
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         
         toast({
           title: "Success", 

@@ -211,7 +211,9 @@ export function useUpdateProfile() {
       const response = await apiRequest("PATCH", "/api/profile", updates);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedUser) => {
+      // Update the auth cache with the new user data
+      queryClient.setQueryData(["/api/auth/me"], { user: updatedUser });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
   });
