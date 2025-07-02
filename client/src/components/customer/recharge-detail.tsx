@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Copy } from "lucide-react";
 import { useTransactions } from "@/lib/api";
@@ -18,6 +19,8 @@ export function RechargeDetail() {
     transactionNo: "",
     rechargeInfo: ""
   });
+  
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
 
   // Find the specific transaction
   const transaction = transactions?.find(t => t.id === parseInt(id || "0") && t.type === "deposit");
@@ -48,11 +51,7 @@ export function RechargeDetail() {
 
   const handleSubmit = () => {
     if (!formData.transactionNo.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Transaction No. zarori hai",
-        variant: "destructive",
-      });
+      setShowErrorDialog(true);
       return;
     }
 
@@ -154,6 +153,25 @@ export function RechargeDetail() {
           </Button>
         </div>
       </div>
+
+      {/* Error Dialog */}
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent className="max-w-sm mx-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-center text-gray-900 font-medium">
+              Transaction No. cannot be empty
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center pt-4">
+            <Button 
+              onClick={() => setShowErrorDialog(false)}
+              className="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+            >
+              OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
