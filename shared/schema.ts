@@ -20,6 +20,7 @@ export const users = pgTable("users", {
   fundPassword: text("fund_password"),
   agentInvitationCode: text("agent_invitation_code"),
   invitationCode: text("invitation_code"),
+  profileImage: text("profile_image"),
   isActive: boolean("is_active").notNull().default(true),
 });
 

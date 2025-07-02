@@ -99,6 +99,7 @@ export class MemStorage implements IStorage {
       fundPassword: null,
       invitationCode: null,
       agentInvitationCode: null,
+      profileImage: null,
       isActive: true,
     };
     this.users.set(adminId, admin);
@@ -123,6 +124,7 @@ export class MemStorage implements IStorage {
       fundPassword: null,
       invitationCode: null,
       agentInvitationCode: null,
+      profileImage: null,
       isActive: true,
     };
     this.users.set(customerId, customer);
@@ -257,6 +259,7 @@ export class MemStorage implements IStorage {
       fundPassword: insertUser.fundPassword || null,
       invitationCode: insertUser.invitationCode || null,
       agentInvitationCode: null,
+      profileImage: null,
       isActive: true,
     };
     this.users.set(id, user);

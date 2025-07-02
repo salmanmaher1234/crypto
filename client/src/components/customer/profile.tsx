@@ -25,7 +25,9 @@ import {
   ChevronRight,
   ArrowLeft,
   Plus,
-  Lock
+  Lock,
+  UserCheck,
+  PenTool
 } from "lucide-react";
 
 export function Profile() {
@@ -1393,32 +1395,80 @@ export function Profile() {
   );
 
   if (currentView === 'personal') {
-    return renderSubView('Personal Information', (
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <div>
-            <Label className="text-sm text-gray-600">Username</Label>
-            <div className="p-3 bg-gray-50 rounded border">{user.username}</div>
-          </div>
-          <div>
-            <Label className="text-sm text-gray-600">Email</Label>
-            <div className="p-3 bg-gray-50 rounded border">{user.email}</div>
-          </div>
-          <div>
-            <Label className="text-sm text-gray-600">Name</Label>
-            <div className="p-3 bg-gray-50 rounded border">{user.name}</div>
-          </div>
-          <div>
-            <Label className="text-sm text-gray-600">Account Status</Label>
-            <div className="p-3 bg-gray-50 rounded border">
-              <Badge variant={user.isActive ? "default" : "destructive"}>
-                {user.isActive ? "Active" : "Inactive"}
-              </Badge>
+    return (
+      <div className="min-h-screen bg-gray-100 p-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentView('main')}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <CardTitle className="flex-1 text-center text-lg font-medium">Personal Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {/* Avatar */}
+            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-blue-600" />
+                </div>
+                <span className="text-sm font-medium">Avatar</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full overflow-hidden">
+                  <img 
+                    src={user?.profileImage || '/api/placeholder/32/32'} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </div>
             </div>
-          </div>
-        </div>
+
+            {/* Username */}
+            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                  <UserCheck className="w-5 h-5 text-orange-600" />
+                </div>
+                <span className="text-sm font-medium">UserName</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">{user?.username || 'AmitKumar'}</span>
+              </div>
+            </div>
+
+            {/* Gender */}
+            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                  <span className="text-pink-600 text-sm">♀♂</span>
+                </div>
+                <span className="text-sm font-medium">Gender</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Confidential</span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </div>
+            </div>
+
+            {/* Signature */}
+            <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <PenTool className="w-5 h-5 text-purple-600" />
+                </div>
+                <span className="text-sm font-medium">Signature</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    ));
+    );
+
   }
 
   if (currentView === 'security') {

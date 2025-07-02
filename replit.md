@@ -126,6 +126,8 @@ Changelog:
 - July 2, 2025. Added bank wallet management functionality - Bank Wallet page includes + icon to add new wallets, "Add Bank Wallet" form with fields for Holder's name, Bank Name, A/C No, IFSC Code, save functionality that integrates with existing bank account API
 - July 2, 2025. Enhanced bank wallet display and management - saved bank accounts now display in image format with individual cards showing Holder's name, Bank Name, A/c No, IFSC Code with copy buttons and Modify/Delete functionality, supports both add and edit modes
 - July 2, 2025. Implemented complete bank wallet modification system - added backend update API endpoint, frontend update hook, and full edit functionality allowing users to modify existing bank wallet details with proper form pre-filling and save operations
+- July 2, 2025. Added complete bank wallet delete functionality - backend DELETE API endpoint, frontend delete hook with confirmation, real-time list updates after deletion with success/error notifications
+- July 2, 2025. Enhanced Personal Information section with modern card-based layout - redesigned to match provided UI with Avatar, UserName, Gender (Confidential), and Signature fields, each with appropriate icons and navigation arrows
 
 ## User Preferences
 
