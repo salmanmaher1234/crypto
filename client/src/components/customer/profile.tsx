@@ -46,6 +46,8 @@ export function Profile() {
   const [showPlatformWallet, setShowPlatformWallet] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState("");
   const [selectedWallet, setSelectedWallet] = useState("");
+  const [selectedBankWallet, setSelectedBankWallet] = useState("");
+  const [withdrawFundPassword, setWithdrawFundPassword] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [hideBalance, setHideBalance] = useState(false);
@@ -447,42 +449,94 @@ export function Profile() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-sm">
-                  <DialogHeader>
-                    <DialogTitle>Withdraw Funds</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
+                  <div className="space-y-4 p-2">
+                    {/* Current available balance */}
                     <div>
-                      <Label>Available Balance: ${parseFloat(user?.availableBalance || user?.balance || "0").toFixed(2)}</Label>
+                      <Label className="text-sm text-gray-600">Current available balance</Label>
+                      <div className="bg-gray-50 rounded p-3 mt-1">
+                        <span className="text-lg font-medium">{parseFloat(user?.availableBalance || user?.balance || "0").toFixed(0)}</span>
+                      </div>
                     </div>
+
+                    {/* Enter Withdraw Amount */}
                     <div>
-                      <Label>Withdrawal Amount</Label>
+                      <div className="flex items-center justify-between mb-1">
+                        <Label className="text-sm text-gray-600">Enter Withdraw Amount</Label>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
+                          onClick={() => setWithdrawAmount(user?.availableBalance || user?.balance || "0")}
+                        >
+                          All cash
+                        </Button>
+                      </div>
                       <Input 
-                        placeholder="Enter amount" 
                         type="number" 
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
+                        className="text-lg"
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setWithdrawAmount("50")}>
-                        $50
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setWithdrawAmount("100")}>
-                        $100
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setWithdrawAmount("500")}>
-                        $500
-                      </Button>
+
+                    {/* Select bank wallet */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <Label className="text-sm text-gray-600">Select bank wallet</Label>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-green-100 text-green-600 border-green-300 text-xs px-2 py-1 h-6"
+                          onClick={() => setSelectedBankWallet("my-wallet")}
+                        >
+                          My wallet
+                        </Button>
+                      </div>
+                      <Select value={selectedBankWallet} onValueChange={setSelectedBankWallet}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Choose bank wallet" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {userBankAccounts.map((account) => (
+                            <SelectItem key={account.id} value={account.id.toString()}>
+                              {account.bankName} - {account.accountNumber}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      Withdrawal fee: 2% • Processing time: 1-3 business days
+
+                    {/* Enter fund password */}
+                    <div>
+                      <Label className="text-sm text-gray-600">Enter your fund password</Label>
+                      <Input 
+                        type="password" 
+                        value={withdrawFundPassword}
+                        onChange={(e) => setWithdrawFundPassword(e.target.value)}
+                        placeholder="Enter fund password"
+                        className="mt-1"
+                      />
+                    </div>
+
+                    {/* Withdraw prompt information */}
+                    <div>
+                      <Label className="text-sm text-red-600">Withdraw prompt information</Label>
+                      <div className="bg-gray-100 rounded p-4 mt-1 min-h-[80px] text-sm text-gray-600">
+                        <div className="space-y-1">
+                          <div>• Minimum withdrawal: 10 USDT</div>
+                          <div>• Processing time: 1-24 hours</div>
+                          <div>• Withdrawal fee: 2 USDT</div>
+                          <div>• Ensure bank details are correct</div>
+                        </div>
+                      </div>
                     </div>
                     <Button 
-                      className="w-full bg-purple-500 hover:bg-purple-600"
+                      className="w-full bg-green-500 hover:bg-green-600 text-white mt-6"
                       onClick={() => {
                         const amount = parseFloat(withdrawAmount);
                         const available = parseFloat(user?.availableBalance || user?.balance || "0");
                         
+                        // Enhanced validation
                         if (!withdrawAmount || amount <= 0) {
                           toast({
                             title: "Invalid amount",
@@ -492,10 +546,39 @@ export function Profile() {
                           return;
                         }
                         
+                        if (amount < 10) {
+                          toast({
+                            title: "Minimum withdrawal",
+                            description: "Minimum withdrawal amount is 10 USDT",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
                         if (amount > available) {
                           toast({
                             title: "Insufficient funds",
                             description: "Amount exceeds available balance",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        // Check if user has selected a bank wallet
+                        if (!selectedBankWallet) {
+                          toast({
+                            title: "Select bank wallet",
+                            description: "Please select a bank wallet for withdrawal",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        // Check fund password
+                        if (!withdrawFundPassword) {
+                          toast({
+                            title: "Fund password required",
+                            description: "Please enter your fund password",
                             variant: "destructive",
                           });
                           return;
@@ -511,8 +594,8 @@ export function Profile() {
                           return;
                         }
                         
-                        // Use the first bank account for withdrawal
-                        const bankAccountId = userBankAccounts[0].id;
+                        // Use selected bank account for withdrawal
+                        const bankAccountId = parseInt(selectedBankWallet);
                         
                         createWithdrawalRequest.mutate({
                           bankAccountId,
@@ -521,9 +604,11 @@ export function Profile() {
                           onSuccess: () => {
                             toast({
                               title: "Withdrawal requested",
-                              description: `$${withdrawAmount} withdrawal request submitted successfully`,
+                              description: `${withdrawAmount} USDT withdrawal request submitted successfully`,
                             });
                             setWithdrawAmount("");
+                            setSelectedBankWallet("");
+                            setWithdrawFundPassword("");
                             setShowWithdrawDialog(false);
                           },
                           onError: () => {
@@ -535,9 +620,9 @@ export function Profile() {
                           }
                         });
                       }}
-                      disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || createWithdrawalRequest.isPending}
+                      disabled={!withdrawAmount || !selectedBankWallet || !withdrawFundPassword || createWithdrawalRequest.isPending}
                     >
-                      Confirm Withdrawal ${withdrawAmount || "0"}
+                      {createWithdrawalRequest.isPending ? "Processing..." : "Submit"}
                     </Button>
                   </div>
                 </DialogContent>
