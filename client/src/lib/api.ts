@@ -219,6 +219,42 @@ export function useUpdateProfile() {
   });
 }
 
+// Password Change API
+export function useChangePassword() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (passwordData: { currentPassword: string; newPassword: string }) => {
+      const response = await apiRequest("PATCH", "/api/profile", { 
+        password: passwordData.newPassword 
+      });
+      return response.json();
+    },
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(["/api/auth/me"], { user: updatedUser });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+  });
+}
+
+// Fund Password Change API
+export function useChangeFundPassword() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (fundPasswordData: { currentFundPassword: string; newFundPassword: string }) => {
+      const response = await apiRequest("PATCH", "/api/profile", { 
+        fundPassword: fundPasswordData.newFundPassword 
+      });
+      return response.json();
+    },
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(["/api/auth/me"], { user: updatedUser });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+  });
+}
+
 // Crypto Prices API
 export function useCryptoPrices() {
   return useQuery({

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile, useChangePassword, useChangeFundPassword } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,8 @@ export function Profile() {
   const createTransaction = useCreateTransaction();
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const updateProfile = useUpdateProfile();
+  const changePassword = useChangePassword();
+  const changeFundPassword = useChangeFundPassword();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
@@ -1811,21 +1813,46 @@ export function Profile() {
               <Button 
                 className="w-full bg-blue-500 hover:bg-blue-600"
                 onClick={() => {
-                  if (passwordData.newPassword === passwordData.confirmPassword) {
+                  if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
                     toast({
-                      title: "Password updated",
-                      description: "Login password has been changed successfully",
+                      title: "Error",
+                      description: "Please fill all fields",
+                      variant: "destructive",
                     });
-                    setShowPasswordDialog(false);
-                    setPasswordData({currentPassword: "", newPassword: "", confirmPassword: ""});
-                  } else {
+                    return;
+                  }
+                  
+                  if (passwordData.newPassword !== passwordData.confirmPassword) {
                     toast({
                       title: "Error",
                       description: "Passwords don't match",
                       variant: "destructive",
                     });
+                    return;
                   }
+                  
+                  changePassword.mutate({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                  }, {
+                    onSuccess: () => {
+                      toast({
+                        title: "Password updated",
+                        description: "Login password has been changed successfully",
+                      });
+                      setShowPasswordDialog(false);
+                      setPasswordData({currentPassword: "", newPassword: "", confirmPassword: ""});
+                    },
+                    onError: () => {
+                      toast({
+                        title: "Error",
+                        description: "Failed to update password. Please check your current password.",
+                        variant: "destructive",
+                      });
+                    }
+                  });
                 }}
+                disabled={changePassword.isPending}
               >
                 Update Password
               </Button>
@@ -1870,21 +1897,46 @@ export function Profile() {
               <Button 
                 className="w-full bg-green-500 hover:bg-green-600"
                 onClick={() => {
-                  if (fundPasswordData.newFundPassword === fundPasswordData.confirmFundPassword) {
+                  if (!fundPasswordData.currentFundPassword || !fundPasswordData.newFundPassword || !fundPasswordData.confirmFundPassword) {
                     toast({
-                      title: "Fund password updated",
-                      description: "Fund password has been changed successfully",
+                      title: "Error",
+                      description: "Please fill all fields",
+                      variant: "destructive",
                     });
-                    setShowFundPasswordDialog(false);
-                    setFundPasswordData({currentFundPassword: "", newFundPassword: "", confirmFundPassword: ""});
-                  } else {
+                    return;
+                  }
+                  
+                  if (fundPasswordData.newFundPassword !== fundPasswordData.confirmFundPassword) {
                     toast({
                       title: "Error",
                       description: "Fund passwords don't match",
                       variant: "destructive",
                     });
+                    return;
                   }
+                  
+                  changeFundPassword.mutate({
+                    currentFundPassword: fundPasswordData.currentFundPassword,
+                    newFundPassword: fundPasswordData.newFundPassword
+                  }, {
+                    onSuccess: () => {
+                      toast({
+                        title: "Fund password updated",
+                        description: "Fund password has been changed successfully",
+                      });
+                      setShowFundPasswordDialog(false);
+                      setFundPasswordData({currentFundPassword: "", newFundPassword: "", confirmFundPassword: ""});
+                    },
+                    onError: () => {
+                      toast({
+                        title: "Error",
+                        description: "Failed to update fund password. Please check your current fund password.",
+                        variant: "destructive",
+                      });
+                    }
+                  });
                 }}
+                disabled={changeFundPassword.isPending}
               >
                 Update Fund Password
               </Button>
