@@ -37,7 +37,7 @@ export function Profile() {
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const { toast } = useToast();
   
-  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'bankwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showBankDialog, setShowBankDialog] = useState(false);
@@ -777,12 +777,7 @@ export function Profile() {
             <Button 
               variant="ghost" 
               className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                // Navigate back to main and show withdrawal dialog with bank wallet selected
-                setCurrentView('main');
-                setSelectedBankWallet("bank-wallet");
-                setShowWithdrawDialog(true);
-              }}
+              onClick={() => setCurrentView('bankwallet')}
             >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
@@ -798,7 +793,7 @@ export function Profile() {
     );
   }
 
-  // Digital Wallet Options View
+  // Digital Wallet Options View (Blank for now)
   if (currentView === 'digitalwallet') {
     return (
       <div className="min-h-screen bg-gray-100 p-4">
@@ -809,82 +804,104 @@ export function Profile() {
             </Button>
             <CardTitle className="flex-1 text-center text-lg font-medium">Digital Wallet</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {/* ImToken */}
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                setCurrentView('main');
-                setSelectedBankWallet("digital-wallet");
-                setShowWithdrawDialog(true);
-              }}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">I</span>
-                </div>
-                <span className="text-left font-medium">ImToken</span>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </Button>
+          <CardContent className="p-8 text-center">
+            <p className="text-gray-500">Digital wallet options will be available soon.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-            {/* BitGet */}
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                setCurrentView('main');
-                setSelectedBankWallet("digital-wallet");
-                setShowWithdrawDialog(true);
-              }}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">B</span>
-                </div>
-                <span className="text-left font-medium">BitGet</span>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+  // Bank Wallet View
+  if (currentView === 'bankwallet') {
+    return (
+      <div className="min-h-screen bg-gray-100 p-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentView('walletselection')}>
+              <ArrowLeft className="w-4 h-4" />
             </Button>
+            <CardTitle className="flex-1 text-center text-lg font-medium">Bank Wallet</CardTitle>
+            <Button variant="ghost" size="sm">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Bank Account Details */}
+            <div className="space-y-3">
+              {/* Holder's name */}
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600 text-sm">Holder's name</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">1</span>
+                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
+                    Copy
+                  </Button>
+                </div>
+              </div>
 
-            {/* TronLink */}
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                setCurrentView('main');
-                setSelectedBankWallet("digital-wallet");
-                setShowWithdrawDialog(true);
-              }}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">T</span>
+              {/* Bank Name */}
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600 text-sm">Bank Name</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">1</span>
+                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
+                    Copy
+                  </Button>
                 </div>
-                <span className="text-left font-medium">TronLink</span>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </Button>
 
-            {/* TokenPocket */}
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between h-16 border border-gray-200 rounded-lg"
-              onClick={() => {
-                setCurrentView('main');
-                setSelectedBankWallet("digital-wallet");
-                setShowWithdrawDialog(true);
-              }}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">P</span>
+              {/* A/c No */}
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600 text-sm">A/c No</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">1</span>
+                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
+                    Copy
+                  </Button>
                 </div>
-                <span className="text-left font-medium">TokenPocket</span>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </Button>
+
+              {/* IFSC Code */}
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600 text-sm">IFSC Code</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">1</span>
+                  <Button variant="ghost" size="sm" className="text-red-500 p-0 h-auto">
+                    Copy
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-3 mt-6">
+              <Button 
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                onClick={() => {
+                  // Handle modify functionality
+                  toast({
+                    title: "Modify",
+                    description: "Bank account modification feature coming soon."
+                  });
+                }}
+              >
+                Modify
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="flex-1"
+                onClick={() => {
+                  // Handle delete functionality
+                  toast({
+                    title: "Delete",
+                    description: "Bank account deletion feature coming soon."
+                  });
+                }}
+              >
+                Delete
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
