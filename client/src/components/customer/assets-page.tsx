@@ -81,19 +81,50 @@ export function AssetsPage() {
               
               <TabsContent value="recharges" className="mt-0 pt-8">
                 {deposits.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-0">
                     {deposits.map((deposit) => (
-                      <div key={deposit.id} className="flex items-center justify-between p-4 border-b border-gray-100">
-                        <div>
-                          <p className="font-medium text-gray-900">Deposit</p>
-                          <p className="text-sm text-gray-500">{deposit.description}</p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(deposit.createdAt).toLocaleDateString()}
-                          </p>
+                      <div key={deposit.id} className="flex items-center justify-between py-4 px-2 border-b border-gray-100 last:border-b-0">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm text-gray-600">Amount</span>
+                            <span className="text-sm font-medium">{parseFloat(deposit.amount).toFixed(0)}</span>
+                          </div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm text-gray-600">Status</span>
+                            <div className="flex items-center">
+                              <span className="text-sm text-blue-600 font-medium capitalize mr-2">
+                                {deposit.status === 'completed' ? 'Applied' : 
+                                 deposit.status === 'pending' ? 'Applied' : 
+                                 deposit.status}
+                              </span>
+                              {(deposit.status === 'completed' || deposit.status === 'pending') && (
+                                <div className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                  Checkout
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">Apply Time</span>
+                            <span className="text-sm text-gray-700">
+                              {new Date(deposit.createdAt).toLocaleString('en-CA', {
+                                year: 'numeric',
+                                month: '2-digit', 
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false
+                              }).replace(',', '')}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium text-green-600">+${parseFloat(deposit.amount).toFixed(2)}</p>
-                          <p className="text-xs text-gray-500 capitalize">{deposit.status}</p>
+                        <div className="ml-4">
+                          <button className="text-gray-400 hover:text-gray-600">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
                         </div>
                       </div>
                     ))}

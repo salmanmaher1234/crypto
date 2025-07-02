@@ -305,6 +305,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Transaction data:", req.body);
       
       const validatedData = insertTransactionSchema.parse(req.body);
+      // Set status to completed for deposits (recharges)
+      if (validatedData.type === "deposit") {
+        validatedData.status = "completed";
+      }
       const transaction = await storage.createTransaction(validatedData);
       console.log("Created transaction:", transaction);
       
