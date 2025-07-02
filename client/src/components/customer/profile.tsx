@@ -61,6 +61,7 @@ export function Profile() {
   const [selectedChannel, setSelectedChannel] = useState("");
   const [showRechargeConfirmDialog, setShowRechargeConfirmDialog] = useState(false);
   const [isProcessingRecharge, setIsProcessingRecharge] = useState(false);
+  const [rechargeStep, setRechargeStep] = useState<'idle' | 'validating' | 'submitting' | 'processing'>('idle');
   const [withdrawFundPassword, setWithdrawFundPassword] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -626,25 +627,53 @@ export function Profile() {
                       </Select>
                     </div>
                     
-                    {/* Recharge prompt message */}
+                    {/* Dynamic Recharge prompt message */}
                     <div>
                       <Label className="text-sm text-red-500">Recharge prompt message</Label>
-                      <div className={`mt-1 p-3 rounded-lg border text-sm transition-all duration-300 ${
-                        isProcessingRecharge 
-                          ? 'bg-blue-50 border-blue-200 animate-pulse' 
-                          : 'bg-gray-50 border-gray-200'
+                      <div className={`mt-1 p-3 rounded-lg border text-sm transition-all duration-500 ${
+                        rechargeStep === 'idle' 
+                          ? 'bg-gray-50 border-gray-200' 
+                          : rechargeStep === 'validating'
+                          ? 'bg-yellow-50 border-yellow-200 animate-pulse'
+                          : rechargeStep === 'submitting'
+                          ? 'bg-orange-50 border-orange-200'
+                          : 'bg-blue-50 border-blue-200 animate-pulse'
                       }`}>
                         <div className="flex items-center space-x-2">
-                          {isProcessingRecharge && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                          {rechargeStep !== 'idle' && (
+                            <div className={`w-2 h-2 rounded-full ${
+                              rechargeStep === 'validating' ? 'bg-yellow-500 animate-ping' :
+                              rechargeStep === 'submitting' ? 'bg-orange-500 animate-bounce' :
+                              'bg-blue-500 animate-spin'
+                            }`}></div>
                           )}
-                          <span className={isProcessingRecharge ? 'text-blue-600 font-medium' : 'text-gray-600'}>
-                            {isProcessingRecharge 
-                              ? 'Processing recharge... Please wait while we verify your transaction.'
-                              : 'Live processing: Please ensure you select the correct channel and enter the exact amount for successful recharge processing.'
+                          <span className={`transition-colors duration-300 ${
+                            rechargeStep === 'idle' ? 'text-gray-600' :
+                            rechargeStep === 'validating' ? 'text-yellow-700 font-medium' :
+                            rechargeStep === 'submitting' ? 'text-orange-700 font-semibold' :
+                            'text-blue-600 font-semibold'
+                          }`}>
+                            {rechargeStep === 'idle' 
+                              ? 'Live processing: Please ensure you select the correct channel and enter the exact amount for successful recharge processing.'
+                              : rechargeStep === 'validating'
+                              ? 'Validating recharge details... Checking amount and channel information.'
+                              : rechargeStep === 'submitting'
+                              ? 'Recharge account form is submitting... Please wait while we process your request.'
+                              : 'Processing transaction... Your recharge is being verified and added to your account.'
                             }
                           </span>
                         </div>
+                        
+                        {/* Progress bar for active states */}
+                        {rechargeStep !== 'idle' && (
+                          <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                            <div className={`h-1.5 rounded-full transition-all duration-1000 ${
+                              rechargeStep === 'validating' ? 'w-1/4 bg-yellow-500' :
+                              rechargeStep === 'submitting' ? 'w-2/3 bg-orange-500' :
+                              'w-full bg-blue-500'
+                            }`}></div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -675,53 +704,74 @@ export function Profile() {
                         }
                         
                         if (user) {
-                          // Start processing animation
+                          // Stage 1: Validation
+                          setRechargeStep('validating');
                           setIsProcessingRecharge(true);
                           
-                          createTransaction.mutate({
-                            userId: user.id,
-                            type: "deposit",
-                            amount: rechargeAmount,
-                            description: `Account recharge of ${rechargeAmount} USDT via bank wallet`
-                          }, {
-                            onSuccess: () => {
-                              // Stop processing animation
-                              setIsProcessingRecharge(false);
+                          setTimeout(() => {
+                            // Stage 2: Submitting
+                            setRechargeStep('submitting');
+                            
+                            setTimeout(() => {
+                              // Stage 3: Processing
+                              setRechargeStep('processing');
                               
-                              toast({
-                                title: "Recharge successful",
-                                description: `${rechargeAmount} USDT has been added to your account via ${selectedChannel || 'bank wallet'}`,
+                              createTransaction.mutate({
+                                userId: user.id,
+                                type: "deposit",
+                                amount: rechargeAmount,
+                                description: `Account recharge of ${rechargeAmount} USDT via bank wallet`
+                              }, {
+                                onSuccess: () => {
+                                  // Reset states
+                                  setRechargeStep('idle');
+                                  setIsProcessingRecharge(false);
+                                  
+                                  toast({
+                                    title: "Recharge successful",
+                                    description: `${rechargeAmount} USDT has been added to your account via ${selectedChannel || 'bank wallet'}`,
+                                  });
+                                  setRechargeAmount("");
+                                  setSelectedChannel("");
+                                  setShowRechargeDialog(false);
+                                  // Show confirmation popup after successful transaction
+                                  setTimeout(() => {
+                                    setShowRechargeConfirmDialog(true);
+                                  }, 500);
+                                },
+                                onError: () => {
+                                  // Reset states on error
+                                  setRechargeStep('idle');
+                                  setIsProcessingRecharge(false);
+                                  
+                                  toast({
+                                    title: "Recharge failed",
+                                    description: "Unable to process recharge. Please try again.",
+                                    variant: "destructive",
+                                  });
+                                }
                               });
-                              setRechargeAmount("");
-                              setSelectedChannel("");
-                              setShowRechargeDialog(false);
-                              // Show confirmation popup after successful transaction
-                              setTimeout(() => {
-                                setShowRechargeConfirmDialog(true);
-                              }, 500);
-                            },
-                            onError: () => {
-                              // Stop processing animation on error
-                              setIsProcessingRecharge(false);
-                              
-                              toast({
-                                title: "Recharge failed",
-                                description: "Unable to process recharge. Please try again.",
-                                variant: "destructive",
-                              });
-                            }
-                          });
+                            }, 1000); // 1 second for submitting stage
+                          }, 800); // 800ms for validation stage
                         }
                       }}
                       disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0 || createTransaction.isPending || isProcessingRecharge}
                     >
-                      {isProcessingRecharge ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Processing...</span>
-                        </div>
-                      ) : (
+                      {rechargeStep === 'idle' ? (
                         'Submit'
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-4 h-4 border-2 border-white rounded-full ${
+                            rechargeStep === 'validating' ? 'border-t-transparent animate-pulse' :
+                            rechargeStep === 'submitting' ? 'border-t-transparent animate-spin' :
+                            'border-t-transparent animate-spin'
+                          }`}></div>
+                          <span>
+                            {rechargeStep === 'validating' ? 'Validating...' :
+                             rechargeStep === 'submitting' ? 'Submitting...' :
+                             'Processing...'}
+                          </span>
+                        </div>
                       )}
                     </Button>
                   </div>
