@@ -60,6 +60,12 @@ export function RechargeDetail() {
       title: "Success",
       description: "Recharge information submitted successfully",
     });
+
+    // Clear the form after successful submission
+    setFormData({
+      transactionNo: "",
+      rechargeInfo: ""
+    });
   };
 
   // Generate a mock order number for display
