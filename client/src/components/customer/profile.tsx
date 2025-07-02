@@ -1773,24 +1773,6 @@ export function Profile() {
             <span>Change Fund Password</span>
           </div>
         </Button>
-        
-        <Button variant="outline" className="w-full justify-start h-12">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-              <Shield className="w-4 h-4 text-purple-600" />
-            </div>
-            <span>Two-Factor Authentication</span>
-          </div>
-        </Button>
-        
-        <Button variant="outline" className="w-full justify-start h-12">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-              <Eye className="w-4 h-4 text-orange-600" />
-            </div>
-            <span>Login History</span>
-          </div>
-        </Button>
 
         {/* Change Password Dialog */}
         <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
