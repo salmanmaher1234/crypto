@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ArrowLeft, ClipboardList, ChevronDown, ChevronRight, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,11 +16,23 @@ export function AssetsPage() {
   const [timeFilter, setTimeFilter] = useState("today");
   const [currentView, setCurrentView] = useState<'main' | 'withdrawDetail'>('main');
   const [selectedWithdraw, setSelectedWithdraw] = useState<any>(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
   const { data: withdrawalRequests, isLoading: withdrawalsLoading } = useWithdrawalRequests();
   const { toast } = useToast();
+
+  // Handle time filter change
+  const handleTimeFilterChange = (value: string) => {
+    setTimeFilter(value);
+    // Reset dates when switching away from conditional
+    if (value !== "conditional") {
+      setStartDate("");
+      setEndDate("");
+    }
+  };
 
   // Copy functionality
   const copyToClipboard = (text: string) => {
@@ -124,20 +138,50 @@ export function AssetsPage() {
     <div className="min-h-screen bg-white">
       <div className="p-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-medium text-gray-900">Asset</h1>
-          <Select value={timeFilter} onValueChange={setTimeFilter}>
-            <SelectTrigger className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 w-32">
-              <SelectValue />
-              <ChevronDown className="w-4 h-4" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">Week</SelectItem>
-              <SelectItem value="month">Month</SelectItem>
-              <SelectItem value="all">All</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold">Asset</h1>
+            <Select value={timeFilter} onValueChange={handleTimeFilterChange}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="yesterday">Yesterday</SelectItem>
+                <SelectItem value="week">Last Week</SelectItem>
+                <SelectItem value="month">Last Month</SelectItem>
+                <SelectItem value="3months">Last 3 Months</SelectItem>
+                <SelectItem value="all">All Orders</SelectItem>
+                <SelectItem value="conditional">Conditional Query</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Conditional Date Inputs */}
+          {timeFilter === "conditional" && (
+            <div className="space-y-2">
+              <div className="space-y-1">
+                <Label htmlFor="startDate" className="text-sm text-gray-600">Start date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="endDate" className="text-sm text-gray-600">End date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}

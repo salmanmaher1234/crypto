@@ -1062,7 +1062,7 @@ export function Profile() {
                       disabled={
                         !withdrawAmount || 
                         withdrawAmount.trim() === "" ||
-                        parseFloat(withdrawAmount) < 1000 ||
+                        parseFloat(withdrawAmount) < 1 ||
                         !selectedBankWallet || 
                         selectedBankWallet.trim() === "" ||
                         createWithdrawalRequest.isPending || 
