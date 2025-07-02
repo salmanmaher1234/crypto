@@ -43,6 +43,8 @@ export function Profile() {
   const [showFundPasswordDialog, setShowFundPasswordDialog] = useState(false);
   const [showPlatformWallet, setShowPlatformWallet] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState("");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -62,6 +64,66 @@ export function Profile() {
   });
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
+
+  const handleImageUpload = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file",
+        description: "Please select an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+    
+    // Create file reader to convert image to base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setProfileImage(result);
+      setUploadingImage(false);
+      
+      toast({
+        title: "Profile image updated",
+        description: "Your profile image has been successfully updated",
+      });
+    };
+    
+    reader.onerror = () => {
+      setUploadingImage(false);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    };
+    
+    reader.readAsDataURL(file);
+  };
+
+  const triggerImageUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = handleImageUpload;
+    input.click();
+  };
 
   const copyUsername = () => {
     if (user?.username) {
@@ -119,11 +181,15 @@ export function Profile() {
           <CardContent className="space-y-4">
             {/* User Info Section */}
             <div className="flex items-center space-x-4 p-4 bg-white rounded-lg">
-              <div className="relative">
-                <Avatar className="w-16 h-16">
-                  <AvatarImage src="/api/placeholder/64/64" />
+              <div className="relative cursor-pointer" onClick={triggerImageUpload}>
+                <Avatar className="w-16 h-16 hover:opacity-80 transition-opacity">
+                  {profileImage ? (
+                    <AvatarImage src={profileImage} alt="Profile" />
+                  ) : (
+                    <AvatarImage src="/api/placeholder/64/64" />
+                  )}
                   <AvatarFallback className="bg-blue-500 text-white text-lg">
-                    {user.username?.charAt(0).toUpperCase()}
+                    {uploadingImage ? "..." : user.username?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <Badge className="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs px-1">
