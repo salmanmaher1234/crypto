@@ -62,6 +62,8 @@ export function Profile() {
   const [showRechargeConfirmDialog, setShowRechargeConfirmDialog] = useState(false);
   const [isProcessingRecharge, setIsProcessingRecharge] = useState(false);
   const [rechargeStep, setRechargeStep] = useState<'idle' | 'validating' | 'submitting' | 'processing'>('idle');
+  const [isProcessingWithdraw, setIsProcessingWithdraw] = useState(false);
+  const [withdrawStep, setWithdrawStep] = useState<'idle' | 'validating' | 'submitting' | 'processing'>('idle');
   const [withdrawFundPassword, setWithdrawFundPassword] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -853,16 +855,59 @@ export function Profile() {
                       />
                     </div>
 
-                    {/* Withdraw prompt information */}
+                    {/* Dynamic Withdraw prompt information */}
                     <div>
                       <Label className="text-sm text-red-600">Withdraw prompt information</Label>
-                      <div className="bg-gray-100 rounded p-4 mt-1 min-h-[80px] text-sm text-gray-600">
-                        <div className="space-y-1">
-                          <div>• Minimum withdrawal: 10 USDT</div>
-                          <div>• Processing time: 1-24 hours</div>
-                          <div>• Withdrawal fee: 2 USDT</div>
-                          <div>• Ensure bank details are correct</div>
+                      <div className={`mt-1 p-4 rounded-lg text-sm transition-all duration-500 ${
+                        withdrawStep === 'idle' 
+                          ? 'bg-gray-100' 
+                          : withdrawStep === 'validating'
+                          ? 'bg-yellow-50 border border-yellow-200 animate-pulse'
+                          : withdrawStep === 'submitting'
+                          ? 'bg-orange-50 border border-orange-200'
+                          : 'bg-blue-50 border border-blue-200 animate-pulse'
+                      }`}>
+                        <div className="flex items-center space-x-2 mb-2">
+                          {withdrawStep !== 'idle' && (
+                            <div className={`w-2 h-2 rounded-full ${
+                              withdrawStep === 'validating' ? 'bg-yellow-500 animate-ping' :
+                              withdrawStep === 'submitting' ? 'bg-orange-500 animate-bounce' :
+                              'bg-blue-500 animate-spin'
+                            }`}></div>
+                          )}
+                          <span className={`font-medium transition-colors duration-300 ${
+                            withdrawStep === 'idle' ? 'text-gray-600' :
+                            withdrawStep === 'validating' ? 'text-yellow-700' :
+                            withdrawStep === 'submitting' ? 'text-orange-700' :
+                            'text-blue-600'
+                          }`}>
+                            {withdrawStep === 'idle' 
+                              ? 'Withdrawal Guidelines:'
+                              : withdrawStep === 'validating'
+                              ? 'Validating withdrawal details... Checking amount and wallet information.'
+                              : withdrawStep === 'submitting'
+                              ? 'Withdraw form is submitting... Please wait while we process your request.'
+                              : 'Processing withdrawal... Your request is being verified and submitted.'
+                            }
+                          </span>
                         </div>
+                        
+                        {withdrawStep === 'idle' ? (
+                          <div className="space-y-1 text-gray-600">
+                            <div>• Minimum withdrawal: 10 USDT</div>
+                            <div>• Processing time: 1-24 hours</div>
+                            <div>• Withdrawal fee: 2 USDT</div>
+                            <div>• Ensure bank details are correct</div>
+                          </div>
+                        ) : (
+                          <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                            <div className={`h-1.5 rounded-full transition-all duration-1000 ${
+                              withdrawStep === 'validating' ? 'w-1/4 bg-yellow-500' :
+                              withdrawStep === 'submitting' ? 'w-2/3 bg-orange-500' :
+                              'w-full bg-blue-500'
+                            }`}></div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <Button 
@@ -929,35 +974,72 @@ export function Profile() {
                           return;
                         }
                         
-                        // Use selected bank account for withdrawal
-                        const bankAccountId = parseInt(selectedBankWallet);
+                        // Stage 1: Validation
+                        setWithdrawStep('validating');
+                        setIsProcessingWithdraw(true);
                         
-                        createWithdrawalRequest.mutate({
-                          bankAccountId,
-                          amount: withdrawAmount
-                        }, {
-                          onSuccess: () => {
-                            toast({
-                              title: "Withdrawal requested",
-                              description: `${withdrawAmount} USDT withdrawal request submitted successfully`,
+                        setTimeout(() => {
+                          // Stage 2: Submitting
+                          setWithdrawStep('submitting');
+                          
+                          setTimeout(() => {
+                            // Stage 3: Processing
+                            setWithdrawStep('processing');
+                            
+                            // Use selected bank account for withdrawal
+                            const bankAccountId = parseInt(selectedBankWallet);
+                            
+                            createWithdrawalRequest.mutate({
+                              bankAccountId,
+                              amount: withdrawAmount
+                            }, {
+                              onSuccess: () => {
+                                // Reset states
+                                setWithdrawStep('idle');
+                                setIsProcessingWithdraw(false);
+                                
+                                toast({
+                                  title: "Withdrawal requested",
+                                  description: `${withdrawAmount} USDT withdrawal request submitted successfully`,
+                                });
+                                setWithdrawAmount("");
+                                setSelectedBankWallet("");
+                                setWithdrawFundPassword("");
+                                setShowWithdrawDialog(false);
+                              },
+                              onError: () => {
+                                // Reset states on error
+                                setWithdrawStep('idle');
+                                setIsProcessingWithdraw(false);
+                                
+                                toast({
+                                  title: "Withdrawal failed",
+                                  description: "Unable to process withdrawal request. Please try again.",
+                                  variant: "destructive",
+                                });
+                              }
                             });
-                            setWithdrawAmount("");
-                            setSelectedBankWallet("");
-                            setWithdrawFundPassword("");
-                            setShowWithdrawDialog(false);
-                          },
-                          onError: () => {
-                            toast({
-                              title: "Withdrawal failed",
-                              description: "Unable to process withdrawal request. Please try again.",
-                              variant: "destructive",
-                            });
-                          }
-                        });
+                          }, 1000); // 1 second for submitting stage
+                        }, 800); // 800ms for validation stage
                       }}
-                      disabled={!withdrawAmount || !selectedBankWallet || !withdrawFundPassword || createWithdrawalRequest.isPending}
+                      disabled={!withdrawAmount || !selectedBankWallet || !withdrawFundPassword || createWithdrawalRequest.isPending || isProcessingWithdraw}
                     >
-                      {createWithdrawalRequest.isPending ? "Processing..." : "Submit"}
+                      {withdrawStep === 'idle' ? (
+                        'Submit'
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-4 h-4 border-2 border-white rounded-full ${
+                            withdrawStep === 'validating' ? 'border-t-transparent animate-pulse' :
+                            withdrawStep === 'submitting' ? 'border-t-transparent animate-spin' :
+                            'border-t-transparent animate-spin'
+                          }`}></div>
+                          <span>
+                            {withdrawStep === 'validating' ? 'Validating...' :
+                             withdrawStep === 'submitting' ? 'Submitting...' :
+                             'Processing...'}
+                          </span>
+                        </div>
+                      )}
                     </Button>
                   </div>
                 </DialogContent>

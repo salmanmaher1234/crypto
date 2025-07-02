@@ -1,25 +1,40 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { useTransactions } from "@/lib/api";
-import { Card, CardContent } from "@/components/ui/card";
+import { useTransactions, useWithdrawalRequests } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClipboardList, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ClipboardList, ChevronDown, ChevronRight, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function AssetsPage() {
   const [activeTab, setActiveTab] = useState("recharges");
   const [timeFilter, setTimeFilter] = useState("today");
+  const [currentView, setCurrentView] = useState<'main' | 'withdrawDetail'>('main');
+  const [selectedWithdraw, setSelectedWithdraw] = useState<any>(null);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
+  const { data: withdrawalRequests, isLoading: withdrawalsLoading } = useWithdrawalRequests();
+  const { toast } = useToast();
+
+  // Copy functionality
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard",
+      description: "Text has been copied successfully",
+    });
+  };
 
   // Filter transactions by type
   const deposits = transactions?.filter(t => t.type === "deposit") || [];
-  const withdrawals = transactions?.filter(t => t.type === "withdrawal") || [];
-  const allFunds = transactions || [];
+  const withdrawals = withdrawalRequests || [];
+  const allFunds = [...(transactions || []), ...(withdrawalRequests || [])];
 
-  if (transactionsLoading) {
+  if (transactionsLoading || withdrawalsLoading) {
     return (
       <div className="min-h-screen bg-white">
         <div className="p-4">
@@ -36,6 +51,75 @@ export function AssetsPage() {
     );
   }
 
+  // Withdrawal Detail View
+  if (currentView === 'withdrawDetail' && selectedWithdraw) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <div className="p-4">
+          {/* Header */}
+          <div className="flex items-center mb-6">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentView('main')}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <h1 className="text-xl font-medium text-center flex-1">Withdraw Detail</h1>
+          </div>
+
+          {/* Withdrawal Details */}
+          <Card className="border border-gray-200">
+            <CardContent className="p-4 space-y-4">
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Amount</span>
+                  <span className="text-blue-600 font-medium">{selectedWithdraw.amount}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Status</span>
+                  <span className="text-blue-600 font-medium">{selectedWithdraw.status}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Type</span>
+                  <span className="text-gray-900">Bank Card</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Address</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-900">Bank - 1 Name - 1 A/C No - 1 IFSC Code - 1</span>
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard("Bank - 1 Name - 1 A/C No - 1 IFSC Code - 1")}>
+                      <Copy className="w-4 h-4 text-blue-600" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Apply Time</span>
+                  <span className="text-gray-900">{new Date(selectedWithdraw.createdAt).toLocaleString()}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Review Time</span>
+                  <span className="text-gray-900">-</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Approve Amt.</span>
+                  <span className="text-gray-900">-</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Comment</span>
+                  <span className="text-gray-900">-</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <div className="p-4">
@@ -43,7 +127,7 @@ export function AssetsPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-medium text-gray-900">Asset</h1>
           <Select value={timeFilter} onValueChange={setTimeFilter}>
-            <SelectTrigger className="w-20 h-8 text-sm border-gray-300">
+            <SelectTrigger className="w-32 h-10 text-sm border-gray-300">
               <SelectValue />
               <ChevronDown className="w-4 h-4" />
             </SelectTrigger>
@@ -130,10 +214,10 @@ export function AssetsPage() {
                             }).replace(',', '')}
                             
                             {/* Show Transaction Number if it exists */}
-                            {deposit.description?.includes('Transaction No:') && (
+                            {deposit.description && deposit.description.includes('Transaction No:') && (
                               <div className="mt-1 text-xs text-green-600 font-medium">
-                                {deposit.description?.split('Transaction No:')[1]?.split('|')[0]?.trim() && (
-                                  <>✓ Transaction No: {deposit.description?.split('Transaction No:')[1]?.split('|')[0]?.trim()}</>
+                                {deposit.description.split('Transaction No:')[1]?.split('|')[0]?.trim() && (
+                                  <>✓ Transaction No: {deposit.description.split('Transaction No:')[1]?.split('|')[0]?.trim()}</>
                                 )}
                               </div>
                             )}
@@ -162,19 +246,50 @@ export function AssetsPage() {
               
               <TabsContent value="withdraws" className="mt-0 pt-8">
                 {withdrawals.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-0">
                     {withdrawals.map((withdrawal) => (
-                      <div key={withdrawal.id} className="flex items-center justify-between p-4 border-b border-gray-100">
-                        <div>
-                          <p className="font-medium text-gray-900">Withdrawal</p>
-                          <p className="text-sm text-gray-500">{withdrawal.description}</p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(withdrawal.createdAt).toLocaleDateString()}
-                          </p>
+                      <div key={withdrawal.id} className="py-4 px-2 border-b border-gray-100 last:border-b-0">
+                        <div className="grid grid-cols-3 gap-4">
+                          {/* Amount Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Amount</div>
+                            <div className="text-sm font-medium">{parseFloat(withdrawal.amount).toFixed(0)}</div>
+                          </div>
+                          
+                          {/* Status Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Status</div>
+                            <div className="text-sm text-blue-600 font-medium">
+                              {withdrawal.status === 'pending' ? 'Applied' : withdrawal.status}
+                            </div>
+                          </div>
+                          
+                          {/* Empty third column for alignment */}
+                          <div></div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium text-red-600">-${parseFloat(withdrawal.amount).toFixed(2)}</p>
-                          <p className="text-xs text-gray-500 capitalize">{withdrawal.status}</p>
+                        
+                        {/* Apply Time and Arrow - full width below */}
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="text-xs text-gray-500">
+                            Apply Time: {new Date(withdrawal.createdAt).toLocaleString('en-CA', {
+                              year: 'numeric',
+                              month: '2-digit', 
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: false
+                            }).replace(',', '')}
+                          </div>
+                          <button 
+                            className="text-gray-400 hover:text-gray-600"
+                            onClick={() => {
+                              setSelectedWithdraw(withdrawal);
+                              setCurrentView('withdrawDetail');
+                            }}
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -188,27 +303,88 @@ export function AssetsPage() {
               </TabsContent>
               
               <TabsContent value="funds" className="mt-0 pt-8">
-                {allFunds.length > 0 ? (
-                  <div className="space-y-3">
-                    {allFunds.map((transaction) => (
-                      <div key={transaction.id} className="flex items-center justify-between p-4 border-b border-gray-100">
-                        <div>
-                          <p className="font-medium text-gray-900 capitalize">{transaction.type.replace('_', ' ')}</p>
-                          <p className="text-sm text-gray-500">{transaction.description}</p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(transaction.createdAt).toLocaleDateString()}
-                          </p>
+                {(transactions && transactions.length > 0) || (withdrawals && withdrawals.length > 0) ? (
+                  <div className="space-y-0">
+                    {/* Show transactions (deposits) */}
+                    {transactions?.map((transaction) => (
+                      <div key={`tx-${transaction.id}`} className="py-4 px-2 border-b border-gray-100 last:border-b-0">
+                        <div className="grid grid-cols-3 gap-4">
+                          {/* Amount Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Amount</div>
+                            <div className="text-sm font-medium">{parseFloat(transaction.amount).toFixed(0)}</div>
+                          </div>
+                          
+                          {/* Status Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Status</div>
+                            <div className="text-sm text-blue-600 font-medium">
+                              {transaction.status === 'completed' ? 'Applied' : 
+                               transaction.status === 'pending' ? 'Applied' : 
+                               transaction.status}
+                            </div>
+                          </div>
+                          
+                          {/* Type Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Type</div>
+                            <div className="text-sm text-green-600 font-medium">
+                              {transaction.type === 'deposit' ? 'Deposit' : transaction.type}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className={`font-medium ${
-                            transaction.type === 'deposit' || transaction.type === 'trade_win' 
-                              ? 'text-green-600' 
-                              : 'text-red-600'
-                          }`}>
-                            {transaction.type === 'deposit' || transaction.type === 'trade_win' ? '+' : '-'}
-                            ${parseFloat(transaction.amount).toFixed(2)}
-                          </p>
-                          <p className="text-xs text-gray-500 capitalize">{transaction.status}</p>
+                        
+                        <div className="mt-2 text-xs text-gray-500">
+                          Apply Time: {new Date(transaction.createdAt).toLocaleString('en-CA', {
+                            year: 'numeric',
+                            month: '2-digit', 
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false
+                          }).replace(',', '')}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {/* Show withdrawal requests */}
+                    {withdrawals?.map((withdrawal) => (
+                      <div key={`wd-${withdrawal.id}`} className="py-4 px-2 border-b border-gray-100 last:border-b-0">
+                        <div className="grid grid-cols-3 gap-4">
+                          {/* Amount Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Amount</div>
+                            <div className="text-sm font-medium">{parseFloat(withdrawal.amount).toFixed(0)}</div>
+                          </div>
+                          
+                          {/* Status Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Status</div>
+                            <div className="text-sm text-blue-600 font-medium">
+                              {withdrawal.status === 'pending' ? 'Applied' : withdrawal.status}
+                            </div>
+                          </div>
+                          
+                          {/* Type Column */}
+                          <div>
+                            <div className="text-sm text-gray-600 mb-1">Type</div>
+                            <div className="text-sm text-red-600 font-medium">
+                              Withdrawal
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-2 text-xs text-gray-500">
+                          Apply Time: {new Date(withdrawal.createdAt).toLocaleString('en-CA', {
+                            year: 'numeric',
+                            month: '2-digit', 
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false
+                          }).replace(',', '')}
                         </div>
                       </div>
                     ))}
