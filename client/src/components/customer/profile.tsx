@@ -94,6 +94,11 @@ export function Profile() {
   const [signatureName, setSignatureName] = useState('');
   const [isDrawing, setIsDrawing] = useState(false);
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
+  
+  // Platform Wallet hooks
+  const walletAddress = "TCbugWAXVppkCmBbHaE8UkaFEtgVZqHLbw";
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
 
@@ -106,6 +111,33 @@ export function Profile() {
       setProfileImage(user.profileImage);
     }
   }, [user]);
+
+  // Platform Wallet QR code generation
+  useEffect(() => {
+    if (currentView === 'platform') {
+      const generateQRCode = async () => {
+        try {
+          const QRCode = (await import('qrcode')).default;
+          const canvas = qrCanvasRef.current;
+          if (canvas) {
+            await QRCode.toCanvas(canvas, walletAddress, {
+              width: 192,
+              margin: 1,
+              color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+              }
+            });
+            const dataUrl = canvas.toDataURL('image/png');
+            setQrCodeDataUrl(dataUrl);
+          }
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+        }
+      };
+      generateQRCode();
+    }
+  }, [currentView, walletAddress]);
 
   // File upload handler for avatar
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -421,6 +453,36 @@ export function Profile() {
           variant: "destructive",
         });
       },
+    });
+  };
+
+  // Platform Wallet functions
+  const downloadQRCode = () => {
+    if (qrCodeDataUrl) {
+      const link = document.createElement('a');
+      link.download = `wallet-qr-${walletAddress.substring(0, 8)}.png`;
+      link.href = qrCodeDataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({
+        title: "Download Started",
+        description: "QR code image has been downloaded",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "QR code is still generating, please wait",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyAddress = () => {
+    navigator.clipboard.writeText(walletAddress);
+    toast({
+      title: "Address Copied",
+      description: "Wallet address copied to clipboard",
     });
   };
 
@@ -1947,65 +2009,8 @@ export function Profile() {
     ));
   }
 
-  // Platform Wallet hooks - moved outside conditional rendering
-  const walletAddress = "TCbugWAXVppkCmBbHaE8UkaFEtgVZqHLbw";
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
-  useEffect(() => {
-    if (currentView === 'platform') {
-      const generateQRCode = async () => {
-        try {
-          const QRCode = (await import('qrcode')).default;
-          const canvas = qrCanvasRef.current;
-          if (canvas) {
-            await QRCode.toCanvas(canvas, walletAddress, {
-              width: 192,
-              margin: 1,
-              color: {
-                dark: '#000000',
-                light: '#FFFFFF'
-              }
-            });
-            const dataUrl = canvas.toDataURL('image/png');
-            setQrCodeDataUrl(dataUrl);
-          }
-        } catch (error) {
-          console.error('Error generating QR code:', error);
-        }
-      };
-      generateQRCode();
-    }
-  }, [currentView, walletAddress]);
-  
-  const downloadQRCode = () => {
-    if (qrCodeDataUrl) {
-      const link = document.createElement('a');
-      link.download = `wallet-qr-${walletAddress.substring(0, 8)}.png`;
-      link.href = qrCodeDataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast({
-        title: "Download Started",
-        description: "QR code image has been downloaded",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "QR code is still generating, please wait",
-        variant: "destructive",
-      });
-    }
-  };
 
-  const copyAddress = () => {
-    navigator.clipboard.writeText(walletAddress);
-    toast({
-      title: "Address Copied",
-      description: "Wallet address copied to clipboard",
-    });
-  };
 
   if (currentView === 'platform') {
 
