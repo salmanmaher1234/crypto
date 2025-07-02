@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
   User, 
@@ -44,6 +45,7 @@ export function Profile() {
   const [showFundPasswordDialog, setShowFundPasswordDialog] = useState(false);
   const [showPlatformWallet, setShowPlatformWallet] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState("");
+  const [selectedWallet, setSelectedWallet] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [hideBalance, setHideBalance] = useState(false);
@@ -276,22 +278,91 @@ export function Profile() {
                         5000
                       </Button>
                     </div>
+                    
+                    {/* Wallet Selection */}
+                    <div>
+                      <Label>Select recharge wallet category</Label>
+                      <Select value={selectedWallet} onValueChange={setSelectedWallet}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Choose your wallet" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="imtoken">ImToken Wallet (1-100000)</SelectItem>
+                          <SelectItem value="bitget">BitGet Wallet (1-100000)</SelectItem>
+                          <SelectItem value="tronlink">TronLink Wallet (1-100000)</SelectItem>
+                          <SelectItem value="tokenpocket">TokenPocket Wallet (1-100000)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Recharge Prompt Message */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="text-sm text-blue-800">
+                        <div className="font-semibold mb-2">Recharge Instructions:</div>
+                        <div className="space-y-1">
+                          <div>• Minimum recharge amount: 1 USDT</div>
+                          <div>• Maximum recharge amount: 100,000 USDT</div>
+                          <div>• Processing time: 1-10 minutes</div>
+                          <div>• Please ensure you select the correct wallet</div>
+                          <div>• Contact support if you encounter any issues</div>
+                        </div>
+                      </div>
+                    </div>
+
                     <Button 
                       className="w-full bg-green-500 hover:bg-green-600"
                       onClick={() => {
-                        if (rechargeAmount && parseFloat(rechargeAmount) > 0 && user) {
+                        const amount = parseFloat(rechargeAmount);
+                        
+                        // Validation checks
+                        if (!rechargeAmount || amount <= 0) {
+                          toast({
+                            title: "Invalid amount",
+                            description: "Please enter a valid recharge amount",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        if (amount < 1 || amount > 100000) {
+                          toast({
+                            title: "Invalid amount",
+                            description: "Amount must be between 1 and 100,000 USDT",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        if (!selectedWallet) {
+                          toast({
+                            title: "Select wallet",
+                            description: "Please select a recharge wallet category",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        if (user) {
+                          const walletNames = {
+                            imtoken: "ImToken Wallet",
+                            bitget: "BitGet Wallet", 
+                            tronlink: "TronLink Wallet",
+                            tokenpocket: "TokenPocket Wallet"
+                          };
+                          
                           createTransaction.mutate({
                             userId: user.id,
                             type: "deposit",
                             amount: rechargeAmount,
-                            description: `Account recharge of $${rechargeAmount}`
+                            description: `Account recharge of ${rechargeAmount} USDT via ${walletNames[selectedWallet as keyof typeof walletNames]}`
                           }, {
                             onSuccess: () => {
                               toast({
                                 title: "Recharge successful",
-                                description: `$${rechargeAmount} has been added to your account`,
+                                description: `${rechargeAmount} USDT has been added to your account via ${walletNames[selectedWallet as keyof typeof walletNames]}`,
                               });
                               setRechargeAmount("");
+                              setSelectedWallet("");
                               setShowRechargeDialog(false);
                             },
                             onError: () => {
