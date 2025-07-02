@@ -1947,16 +1947,17 @@ export function Profile() {
     ));
   }
 
-  if (currentView === 'platform') {
-    const walletAddress = "TCbugWAXVppkCmBbHaE8UkaFEtgVZqHLbw";
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  // Platform Wallet hooks - moved outside conditional rendering
+  const walletAddress = "TCbugWAXVppkCmBbHaE8UkaFEtgVZqHLbw";
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
-    useEffect(() => {
+  useEffect(() => {
+    if (currentView === 'platform') {
       const generateQRCode = async () => {
         try {
           const QRCode = (await import('qrcode')).default;
-          const canvas = canvasRef.current;
+          const canvas = qrCanvasRef.current;
           if (canvas) {
             await QRCode.toCanvas(canvas, walletAddress, {
               width: 192,
@@ -1974,36 +1975,39 @@ export function Profile() {
         }
       };
       generateQRCode();
-    }, [walletAddress]);
-    
-    const downloadQRCode = () => {
-      if (qrCodeDataUrl) {
-        const link = document.createElement('a');
-        link.download = `wallet-qr-${walletAddress.substring(0, 8)}.png`;
-        link.href = qrCodeDataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast({
-          title: "Download Started",
-          description: "QR code image has been downloaded",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "QR code is still generating, please wait",
-          variant: "destructive",
-        });
-      }
-    };
-
-    const copyAddress = () => {
-      navigator.clipboard.writeText(walletAddress);
+    }
+  }, [currentView, walletAddress]);
+  
+  const downloadQRCode = () => {
+    if (qrCodeDataUrl) {
+      const link = document.createElement('a');
+      link.download = `wallet-qr-${walletAddress.substring(0, 8)}.png`;
+      link.href = qrCodeDataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       toast({
-        title: "Address Copied",
-        description: "Wallet address copied to clipboard",
+        title: "Download Started",
+        description: "QR code image has been downloaded",
       });
-    };
+    } else {
+      toast({
+        title: "Error",
+        description: "QR code is still generating, please wait",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyAddress = () => {
+    navigator.clipboard.writeText(walletAddress);
+    toast({
+      title: "Address Copied",
+      description: "Wallet address copied to clipboard",
+    });
+  };
+
+  if (currentView === 'platform') {
 
     return renderSubView('Platform Wallet', (
       <div className="flex flex-col items-center justify-center space-y-6 p-6 bg-gray-50 min-h-[400px]">
@@ -2016,7 +2020,7 @@ export function Profile() {
         <div className="bg-white p-4 rounded-lg shadow-sm border">
           <div className="w-48 h-48 bg-white flex items-center justify-center">
             <canvas 
-              ref={canvasRef}
+              ref={qrCanvasRef}
               width={192}
               height={192}
               className="border border-gray-200"
