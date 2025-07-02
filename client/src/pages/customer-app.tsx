@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 const sections = [
   { id: "home", label: "Home", icon: Home },
   { id: "orders", label: "Orders", icon: FileText },
-  { id: "trade", label: "Trade", icon: TrendingUp },
+  { id: "market", label: "Market", icon: TrendingUp },
   { id: "wallet", label: "Wallet", icon: Wallet },
   { id: "profile", label: "Profile", icon: User },
 ];
@@ -48,8 +48,16 @@ export default function CustomerApp() {
             onNavigateToProfile={() => setActiveSection("profile")}
           />
         );
-      case "trade":
-        return <TradingInterface />;
+      case "market":
+        return (
+          <CryptoTrading 
+            currency="BTC/USD"
+            onBack={() => setActiveSection("home")}
+            onOrderPlaced={() => {
+              setActiveSection("orders");
+            }}
+          />
+        );
       case "orders":
         return <CustomerBettingOrders />;
       case "wallet":
