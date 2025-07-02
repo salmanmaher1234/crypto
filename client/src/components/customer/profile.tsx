@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile, useChangePassword, useChangeFundPassword } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
@@ -1949,12 +1949,52 @@ export function Profile() {
 
   if (currentView === 'platform') {
     const walletAddress = "TCbugWAXVppkCmBbHaE8UkaFEtgVZqHLbw";
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+
+    useEffect(() => {
+      const generateQRCode = async () => {
+        try {
+          const QRCode = (await import('qrcode')).default;
+          const canvas = canvasRef.current;
+          if (canvas) {
+            await QRCode.toCanvas(canvas, walletAddress, {
+              width: 192,
+              margin: 1,
+              color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+              }
+            });
+            const dataUrl = canvas.toDataURL('image/png');
+            setQrCodeDataUrl(dataUrl);
+          }
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+        }
+      };
+      generateQRCode();
+    }, [walletAddress]);
     
     const downloadQRCode = () => {
-      toast({
-        title: "Download Started",
-        description: "QR code image has been downloaded",
-      });
+      if (qrCodeDataUrl) {
+        const link = document.createElement('a');
+        link.download = `wallet-qr-${walletAddress.substring(0, 8)}.png`;
+        link.href = qrCodeDataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast({
+          title: "Download Started",
+          description: "QR code image has been downloaded",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "QR code is still generating, please wait",
+          variant: "destructive",
+        });
+      }
     };
 
     const copyAddress = () => {
@@ -1975,79 +2015,21 @@ export function Profile() {
         {/* QR Code Container */}
         <div className="bg-white p-4 rounded-lg shadow-sm border">
           <div className="w-48 h-48 bg-white flex items-center justify-center">
-            {/* QR Code SVG */}
-            <svg width="192" height="192" className="border border-gray-200">
-              {/* QR Code pattern using SVG rectangles */}
-              <defs>
-                <pattern id="qrPattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
-                  <rect x="0" y="0" width="4" height="4" fill="black"/>
-                  <rect x="4" y="4" width="4" height="4" fill="black"/>
-                </pattern>
-              </defs>
-              
-              {/* Background */}
-              <rect width="192" height="192" fill="white"/>
-              
-              {/* Corner detection patterns */}
-              {/* Top-left */}
-              <rect x="8" y="8" width="32" height="32" fill="black"/>
-              <rect x="12" y="12" width="24" height="24" fill="white"/>
-              <rect x="16" y="16" width="16" height="16" fill="black"/>
-              <rect x="20" y="20" width="8" height="8" fill="white"/>
-              
-              {/* Top-right */}
-              <rect x="152" y="8" width="32" height="32" fill="black"/>
-              <rect x="156" y="12" width="24" height="24" fill="white"/>
-              <rect x="160" y="16" width="16" height="16" fill="black"/>
-              <rect x="164" y="20" width="8" height="8" fill="white"/>
-              
-              {/* Bottom-left */}
-              <rect x="8" y="152" width="32" height="32" fill="black"/>
-              <rect x="12" y="156" width="24" height="24" fill="white"/>
-              <rect x="16" y="160" width="16" height="16" fill="black"/>
-              <rect x="20" y="164" width="8" height="8" fill="white"/>
-              
-              {/* Data pattern simulation */}
-              <rect x="48" y="8" width="4" height="4" fill="black"/>
-              <rect x="56" y="8" width="4" height="4" fill="black"/>
-              <rect x="64" y="8" width="4" height="4" fill="black"/>
-              <rect x="72" y="8" width="4" height="4" fill="black"/>
-              <rect x="88" y="8" width="4" height="4" fill="black"/>
-              <rect x="96" y="8" width="4" height="4" fill="black"/>
-              <rect x="104" y="8" width="4" height="4" fill="black"/>
-              <rect x="112" y="8" width="4" height="4" fill="black"/>
-              <rect x="128" y="8" width="4" height="4" fill="black"/>
-              <rect x="136" y="8" width="4" height="4" fill="black"/>
-              <rect x="144" y="8" width="4" height="4" fill="black"/>
-              
-              {/* More data patterns */}
-              <rect x="8" y="48" width="4" height="4" fill="black"/>
-              <rect x="48" y="48" width="4" height="4" fill="black"/>
-              <rect x="56" y="48" width="4" height="4" fill="black"/>
-              <rect x="72" y="48" width="4" height="4" fill="black"/>
-              <rect x="88" y="48" width="4" height="4" fill="black"/>
-              <rect x="104" y="48" width="4" height="4" fill="black"/>
-              <rect x="120" y="48" width="4" height="4" fill="black"/>
-              <rect x="136" y="48" width="4" height="4" fill="black"/>
-              <rect x="152" y="48" width="4" height="4" fill="black"/>
-              <rect x="168" y="48" width="4" height="4" fill="black"/>
-              <rect x="184" y="48" width="4" height="4" fill="black"/>
-              
-              {/* Random pattern blocks */}
-              {Array.from({length: 200}).map((_, i) => {
-                const x = 48 + (i % 16) * 8;
-                const y = 64 + Math.floor(i / 16) * 8;
-                const shouldShow = Math.random() > 0.5;
-                return shouldShow && x < 144 && y < 144 ? (
-                  <rect key={i} x={x} y={y} width="4" height="4" fill="black"/>
-                ) : null;
-              })}
-              
-              {/* Center logo */}
-              <circle cx="96" cy="96" r="16" fill="#3B82F6"/>
-              <circle cx="96" cy="96" r="12" fill="white"/>
-              <path d="M88 92 L88 100 L104 100 L104 92 L100 92 L100 96 L92 96 L92 92 Z" fill="#3B82F6"/>
-            </svg>
+            <canvas 
+              ref={canvasRef}
+              width={192}
+              height={192}
+              className="border border-gray-200"
+              style={{ display: qrCodeDataUrl ? 'block' : 'none' }}
+            />
+            {!qrCodeDataUrl && (
+              <div className="w-48 h-48 bg-gray-100 flex items-center justify-center border border-gray-200">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-500">Generating QR Code...</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
