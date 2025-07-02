@@ -147,12 +147,12 @@ export function Profile() {
     }
   }, [currentView, walletAddress]);
 
-  // Auto-select first bank wallet when available
+  // Auto-select Bank Wallet as default
   useEffect(() => {
-    if (userBankAccounts && userBankAccounts.length > 0 && !selectedBankWallet) {
-      setSelectedBankWallet(userBankAccounts[0].id.toString());
+    if (!selectedBankWallet) {
+      setSelectedBankWallet("bank-wallet");
     }
-  }, [userBankAccounts, selectedBankWallet]);
+  }, [selectedBankWallet]);
 
   // File upload handler for avatar
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -842,20 +842,11 @@ export function Profile() {
                       </div>
                       <Select value={selectedBankWallet} onValueChange={setSelectedBankWallet}>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select bank wallet" />
+                          <SelectValue placeholder="Select wallet type" />
                         </SelectTrigger>
                         <SelectContent>
-                          {userBankAccounts && userBankAccounts.length > 0 ? (
-                            userBankAccounts.map((account) => (
-                              <SelectItem key={account.id} value={account.id.toString()}>
-                                {account.bankName} - {account.accountNumber}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="no-accounts" disabled>
-                              No bank accounts available
-                            </SelectItem>
-                          )}
+                          <SelectItem value="digital-wallet">Digital Wallet</SelectItem>
+                          <SelectItem value="bank-wallet">Bank Wallet</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -995,39 +986,76 @@ export function Profile() {
                             // Stage 3: Processing
                             setWithdrawStep('processing');
                             
-                            // Use selected bank account for withdrawal
-                            const bankAccountId = parseInt(selectedBankWallet);
-                            
-                            createWithdrawalRequest.mutate({
-                              bankAccountId,
-                              amount: withdrawAmount
-                            }, {
-                              onSuccess: () => {
-                                // Reset states
-                                setWithdrawStep('idle');
-                                setIsProcessingWithdraw(false);
-                                
-                                toast({
-                                  title: "Withdrawal requested",
-                                  description: `${withdrawAmount} USDT withdrawal request submitted successfully`,
-                                });
-                                setWithdrawAmount("");
-                                setSelectedBankWallet("");
-                                setWithdrawFundPassword("");
-                                setShowWithdrawDialog(false);
-                              },
-                              onError: () => {
-                                // Reset states on error
-                                setWithdrawStep('idle');
-                                setIsProcessingWithdraw(false);
-                                
-                                toast({
-                                  title: "Withdrawal failed",
-                                  description: "Unable to process withdrawal request. Please try again.",
-                                  variant: "destructive",
-                                });
-                              }
-                            });
+                            // Handle withdrawal for both digital and bank wallets
+                            if (selectedBankWallet === "digital-wallet") {
+                              // For digital wallet, use a default bank account or create one
+                              const defaultBankAccountId = userBankAccounts?.[0]?.id || 1;
+                              
+                              createWithdrawalRequest.mutate({
+                                bankAccountId: defaultBankAccountId,
+                                amount: withdrawAmount
+                              }, {
+                                onSuccess: () => {
+                                  // Reset states
+                                  setWithdrawStep('idle');
+                                  setIsProcessingWithdraw(false);
+                                  
+                                  toast({
+                                    title: "Withdrawal requested",
+                                    description: `${withdrawAmount} USDT withdrawal request submitted successfully via Digital Wallet`,
+                                  });
+                                  setWithdrawAmount("");
+                                  setSelectedBankWallet("bank-wallet");
+                                  setWithdrawFundPassword("");
+                                  setShowWithdrawDialog(false);
+                                },
+                                onError: () => {
+                                  // Reset states on error
+                                  setWithdrawStep('idle');
+                                  setIsProcessingWithdraw(false);
+                                  
+                                  toast({
+                                    title: "Withdrawal failed",
+                                    description: "Unable to process withdrawal request. Please try again.",
+                                    variant: "destructive",
+                                  });
+                                }
+                              });
+                            } else if (selectedBankWallet === "bank-wallet") {
+                              // For bank wallet, use the first available bank account
+                              const bankAccountId = userBankAccounts?.[0]?.id || 1;
+                              
+                              createWithdrawalRequest.mutate({
+                                bankAccountId: bankAccountId,
+                                amount: withdrawAmount
+                              }, {
+                                onSuccess: () => {
+                                  // Reset states
+                                  setWithdrawStep('idle');
+                                  setIsProcessingWithdraw(false);
+                                  
+                                  toast({
+                                    title: "Withdrawal requested",
+                                    description: `${withdrawAmount} USDT withdrawal request submitted successfully via Bank Wallet`,
+                                  });
+                                  setWithdrawAmount("");
+                                  setSelectedBankWallet("bank-wallet");
+                                  setWithdrawFundPassword("");
+                                  setShowWithdrawDialog(false);
+                                },
+                                onError: () => {
+                                  // Reset states on error
+                                  setWithdrawStep('idle');
+                                  setIsProcessingWithdraw(false);
+                                  
+                                  toast({
+                                    title: "Withdrawal failed",
+                                    description: "Unable to process withdrawal request. Please try again.",
+                                    variant: "destructive",
+                                  });
+                                }
+                              });
+                            }
                           }, 1000); // 1 second for submitting stage
                         }, 800); // 800ms for validation stage
                       }}
