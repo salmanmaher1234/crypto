@@ -37,7 +37,7 @@ export function Profile() {
   const createWithdrawalRequest = useCreateWithdrawalRequest();
   const { toast } = useToast();
   
-  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'bankwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'personal' | 'wallet' | 'walletselection' | 'digitalwallet' | 'bankwallet' | 'addbankwallet' | 'security' | 'platform' | 'announcement' | 'message' | 'about'>('main');
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showBankDialog, setShowBankDialog] = useState(false);
@@ -67,6 +67,14 @@ export function Profile() {
     bankName: "",
     accountNumber: "",
     ifscCode: ""
+  });
+  
+  // New Bank Wallet form states
+  const [newBankWallet, setNewBankWallet] = useState({
+    holderName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: ''
   });
 
   const userBankAccounts = bankAccounts?.filter(account => account.userId === user?.id) || [];
@@ -812,7 +820,7 @@ export function Profile() {
     );
   }
 
-  // Bank Wallet View (Blank for now)
+  // Bank Wallet View
   if (currentView === 'bankwallet') {
     return (
       <div className="min-h-screen bg-gray-100 p-4">
@@ -822,9 +830,127 @@ export function Profile() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <CardTitle className="flex-1 text-center text-lg font-medium">Bank Wallet</CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => setCurrentView('addbankwallet')}>
+              <Plus className="w-4 h-4" />
+            </Button>
           </CardHeader>
           <CardContent className="p-8 text-center">
-            <p className="text-gray-500">Bank wallet options will be available soon.</p>
+            <p className="text-gray-500">No bank wallets added yet. Click the + button to add your first bank wallet.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Add Bank Wallet Form View
+  if (currentView === 'addbankwallet') {
+    const handleSaveBankWallet = async () => {
+      // Validate all fields are filled
+      if (!newBankWallet.holderName || !newBankWallet.bankName || 
+          !newBankWallet.accountNumber || !newBankWallet.ifscCode) {
+        toast({
+          title: "Error",
+          description: "Please fill all required fields.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      try {
+        // Create new bank account using existing API
+        await createBankAccount.mutateAsync({
+          accountHolderName: newBankWallet.holderName,
+          bankName: newBankWallet.bankName,
+          accountNumber: newBankWallet.accountNumber,
+          ifscCode: newBankWallet.ifscCode
+        });
+
+        // Reset form
+        setNewBankWallet({
+          holderName: '',
+          bankName: '',
+          accountNumber: '',
+          ifscCode: ''
+        });
+
+        toast({
+          title: "Success",
+          description: "Bank wallet added successfully!"
+        });
+
+        // Navigate back to bank wallet view
+        setCurrentView('bankwallet');
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to add bank wallet. Please try again.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-100 p-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+            <Button variant="ghost" size="sm" onClick={() => setCurrentView('bankwallet')}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <CardTitle className="flex-1 text-center text-lg font-medium">Add Bank Wallet</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Holder's name */}
+            <div>
+              <Label className="text-sm text-gray-600">Holder's name</Label>
+              <Input
+                placeholder="Please enter holder's name"
+                value={newBankWallet.holderName}
+                onChange={(e) => setNewBankWallet(prev => ({ ...prev, holderName: e.target.value }))}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Bank Name */}
+            <div>
+              <Label className="text-sm text-gray-600">Bank Name</Label>
+              <Input
+                placeholder="Please enter bank name"
+                value={newBankWallet.bankName}
+                onChange={(e) => setNewBankWallet(prev => ({ ...prev, bankName: e.target.value }))}
+                className="mt-1"
+              />
+            </div>
+
+            {/* A/C No */}
+            <div>
+              <Label className="text-sm text-gray-600">A/C No</Label>
+              <Input
+                placeholder="Please enter A/C No"
+                value={newBankWallet.accountNumber}
+                onChange={(e) => setNewBankWallet(prev => ({ ...prev, accountNumber: e.target.value }))}
+                className="mt-1"
+              />
+            </div>
+
+            {/* IFSC Code */}
+            <div>
+              <Label className="text-sm text-gray-600">IFSC Code</Label>
+              <Input
+                placeholder="Please enter IFSC Code"
+                value={newBankWallet.ifscCode}
+                onChange={(e) => setNewBankWallet(prev => ({ ...prev, ifscCode: e.target.value }))}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Save Button */}
+            <Button 
+              className="w-full bg-green-500 hover:bg-green-600 text-white mt-6"
+              onClick={handleSaveBankWallet}
+              disabled={createBankAccount.isPending}
+            >
+              {createBankAccount.isPending ? "Saving..." : "Save"}
+            </Button>
           </CardContent>
         </Card>
       </div>
