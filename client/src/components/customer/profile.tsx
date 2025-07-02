@@ -242,7 +242,7 @@ export function Profile() {
                       <Label>Current Balance: ${parseFloat(user?.balance || "0").toFixed(2)}</Label>
                     </div>
                     <div>
-                      <Label>Recharge Amount</Label>
+                      <Label>Select a fast amount of USDT</Label>
                       <Input 
                         placeholder="Enter amount" 
                         type="number" 
@@ -250,15 +250,30 @@ export function Profile() {
                         onChange={(e) => setRechargeAmount(e.target.value)}
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-2">
                       <Button variant="outline" size="sm" onClick={() => setRechargeAmount("100")}>
-                        $100
+                        100
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("300")}>
+                        300
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => setRechargeAmount("500")}>
-                        $500
+                        500
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("700")}>
+                        700
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1000")}>
-                        $1000
+                        1000
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("1500")}>
+                        1500
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("3000")}>
+                        3000
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setRechargeAmount("5000")}>
+                        5000
                       </Button>
                     </div>
                     <Button 
