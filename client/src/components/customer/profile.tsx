@@ -401,15 +401,43 @@ export function Profile() {
     
     // Create file reader to convert image to base64
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const result = e.target?.result as string;
-      setProfileImage(result);
-      setUploadingImage(false);
       
-      toast({
-        title: "Profile image updated",
-        description: "Your profile image has been successfully updated",
-      });
+      try {
+        // Update user profile image on server
+        const response = await fetch('/api/user/profile-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Session-ID': localStorage.getItem('sessionId') || '',
+          },
+          body: JSON.stringify({ profileImage: result }),
+        });
+
+        if (response.ok) {
+          // Update local state
+          setProfileImage(result);
+          
+          // Invalidate user cache to refresh everywhere
+          queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+          
+          toast({
+            title: "Profile image updated",
+            description: "Your profile image has been successfully updated",
+          });
+        } else {
+          throw new Error('Failed to update profile image');
+        }
+      } catch (error) {
+        toast({
+          title: "Upload failed",
+          description: "Failed to update profile image. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setUploadingImage(false);
+      }
     };
     
     reader.onerror = () => {
@@ -544,7 +572,7 @@ export function Profile() {
                   Frozen Amount: {hideBalance ? "****" : parseFloat(user.frozenBalance || "0").toFixed(0)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  Credit Score: {hideBalance ? "**" : user.reputation || 80}
+                  Credit Score: {hideBalance ? "**" : user.reputation || 85}
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setHideBalance(!hideBalance)}>

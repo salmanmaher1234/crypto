@@ -358,6 +358,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile image update route
+  app.post("/api/user/profile-image", authenticateUser, async (req, res) => {
+    try {
+      const { profileImage } = req.body;
+      
+      if (!profileImage) {
+        return res.status(400).json({ message: "Profile image is required" });
+      }
+      
+      const updatedUser = await storage.updateUser((req as any).userId, { profileImage });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ message: "Profile image updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update profile image" });
+    }
+  });
+
   // Update transaction with additional details (like transaction number)
   app.patch("/api/transactions/:id/details", authenticateUser, async (req, res) => {
     try {

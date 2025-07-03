@@ -81,9 +81,17 @@ export default function CustomerApp() {
         <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm sm:text-base font-medium mr-3">
-                {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
+              {user?.profileImage ? (
+                <img 
+                  src={user.profileImage} 
+                  alt="Profile" 
+                  className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full object-cover mr-3"
+                />
+              ) : (
+                <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm sm:text-base font-medium mr-3">
+                  {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+              )}
               <div>
                 <div className="text-sm sm:text-base font-medium text-gray-900">{user?.name || user?.username}</div>
                 <div className="text-xs sm:text-sm text-gray-500">Welcome back</div>
