@@ -33,6 +33,10 @@ import {
 
 export function Profile() {
   const { user, logout } = useAuth();
+  
+  // Debug user data
+  console.log("Profile component - user data:", user);
+  console.log("Profile component - frozen balance:", user?.frozenBalance);
   const { data: bankAccounts } = useBankAccounts();
   const { data: announcements } = useAnnouncements();
   const { data: messages } = useMessages();
