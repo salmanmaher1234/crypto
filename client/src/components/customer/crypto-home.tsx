@@ -204,7 +204,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
           className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
           onClick={onNavigateToProfile}
         >
-          <AvatarImage src={`/api/placeholder/40/40`} alt={user?.name || 'Profile'} />
+          <AvatarImage src={user?.profileImage || `/api/placeholder/40/40`} alt={user?.name || 'Profile'} />
           <AvatarFallback className="bg-blue-500 text-white font-bold">
             {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
           </AvatarFallback>

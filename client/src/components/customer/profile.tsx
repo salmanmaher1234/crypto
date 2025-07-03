@@ -520,11 +520,7 @@ export function Profile() {
             <div className="flex items-center space-x-4 p-4 bg-white rounded-lg">
               <div className="relative cursor-pointer" onClick={triggerImageUpload}>
                 <Avatar className="w-16 h-16 hover:opacity-80 transition-opacity">
-                  {profileImage ? (
-                    <AvatarImage src={profileImage} alt="Profile" />
-                  ) : (
-                    <AvatarImage src="/api/placeholder/64/64" />
-                  )}
+                  <AvatarImage src={user?.profileImage || "/api/placeholder/64/64"} alt="Profile" />
                   <AvatarFallback className="bg-blue-500 text-white text-lg">
                     {uploadingImage ? "..." : user.username?.charAt(0).toUpperCase()}
                   </AvatarFallback>
@@ -1807,7 +1803,7 @@ export function Profile() {
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-full overflow-hidden">
                   <img 
-                    src={profileImage || user?.profileImage || '/api/placeholder/32/32'} 
+                    src={user?.profileImage || '/api/placeholder/32/32'} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
                   />

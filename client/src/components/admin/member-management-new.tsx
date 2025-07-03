@@ -256,8 +256,9 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="text-sm font-medium">${parseFloat(user.balance || "0").toFixed(2)}</div>
-                        <div className="text-xs text-gray-500">Frozen: ${parseFloat(user.frozenBalance || "0").toFixed(2)}</div>
+                        <div className="text-sm font-medium">Total: ${parseFloat(user.balance || "0").toFixed(2)}</div>
+                        <div className="text-xs text-green-600">Available: ${parseFloat(user.availableBalance || "0").toFixed(2)}</div>
+                        <div className="text-xs text-red-500">Frozen: ${parseFloat(user.frozenBalance || "0").toFixed(2)}</div>
                       </div>
                     </TableCell>
                     <TableCell>

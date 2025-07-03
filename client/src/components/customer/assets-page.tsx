@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { useTransactions, useWithdrawalRequests } from "@/lib/api";
+import { useTransactions, useWithdrawalRequests, useBankAccounts } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,7 @@ export function AssetsPage() {
   const { user } = useAuth();
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
   const { data: withdrawalRequests, isLoading: withdrawalsLoading } = useWithdrawalRequests();
+  const { data: bankAccounts } = useBankAccounts();
   const { toast } = useToast();
 
   // Handle time filter change
@@ -142,10 +143,21 @@ export function AssetsPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Address</span>
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-900">Bank - 1 Name - 1 A/C No - 1 IFSC Code - 1</span>
-                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard("Bank - 1 Name - 1 A/C No - 1 IFSC Code - 1")}>
-                      <Copy className="w-4 h-4 text-blue-600" />
-                    </Button>
+                    {(() => {
+                      const bankAccount = bankAccounts?.find(acc => acc.id === selectedWithdraw.bankAccountId);
+                      const addressText = bankAccount 
+                        ? `${bankAccount.bankName} - ${bankAccount.accountHolderName} - A/C No ${bankAccount.accountNumber} - IFSC ${bankAccount.ifscCode}`
+                        : "Bank details not available";
+                      
+                      return (
+                        <>
+                          <span className="text-gray-900 text-sm">{addressText}</span>
+                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(addressText)}>
+                            <Copy className="w-4 h-4 text-blue-600" />
+                          </Button>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
                 
