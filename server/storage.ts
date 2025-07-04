@@ -269,7 +269,7 @@ export class MemStorage implements IStorage {
       balance: "0.00",
       availableBalance: "0.00",
       frozenBalance: "0.00",
-      reputation: 85,
+      reputation: insertUser.reputation || 85,
       winLoseSetting: "To Win",
       direction: "Actual",
       accountStatus: "Active",

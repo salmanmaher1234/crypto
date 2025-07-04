@@ -134,6 +134,10 @@ Changelog:
 - July 2, 2025. Enhanced recharge form with channel selection - added "Select recharge wallet category" dropdown with Channel 01-04 options, recharge prompt message section, changed button text to "Submit", maintains same layout as provided design
 - July 2, 2025. Reorganized recharge form layout - restructured order to: fast amount buttons, manual amount input with proper heading, channel selection, live processing prompt message, removed bank wallet selection from recharge dialog
 - July 4, 2025. Reorganized admin panel button structure - removed first "Other" button, restructured button order to: Change a bank, Details, Order, Deposit, Deduction, Other, Freeze, Unfreeze, Change group with "$100" text removed from freeze/unfreeze buttons
+- July 4, 2025. Implemented dynamic freeze/unfreeze functionality with custom amount dialog boxes - replaced fixed $100 amounts with user input fields, added validation and proper error handling
+- July 4, 2025. Added comprehensive Add Member functionality - new members default to VIP Level/reputation of 100, includes username, email, password, name, and reputation fields with proper validation
+- July 4, 2025. Enhanced VIP Level display system - admin panel shows reputation as "X/100" format with progress bar, customer profile displays Credit Score with privacy toggle, real-time updates through React Query
+- July 4, 2025. Fixed in-memory storage to properly handle reputation values during user creation - now correctly uses passed reputation value instead of hardcoded 85
 
 ## User Preferences
 
