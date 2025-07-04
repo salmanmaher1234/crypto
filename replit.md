@@ -133,6 +133,7 @@ Changelog:
 - July 2, 2025. Fixed recharge detail navigation - removed redirect after form submission, now uses back navigation to Assets tab, cleaned up debug logging, confirmed Transaction No. modification functionality working correctly
 - July 2, 2025. Enhanced recharge form with channel selection - added "Select recharge wallet category" dropdown with Channel 01-04 options, recharge prompt message section, changed button text to "Submit", maintains same layout as provided design
 - July 2, 2025. Reorganized recharge form layout - restructured order to: fast amount buttons, manual amount input with proper heading, channel selection, live processing prompt message, removed bank wallet selection from recharge dialog
+- July 4, 2025. Reorganized admin panel button structure - removed first "Other" button, restructured button order to: Change a bank, Details, Order, Deposit, Deduction, Other, Freeze, Unfreeze, Change group with "$100" text removed from freeze/unfreeze buttons
 
 ## User Preferences
 
