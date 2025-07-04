@@ -571,7 +571,7 @@ export function Profile() {
                   </Button>
                 </div>
                 <div className="text-sm text-gray-600 mb-1">
-                  Real Balance: {hideBalance ? "****" : parseFloat(user.balance || "0").toFixed(0)}
+                  Real Balance: {hideBalance ? "****" : parseFloat(user.availableBalance || user.balance || "0").toFixed(0)}
                 </div>
                 <div className="text-sm text-gray-600 mb-1">
                   Frozen Amount: {hideBalance ? "****" : parseFloat(user.frozenBalance || "0").toFixed(0)}
@@ -759,14 +759,24 @@ export function Profile() {
                               const currentAvailable = parseFloat(user.availableBalance || "0");
                               const addAmount = parseFloat(rechargeAmount);
                               
-                              updateUser.mutate({
-                                id: user.id,
-                                updates: { 
+                              // Use dedicated recharge endpoint instead of updateUser
+                              fetch('/api/recharge', {
+                                method: 'PATCH',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                },
+                                credentials: 'include',
+                                body: JSON.stringify({
                                   balance: (currentBalance + addAmount).toString(),
                                   availableBalance: (currentAvailable + addAmount).toString()
-                                }
-                              }, {
-                                onSuccess: () => {
+                                })
+                              })
+                              .then(response => response.json())
+                              .then(data => {
+                                if (data.id) {
+                                  // Success - invalidate queries to refresh UI
+                                  queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+                                  
                                   // Create a completed transaction record for history
                                   createTransaction.mutate({
                                     userId: user.id,
@@ -791,9 +801,8 @@ export function Profile() {
                                   setTimeout(() => {
                                     setShowRechargeConfirmDialog(true);
                                   }, 500);
-                                },
-                                onError: () => {
-                                  // Reset states on error
+                                } else {
+                                  // Error handling
                                   setRechargeStep('idle');
                                   setIsProcessingRecharge(false);
                                   
@@ -803,6 +812,17 @@ export function Profile() {
                                     variant: "destructive",
                                   });
                                 }
+                              })
+                              .catch(error => {
+                                // Reset states on error
+                                setRechargeStep('idle');
+                                setIsProcessingRecharge(false);
+                                
+                                toast({
+                                  title: "Recharge failed",
+                                  description: "Unable to process recharge. Please try again.",
+                                  variant: "destructive",
+                                });
                               });
                             }, 1000); // 1 second for submitting stage
                           }, 800); // 800ms for validation stage

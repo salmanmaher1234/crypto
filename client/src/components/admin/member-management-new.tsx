@@ -7,12 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle, MoreHorizontal, Unlock } from "lucide-react";
+import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle, Unlock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
@@ -444,32 +444,36 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button size="sm" variant="outline" className="h-6 px-2 text-xs">
-                              <MoreHorizontal className="w-3 h-3 mr-1" />
-                              Other
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={() => handleFreezeAmount(user, 100)}>
-                              <Lock className="w-4 h-4 mr-2" />
-                              Freeze $100
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleUnfreezeAmount(user, 100)}
-                              disabled={parseFloat(user.frozenBalance || "0") === 0}
-                            >
-                              <Unlock className="w-4 h-4 mr-2" />
-                              Unfreeze $100
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setSelectedUser(user)}>
-                              <Settings className="w-4 h-4 mr-2" />
-                              Change Bank
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-6 px-2 text-xs bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
+                          onClick={() => setSelectedUser(user)}
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Other
+                        </Button>
+                        {/* Freeze Button */}
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                          onClick={() => handleFreezeAmount(user, 100)}
+                        >
+                          <Lock className="w-3 h-3 mr-1" />
+                          Freeze $100
+                        </Button>
+                        {/* Unfreeze Button */}
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                          onClick={() => handleUnfreezeAmount(user, 100)}
+                          disabled={parseFloat(user.frozenBalance || "0") === 0}
+                        >
+                          <Unlock className="w-3 h-3 mr-1" />
+                          Unfreeze $100
+                        </Button>
                         {/* Change Bank Dialog */}
                         <Dialog open={bankDialogOpen && selectedUser?.id === user.id} onOpenChange={setBankDialogOpen}>
                           <DialogTrigger asChild>
@@ -800,28 +804,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* Freeze/Unfreeze Button */}
-                        {parseFloat(user.frozenBalance || "0") > 0 ? (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="h-6 px-2 text-xs bg-cyan-50 text-cyan-600 border-cyan-200 hover:bg-cyan-100"
-                            onClick={() => handleUnfreeze(user)}
-                          >
-                            <LockOpen className="w-3 h-3 mr-1" />
-                            Unfreeze
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="h-6 px-2 text-xs bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"
-                            onClick={() => handleFreeze(user)}
-                          >
-                            <Lock className="w-3 h-3 mr-1" />
-                            Freeze
-                          </Button>
-                        )}
+
 
                         <Button size="sm" variant="outline" className="h-6 px-2 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100">
                           <AlertTriangle className="w-3 h-3 mr-1" />

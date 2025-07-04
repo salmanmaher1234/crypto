@@ -210,6 +210,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer recharge endpoint - allows customer to update their own balance
+  app.patch("/api/recharge", authenticateUser, async (req, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { balance, availableBalance } = req.body;
+      
+      const updatedUser = await storage.updateUser(userId, { 
+        balance, 
+        availableBalance 
+      });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update balance" });
+    }
+  });
+
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
