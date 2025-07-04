@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle, MoreHorizontal, Unlock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
@@ -93,20 +94,45 @@ export function MemberManagement() {
 
   const handleBalanceAction = (action: string, amount: string, userId: number) => {
     if (!amount || parseFloat(amount) <= 0) return;
+    
+    const user = users?.find(u => u.id === userId);
+    if (!user) return;
 
-    createTransaction.mutate({
-      userId,
-      type: action,
-      amount,
-      description: `Admin ${action}: $${amount}`,
+    const amountNum = parseFloat(amount);
+    const currentBalance = parseFloat(user.balance || "0");
+    const currentAvailable = parseFloat(user.availableBalance || "0");
+
+    let newBalance = currentBalance;
+    let newAvailable = currentAvailable;
+
+    if (action === "deposit") {
+      newBalance = currentBalance + amountNum;
+      newAvailable = currentAvailable + amountNum;
+    } else if (action === "withdrawal") {
+      if (currentAvailable < amountNum) {
+        toast({
+          title: "Insufficient balance",
+          description: "Cannot deduct more than available balance",
+          variant: "destructive",
+        });
+        return;
+      }
+      newBalance = currentBalance - amountNum;
+      newAvailable = currentAvailable - amountNum;
+    }
+
+    // Direct balance update
+    updateUser.mutate({
+      id: userId,
+      updates: { 
+        balance: newBalance.toString(),
+        availableBalance: newAvailable.toString()
+      }
     }, {
       onSuccess: () => {
-        // Invalidate users cache to refresh balance instantly
-        queryClient.invalidateQueries({ queryKey: ['/api/users'] });
-        
         toast({
-          title: "Transaction successful",
-          description: `${action} of $${amount} processed successfully`,
+          title: `${action.charAt(0).toUpperCase() + action.slice(1)} successful`,
+          description: `${action === "deposit" ? "Added" : "Deducted"} $${amount}`,
         });
         setDepositAmount("");
         setDeductionAmount("");
@@ -115,7 +141,7 @@ export function MemberManagement() {
       },
       onError: () => {
         toast({
-          title: "Transaction failed",
+          title: `${action.charAt(0).toUpperCase() + action.slice(1)} failed`,
           description: `Failed to process ${action}`,
           variant: "destructive",
         });
@@ -134,15 +160,79 @@ export function MemberManagement() {
   };
 
   const handleFreezeAmount = (user: User, amount: number) => {
-    handleBalanceAction("freeze", amount.toString(), user.id);
+    const currentAvailable = parseFloat(user.availableBalance || "0");
+    const currentFrozen = parseFloat(user.frozenBalance || "0");
+    
+    if (currentAvailable < amount) {
+      toast({
+        title: "Insufficient balance",
+        description: "Cannot freeze more than available balance",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Direct balance update without creating transaction
+    updateUser.mutate({
+      id: user.id,
+      updates: { 
+        availableBalance: (currentAvailable - amount).toString(),
+        frozenBalance: (currentFrozen + amount).toString()
+      }
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Balance frozen",
+          description: `$${amount} has been frozen`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Freeze failed",
+          description: "Failed to freeze balance",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   const handleUnfreezeAmount = (user: User, amount: number) => {
+    const currentAvailable = parseFloat(user.availableBalance || "0");
     const currentFrozen = parseFloat(user.frozenBalance || "0");
-    if (currentFrozen === 0) return;
+    
+    if (currentFrozen === 0) {
+      toast({
+        title: "No frozen balance",
+        description: "User has no frozen balance to unfreeze",
+        variant: "destructive",
+      });
+      return;
+    }
     
     const unfreezeAmount = Math.min(amount, currentFrozen);
-    handleBalanceAction("unfreeze", unfreezeAmount.toString(), user.id);
+    
+    // Direct balance update without creating transaction
+    updateUser.mutate({
+      id: user.id,
+      updates: { 
+        availableBalance: (currentAvailable + unfreezeAmount).toString(),
+        frozenBalance: (currentFrozen - unfreezeAmount).toString()
+      }
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Balance unfrozen",
+          description: `$${unfreezeAmount} has been unfrozen`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Unfreeze failed",
+          description: "Failed to unfreeze balance",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   const handleFreeze = (user: User, amount?: string) => {
@@ -157,47 +247,7 @@ export function MemberManagement() {
     }
   };
 
-  const handleApproveTransaction = (transactionId: number) => {
-    updateTransaction.mutate({
-      id: transactionId,
-      updates: { status: "completed" }
-    }, {
-      onSuccess: () => {
-        toast({
-          title: "Transaction approved",
-          description: "Recharge has been approved and balance updated",
-        });
-      },
-      onError: () => {
-        toast({
-          title: "Approval failed",
-          description: "Failed to approve transaction",
-          variant: "destructive",
-        });
-      }
-    });
-  };
 
-  const handleRejectTransaction = (transactionId: number) => {
-    updateTransaction.mutate({
-      id: transactionId,
-      updates: { status: "rejected" }
-    }, {
-      onSuccess: () => {
-        toast({
-          title: "Transaction rejected",
-          description: "Recharge request has been rejected",
-        });
-      },
-      onError: () => {
-        toast({
-          title: "Rejection failed",
-          description: "Failed to reject transaction",
-          variant: "destructive",
-        });
-      }
-    });
-  };
 
   const handleBankAccountSave = () => {
     if (!selectedUser) return;
@@ -241,68 +291,8 @@ export function MemberManagement() {
     );
   }
 
-  // Get pending transactions for approval
-  const pendingTransactions = transactions?.filter(t => t.status === "pending") || [];
-
   return (
-    <div className="p-6 space-y-6">
-      {/* Pending Transactions Section */}
-      {pendingTransactions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-500" />
-              Pending Transactions ({pendingTransactions.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {pendingTransactions.map((transaction) => {
-                const user = users?.find(u => u.id === transaction.userId);
-                return (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg bg-orange-50">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                        <Wallet className="w-5 h-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <div className="font-medium">{user?.name || user?.username}</div>
-                        <div className="text-sm text-gray-600">
-                          {transaction.type === "deposit" ? "Recharge" : transaction.type} - ${transaction.amount}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(transaction.createdAt).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        className="bg-green-500 hover:bg-green-600"
-                        onClick={() => handleApproveTransaction(transaction.id)}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        Approve
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="border-red-200 text-red-600 hover:bg-red-50"
-                        onClick={() => handleRejectTransaction(transaction.id)}
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Reject
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Member Management Section */}
+    <div className="p-6">
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -454,24 +444,32 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {/* Freeze/Unfreeze Buttons */}
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
-                          onClick={() => handleFreezeAmount(user, 100)}
-                        >
-                          Freeze $100
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
-                          onClick={() => handleUnfreezeAmount(user, 100)}
-                          disabled={parseFloat(user.frozenBalance || "0") === 0}
-                        >
-                          Unfreeze $100
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" className="h-6 px-2 text-xs">
+                              <MoreHorizontal className="w-3 h-3 mr-1" />
+                              Other
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => handleFreezeAmount(user, 100)}>
+                              <Lock className="w-4 h-4 mr-2" />
+                              Freeze $100
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleUnfreezeAmount(user, 100)}
+                              disabled={parseFloat(user.frozenBalance || "0") === 0}
+                            >
+                              <Unlock className="w-4 h-4 mr-2" />
+                              Unfreeze $100
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => setSelectedUser(user)}>
+                              <Settings className="w-4 h-4 mr-2" />
+                              Change Bank
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                         {/* Change Bank Dialog */}
                         <Dialog open={bankDialogOpen && selectedUser?.id === user.id} onOpenChange={setBankDialogOpen}>
                           <DialogTrigger asChild>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile, useChangePassword, useChangeFundPassword, useMessages, useMarkMessageAsRead } from "@/lib/api";
+import { useBankAccounts, useCreateBankAccount, useUpdateBankAccount, useDeleteBankAccount, useAnnouncements, useCreateTransaction, useCreateWithdrawalRequest, useUpdateProfile, useChangePassword, useChangeFundPassword, useMessages, useMarkMessageAsRead, useUpdateUser } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,7 @@ export function Profile() {
   const changePassword = useChangePassword();
   const changeFundPassword = useChangeFundPassword();
   const markMessageAsRead = useMarkMessageAsRead();
+  const updateUser = useUpdateUser();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   
@@ -753,21 +754,35 @@ export function Profile() {
                               // Stage 3: Processing
                               setRechargeStep('processing');
                               
-                              createTransaction.mutate({
-                                userId: user.id,
-                                type: "deposit",
-                                amount: rechargeAmount,
-                                status: "pending",
-                                description: `Recharge request of ${rechargeAmount} USDT via ${selectedChannel || 'bank wallet'} - Pending admin approval`
+                              // Direct balance update instead of pending transaction
+                              const currentBalance = parseFloat(user.balance || "0");
+                              const currentAvailable = parseFloat(user.availableBalance || "0");
+                              const addAmount = parseFloat(rechargeAmount);
+                              
+                              updateUser.mutate({
+                                id: user.id,
+                                updates: { 
+                                  balance: (currentBalance + addAmount).toString(),
+                                  availableBalance: (currentAvailable + addAmount).toString()
+                                }
                               }, {
                                 onSuccess: () => {
+                                  // Create a completed transaction record for history
+                                  createTransaction.mutate({
+                                    userId: user.id,
+                                    type: "deposit",
+                                    amount: rechargeAmount,
+                                    status: "completed",
+                                    description: `Recharge of ${rechargeAmount} USDT via ${selectedChannel || 'bank wallet'} - Balance updated`
+                                  });
+
                                   // Reset states
                                   setRechargeStep('idle');
                                   setIsProcessingRecharge(false);
                                   
                                   toast({
-                                    title: "Recharge request submitted",
-                                    description: `${rechargeAmount} USDT recharge request submitted. Awaiting admin approval.`,
+                                    title: "Recharge successful",
+                                    description: `${rechargeAmount} USDT added to your balance successfully.`,
                                   });
                                   setRechargeAmount("");
                                   setSelectedChannel("");
