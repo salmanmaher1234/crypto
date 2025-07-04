@@ -147,6 +147,7 @@ Changelog:
 - July 4, 2025. Removed $ currency signs from Member Management Balance column - displays clean number format for Total amount, Available, and Frozen values
 - July 4, 2025. Fixed slider and banner image container structure - now uses consistent fixed height containers with proper responsive scaling (h-32 to xl:h-52) ensuring all images have equal container sizes and full image height coverage with object-cover for all screen sizes
 - July 4, 2025. Updated slider and banner to use automatic height - containers now adapt to image content height with h-auto, allowing images to display their full natural height while maintaining responsive behavior
+- July 4, 2025. Set slider to fixed height 535.781px with responsive scaling - uses Tailwind classes h-[250px] on mobile up to xl:h-[535.781px] on extra large screens, both images now properly adjust to container with object-cover
 
 ## User Preferences
 
