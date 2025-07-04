@@ -603,18 +603,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* 3. Order Button */}
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100"
-                          onClick={() => setSelectedUser(user)}
-                        >
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Order
-                        </Button>
-
-                        {/* 4. Deposit Dialog */}
+                        {/* 3. Deposit Dialog */}
                         <Dialog open={depositDialogOpen && selectedUser?.id === user.id} onOpenChange={setDepositDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
@@ -656,7 +645,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* Deduction Dialog */}
+                        {/* 4. Deduction Dialog */}
                         <Dialog open={deductionDialogOpen && selectedUser?.id === user.id} onOpenChange={setDeductionDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
@@ -698,7 +687,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* 6. Other/Edit Dialog */}
+                        {/* 5. Other/Edit Dialog */}
                         <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
@@ -785,7 +774,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* 7. Freeze Button */}
+                        {/* 6. Freeze Button */}
                         <Button 
                           size="sm" 
                           variant="outline" 
@@ -796,7 +785,7 @@ export function MemberManagement() {
                           Freeze
                         </Button>
 
-                        {/* 8. Unfreeze Button */}
+                        {/* 7. Unfreeze Button */}
                         <Button 
                           size="sm" 
                           variant="outline" 
@@ -808,7 +797,7 @@ export function MemberManagement() {
                           Unfreeze
                         </Button>
 
-                        {/* 9. Change group Button */}
+                        {/* 8. Change group Button */}
                         <Button size="sm" variant="outline" className="h-6 px-2 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100">
                           <AlertTriangle className="w-3 h-3 mr-1" />
                           Change group
