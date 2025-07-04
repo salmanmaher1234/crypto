@@ -949,7 +949,7 @@ export function MemberManagement() {
                                   onChange={(e) => setFreezeAmount(e.target.value)}
                                 />
                                 <p className="text-sm text-muted-foreground mt-1">
-                                  Available Balance: ${user.availableBalance}
+                                  Available Balance: {user.availableBalance}
                                 </p>
                               </div>
                               <div className="flex justify-end gap-2">
@@ -993,7 +993,7 @@ export function MemberManagement() {
                                   onChange={(e) => setUnfreezeAmount(e.target.value)}
                                 />
                                 <p className="text-sm text-muted-foreground mt-1">
-                                  Frozen Balance: ${user.frozenBalance}
+                                  Frozen Balance: {user.frozenBalance}
                                 </p>
                               </div>
                               <div className="flex justify-end gap-2">

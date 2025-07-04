@@ -7,6 +7,9 @@ import { ChevronRight, TrendingUp, TrendingDown, RotateCcw, ChevronLeft, Refresh
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
+import cryptoExchangeImg from "@assets/1000000575770863_1751631239841.png";
+import tradingChartImg from "@assets/ats_middle_1751631239842.jpg";
+import paymentCardImg from "@assets/1000001387435998_1751631239844.jpg";
 
 interface CryptoHomeProps {
   onSelectCurrency: (currency: string) => void;
@@ -23,8 +26,9 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
   // Slider images
   const sliderImages = [
-    "/slider-banner-1.svg",
-    "/slider-banner-2.svg"
+    cryptoExchangeImg,  // 1st image - Crypto Exchange
+    tradingChartImg,    // 2nd image - Trading Chart
+    paymentCardImg      // 3rd image - Payment Card
   ];
 
   // Auto-slide every 5 seconds for banner

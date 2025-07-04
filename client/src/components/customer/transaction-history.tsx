@@ -128,7 +128,7 @@ export function TransactionHistory() {
                     </div>
                   </div>
                   <div className={`font-medium text-sm sm:text-base flex-shrink-0 ml-2 ${getAmountColor(transaction.type)}`}>
-                    {getAmountPrefix(transaction.type)}${parseFloat(transaction.amount).toFixed(2)}
+                    {getAmountPrefix(transaction.type)}{parseFloat(transaction.amount).toFixed(2)}
                   </div>
                 </div>
               ))}

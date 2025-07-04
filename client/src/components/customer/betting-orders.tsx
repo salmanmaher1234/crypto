@@ -129,9 +129,9 @@ Close Price: ${order.exitPrice || order.entryPrice}
 Buy Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
 Close Time: ${order.status === 'completed' ? format(new Date(order.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending'}
 Billing Time: ${order.duration}s
-Order Amount: ${order.amount}
+Order Amount: {order.amount}
 Order Status: ${order.status === 'active' ? 'Pending' : order.status}
-Profit Amount: ${profit > 0 ? '+' : ''}${profit.toFixed(0)}
+Profit Amount: ${profit > 0 ? '+' : ''}{profit.toFixed(0)}
 Scale: ${order.duration}s
 Buy Direction: ${order.direction}
 Actual Rise Fall: ${order.result === 'win' ? 'Rise' : order.result === 'loss' ? 'Fall' : 'Rise'}
@@ -189,7 +189,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
             { label: "Billing Time", value: `${selectedOrder.duration}s` },
             { label: "Order Amount", value: selectedOrder.amount },
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
-            { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}${profit.toFixed(0)}`, isProfit: true },
+            { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}{profit.toFixed(0)}`, isProfit: true },
             { label: "Scale", value: "20%" },
             { label: "Buy Direction", value: selectedOrder.direction, isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },

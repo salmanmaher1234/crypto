@@ -603,7 +603,7 @@ export function Profile() {
                   </DialogHeader>
                   <div className="space-y-2">
                     <div>
-                      <Label>Current Balance: ${parseFloat(user?.balance || "0").toFixed(2)}</Label>
+                      <Label>Current Balance: {parseFloat(user?.balance || "0").toFixed(2)}</Label>
                     </div>
                     
                     {/* Select a fast amount of USDT */}
@@ -947,7 +947,7 @@ export function Profile() {
                         if (amount < 10) {
                           toast({
                             title: "Minimum withdrawal",
-                            description: "Minimum withdrawal amount is $10",
+                            description: "Minimum withdrawal amount is 10",
                             variant: "destructive",
                           });
                           return;
@@ -1735,8 +1735,8 @@ export function Profile() {
               <div className="space-y-4">
                 <div className="p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg text-white">
                   <h3 className="font-medium mb-2">Digital Wallet Balance</h3>
-                  <div className="text-2xl font-bold">${parseFloat(user?.balance || "0").toFixed(2)}</div>
-                  <div className="text-sm opacity-90">Available: ${parseFloat(user?.availableBalance || "0").toFixed(2)}</div>
+                  <div className="text-2xl font-bold">{parseFloat(user?.balance || "0").toFixed(2)}</div>
+                  <div className="text-sm opacity-90">Available: {parseFloat(user?.availableBalance || "0").toFixed(2)}</div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

@@ -138,6 +138,8 @@ Changelog:
 - July 4, 2025. Added comprehensive Add Member functionality - new members default to VIP Level/reputation of 100, includes username, email, password, name, and reputation fields with proper validation
 - July 4, 2025. Enhanced VIP Level display system - admin panel shows reputation as "X/100" format with progress bar, customer profile displays Credit Score with privacy toggle, real-time updates through React Query
 - July 4, 2025. Fixed in-memory storage to properly handle reputation values during user creation - now correctly uses passed reputation value instead of hardcoded 85
+- July 4, 2025. Removed all $ currency signs throughout the application - replaced with clean number displays in balance cards, profile sections, admin panels, transaction history, betting orders, and wallet management components
+- July 4, 2025. Updated crypto-home slider with new images - replaced default slider banners with provided crypto exchange, trading chart, and payment card images for enhanced visual appeal
 
 ## User Preferences
 
