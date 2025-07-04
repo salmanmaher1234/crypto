@@ -246,7 +246,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
               <img 
                 src={image} 
                 alt={`Slide ${index + 1}`}
-                className="w-full h-auto object-contain"
+                className="w-full h-32 sm:h-36 md:h-40 lg:h-48 xl:h-52 object-cover"
               />
             </div>
           ))}
@@ -316,7 +316,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
           <img 
             src={bannerTradingImg} 
             alt="Trading Chart" 
-            className="w-full h-48 lg:h-64 object-cover"
+            className="w-full h-32 sm:h-36 md:h-40 lg:h-48 xl:h-52 object-cover"
           />
         </div>
       </div>

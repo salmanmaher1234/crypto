@@ -142,9 +142,9 @@ export function MemberManagement() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">${parseFloat(user.balance).toFixed(2)}</div>
+                      <div className="font-medium">{parseFloat(user.balance).toFixed(2)}</div>
                       <div className="text-sm text-gray-500">
-                        Available: ${parseFloat(user.availableBalance).toFixed(2)}
+                        Available: {parseFloat(user.availableBalance).toFixed(2)}
                       </div>
                     </div>
                   </TableCell>

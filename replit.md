@@ -143,6 +143,8 @@ Changelog:
 - July 4, 2025. Replaced investment banner section with trading chart image - removed all text content and replaced with clean trading chart image display
 - July 4, 2025. Removed 2nd image from slider - now displays only crypto exchange and payment card images (1st and 3rd positions)
 - July 4, 2025. Completed final $ currency sign removal from admin betting orders and member management components
+- July 4, 2025. Made slider and banner images fully responsive - consistent height scaling across all screen sizes (h-32 sm:h-36 md:h-40 lg:h-48 xl:h-52) with object-cover for proper aspect ratio
+- July 4, 2025. Removed $ currency signs from Member Management Balance column - displays clean number format for Total amount, Available, and Frozen values
 
 ## User Preferences
 
