@@ -145,6 +145,7 @@ Changelog:
 - July 4, 2025. Completed final $ currency sign removal from admin betting orders and member management components
 - July 4, 2025. Made slider and banner images fully responsive - consistent height scaling across all screen sizes (h-32 sm:h-36 md:h-40 lg:h-48 xl:h-52) with object-cover for proper aspect ratio
 - July 4, 2025. Removed $ currency signs from Member Management Balance column - displays clean number format for Total amount, Available, and Frozen values
+- July 4, 2025. Fixed slider and banner image container structure - now uses consistent fixed height containers with proper responsive scaling (h-32 to xl:h-52) ensuring all images have equal container sizes and full image height coverage with object-cover for all screen sizes
 
 ## User Preferences
 
