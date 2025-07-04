@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsers, useUpdateUser, useCreateTransaction } from "@/lib/api";
+import { useUsers, useUpdateUser, useCreateTransaction, useTransactions, useUpdateTransaction } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,10 @@ import type { User } from "@shared/schema";
 
 export function MemberManagement() {
   const { data: users, isLoading } = useUsers();
+  const { data: transactions } = useTransactions();
   const updateUser = useUpdateUser();
   const createTransaction = useCreateTransaction();
+  const updateTransaction = useUpdateTransaction();
   const { toast } = useToast();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -131,6 +133,18 @@ export function MemberManagement() {
     handleBalanceAction("withdrawal", deductionAmount, selectedUser.id);
   };
 
+  const handleFreezeAmount = (user: User, amount: number) => {
+    handleBalanceAction("freeze", amount.toString(), user.id);
+  };
+
+  const handleUnfreezeAmount = (user: User, amount: number) => {
+    const currentFrozen = parseFloat(user.frozenBalance || "0");
+    if (currentFrozen === 0) return;
+    
+    const unfreezeAmount = Math.min(amount, currentFrozen);
+    handleBalanceAction("unfreeze", unfreezeAmount.toString(), user.id);
+  };
+
   const handleFreeze = (user: User, amount?: string) => {
     const freezeAmount = amount || "100";
     handleBalanceAction("freeze", freezeAmount, user.id);
@@ -141,6 +155,48 @@ export function MemberManagement() {
     if (parseFloat(unfreezeAmount) > 0) {
       handleBalanceAction("unfreeze", unfreezeAmount, user.id);
     }
+  };
+
+  const handleApproveTransaction = (transactionId: number) => {
+    updateTransaction.mutate({
+      id: transactionId,
+      updates: { status: "completed" }
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Transaction approved",
+          description: "Recharge has been approved and balance updated",
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Approval failed",
+          description: "Failed to approve transaction",
+          variant: "destructive",
+        });
+      }
+    });
+  };
+
+  const handleRejectTransaction = (transactionId: number) => {
+    updateTransaction.mutate({
+      id: transactionId,
+      updates: { status: "rejected" }
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Transaction rejected",
+          description: "Recharge request has been rejected",
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Rejection failed",
+          description: "Failed to reject transaction",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   const handleBankAccountSave = () => {
@@ -185,8 +241,68 @@ export function MemberManagement() {
     );
   }
 
+  // Get pending transactions for approval
+  const pendingTransactions = transactions?.filter(t => t.status === "pending") || [];
+
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-6">
+      {/* Pending Transactions Section */}
+      {pendingTransactions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-500" />
+              Pending Transactions ({pendingTransactions.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {pendingTransactions.map((transaction) => {
+                const user = users?.find(u => u.id === transaction.userId);
+                return (
+                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg bg-orange-50">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                        <Wallet className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium">{user?.name || user?.username}</div>
+                        <div className="text-sm text-gray-600">
+                          {transaction.type === "deposit" ? "Recharge" : transaction.type} - ${transaction.amount}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(transaction.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600"
+                        onClick={() => handleApproveTransaction(transaction.id)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Approve
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="border-red-200 text-red-600 hover:bg-red-50"
+                        onClick={() => handleRejectTransaction(transaction.id)}
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Member Management Section */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -338,6 +454,24 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
+                        {/* Freeze/Unfreeze Buttons */}
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                          onClick={() => handleFreezeAmount(user, 100)}
+                        >
+                          Freeze $100
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                          onClick={() => handleUnfreezeAmount(user, 100)}
+                          disabled={parseFloat(user.frozenBalance || "0") === 0}
+                        >
+                          Unfreeze $100
+                        </Button>
                         {/* Change Bank Dialog */}
                         <Dialog open={bankDialogOpen && selectedUser?.id === user.id} onOpenChange={setBankDialogOpen}>
                           <DialogTrigger asChild>

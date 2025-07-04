@@ -305,18 +305,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Transaction data:", req.body);
       
       const validatedData = insertTransactionSchema.parse(req.body);
-      // Set status to completed for deposits (recharges)
-      if (validatedData.type === "deposit") {
-        validatedData.status = "completed";
-      }
       const transaction = await storage.createTransaction(validatedData);
       console.log("Created transaction:", transaction);
       
-      // Update user balance based on transaction type
-      const user = await storage.getUser(validatedData.userId);
-      console.log("User before transaction update:", user);
-      
-      if (user) {
+      // Update user balance only for completed transactions
+      if (transaction.status === "completed") {
+        const user = await storage.getUser(validatedData.userId);
+        console.log("User before transaction update:", user);
+        
+        if (user) {
         const amount = parseFloat(validatedData.amount);
         let balanceUpdate = {};
         
@@ -350,6 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Balance update object:", balanceUpdate);
         const updatedUser = await storage.updateUser(validatedData.userId, balanceUpdate);
         console.log("Updated user after transaction:", updatedUser);
+        }
       }
       
       res.json(transaction);
@@ -376,6 +374,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Profile image updated successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to update profile image" });
+    }
+  });
+
+  // Transaction update route for admin approval
+  app.patch("/api/transactions/:id", authenticateUser, async (req, res) => {
+    try {
+      const transactionId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const transaction = await storage.updateTransaction(transactionId, updates);
+      
+      if (!transaction) {
+        return res.status(404).json({ message: "Transaction not found" });
+      }
+      
+      // If transaction is being approved (completed), update user balance
+      if (updates.status === "completed" && transaction.type === "deposit") {
+        const user = await storage.getUser(transaction.userId);
+        if (user) {
+          const amount = parseFloat(transaction.amount);
+          const balanceUpdate = {
+            balance: (parseFloat(user.balance) + amount).toFixed(2),
+            availableBalance: (parseFloat(user.availableBalance) + amount).toFixed(2),
+          };
+          await storage.updateUser(transaction.userId, balanceUpdate);
+        }
+      }
+      
+      res.json(transaction);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update transaction" });
     }
   });
 

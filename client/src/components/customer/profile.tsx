@@ -757,7 +757,8 @@ export function Profile() {
                                 userId: user.id,
                                 type: "deposit",
                                 amount: rechargeAmount,
-                                description: `Account recharge of ${rechargeAmount} USDT via bank wallet`
+                                status: "pending",
+                                description: `Recharge request of ${rechargeAmount} USDT via ${selectedChannel || 'bank wallet'} - Pending admin approval`
                               }, {
                                 onSuccess: () => {
                                   // Reset states
@@ -765,8 +766,8 @@ export function Profile() {
                                   setIsProcessingRecharge(false);
                                   
                                   toast({
-                                    title: "Recharge successful",
-                                    description: `${rechargeAmount} USDT has been added to your account via ${selectedChannel || 'bank wallet'}`,
+                                    title: "Recharge request submitted",
+                                    description: `${rechargeAmount} USDT recharge request submitted. Awaiting admin approval.`,
                                   });
                                   setRechargeAmount("");
                                   setSelectedChannel("");

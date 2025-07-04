@@ -34,12 +34,28 @@ export function useCreateTransaction() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (transaction: { userId: number; type: string; amount: string; description?: string }) => {
+    mutationFn: async (transaction: { userId: number; type: string; amount: string; description?: string; status?: string }) => {
       const response = await apiRequest("POST", "/api/transactions", transaction);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+  });
+}
+
+export function useUpdateTransaction() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: number; updates: { status?: string; [key: string]: any } }) => {
+      const response = await apiRequest("PATCH", `/api/transactions/${id}`, updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
   });
