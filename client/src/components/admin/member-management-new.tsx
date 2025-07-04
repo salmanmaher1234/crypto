@@ -444,16 +444,7 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                          onClick={() => setSelectedUser(user)}
-                        >
-                          <Edit className="w-3 h-3 mr-1" />
-                          Other
-                        </Button>
-                        {/* Freeze Button */}
+                        {/* 1. Freeze Button */}
                         <Button 
                           size="sm" 
                           variant="outline" 
@@ -461,20 +452,10 @@ export function MemberManagement() {
                           onClick={() => handleFreezeAmount(user, 100)}
                         >
                           <Lock className="w-3 h-3 mr-1" />
-                          Freeze $100
+                          Freeze
                         </Button>
-                        {/* Unfreeze Button */}
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
-                          onClick={() => handleUnfreezeAmount(user, 100)}
-                          disabled={parseFloat(user.frozenBalance || "0") === 0}
-                        >
-                          <Unlock className="w-3 h-3 mr-1" />
-                          Unfreeze $100
-                        </Button>
-                        {/* Change Bank Dialog */}
+                        
+                        {/* 2. Change Bank Dialog */}
                         <Dialog open={bankDialogOpen && selectedUser?.id === user.id} onOpenChange={setBankDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
@@ -717,7 +698,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* Other/Edit Dialog */}
+                        {/* 7. Other Button - Dialog */}
                         <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
                           <DialogTrigger asChild>
                             <Button 
@@ -804,11 +785,16 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-
-
-                        <Button size="sm" variant="outline" className="h-6 px-2 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100">
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                          Change group
+                        {/* 8. Unfreeze Button */}
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                          onClick={() => handleUnfreezeAmount(user, 100)}
+                          disabled={parseFloat(user.frozenBalance || "0") === 0}
+                        >
+                          <Unlock className="w-3 h-3 mr-1" />
+                          Unfreeze
                         </Button>
                       </div>
                     </TableCell>
