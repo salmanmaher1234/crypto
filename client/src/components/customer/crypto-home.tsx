@@ -8,8 +8,8 @@ import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import cryptoExchangeImg from "@assets/1000000575770863_1751631239841.png";
-import tradingChartImg from "@assets/ats_middle_1751631239842.jpg";
 import paymentCardImg from "@assets/1000001387435998_1751631239844.jpg";
+import bannerTradingImg from "@assets/ats_middle_1751631513890.jpg";
 
 interface CryptoHomeProps {
   onSelectCurrency: (currency: string) => void;
@@ -27,8 +27,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   // Slider images
   const sliderImages = [
     cryptoExchangeImg,  // 1st image - Crypto Exchange
-    tradingChartImg,    // 2nd image - Trading Chart
-    paymentCardImg      // 3rd image - Payment Card
+    paymentCardImg      // 2nd image - Payment Card (was 3rd)
   ];
 
   // Auto-slide every 5 seconds for banner
@@ -311,40 +310,14 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </div>
 
-      {/* Investment Banner */}
+      {/* Trading Chart Banner */}
       <div className="relative">
-        <div 
-          className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-xl p-4 lg:p-6 text-white relative overflow-hidden"
-          style={{
-            backgroundImage: `url('/trading-chart-bg.svg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        >
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-800/60 to-slate-900/80 rounded-xl"></div>
-          
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="space-y-2">
-              <h2 className="text-xl lg:text-2xl font-bold">SuperCoin Investment</h2>
-              <p className="text-blue-100 max-w-md text-sm lg:text-base">
-                Start your crypto journey with professional trading tools and real-time market data
-              </p>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs lg:text-sm text-yellow-100">24/7 Trading</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="hidden md:block">
-              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <TrendingUp className="w-10 h-10 text-green-400" />
-              </div>
-            </div>
-          </div>
+        <div className="rounded-xl overflow-hidden">
+          <img 
+            src={bannerTradingImg} 
+            alt="Trading Chart" 
+            className="w-full h-48 lg:h-64 object-cover"
+          />
         </div>
       </div>
 

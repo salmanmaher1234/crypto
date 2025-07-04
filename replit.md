@@ -140,6 +140,9 @@ Changelog:
 - July 4, 2025. Fixed in-memory storage to properly handle reputation values during user creation - now correctly uses passed reputation value instead of hardcoded 85
 - July 4, 2025. Removed all $ currency signs throughout the application - replaced with clean number displays in balance cards, profile sections, admin panels, transaction history, betting orders, and wallet management components
 - July 4, 2025. Updated crypto-home slider with new images - replaced default slider banners with provided crypto exchange, trading chart, and payment card images for enhanced visual appeal
+- July 4, 2025. Replaced investment banner section with trading chart image - removed all text content and replaced with clean trading chart image display
+- July 4, 2025. Removed 2nd image from slider - now displays only crypto exchange and payment card images (1st and 3rd positions)
+- July 4, 2025. Completed final $ currency sign removal from admin betting orders and member management components
 
 ## User Preferences
 

@@ -58,12 +58,12 @@ export function MemberManagement() {
       userId: selectedUser.id,
       type: action,
       amount,
-      description: `Admin ${action}: $${amount}`,
+      description: `Admin ${action}: ${amount}`,
     }, {
       onSuccess: () => {
         toast({
           title: "Transaction completed",
-          description: `${action} of $${amount} completed successfully`,
+          description: `${action} of ${amount} completed successfully`,
         });
       },
       onError: () => {

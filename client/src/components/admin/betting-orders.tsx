@@ -138,10 +138,10 @@ export function BettingOrders() {
                       <TableCell>
                         <div>
                           <div className="font-medium">{order.asset}</div>
-                          <div className="text-sm text-gray-500">${parseFloat(order.entryPrice).toFixed(2)}</div>
+                          <div className="text-sm text-gray-500">{parseFloat(order.entryPrice).toFixed(2)}</div>
                         </div>
                       </TableCell>
-                      <TableCell>${parseFloat(order.amount).toFixed(2)}</TableCell>
+                      <TableCell>{parseFloat(order.amount).toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge 
                           variant={order.direction === "Buy Up" ? "default" : "destructive"}
