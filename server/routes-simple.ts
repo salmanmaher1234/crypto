@@ -180,6 +180,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin create user endpoint
+  app.post("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const result = insertUserSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid user data", errors: result.error.errors });
+      }
+
+      const { username, email } = result.data;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      const existingEmail = await storage.getUserByEmail(email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      // Create user with reputation defaulting to 100 for new members
+      const user = await storage.createUser({
+        ...result.data,
+        reputation: result.data.reputation || 100, // Default VIP Level to 100
+        role: result.data.role || "customer"
+      });
+
+      const { password: _, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
   // Customer profile update endpoint
   app.patch("/api/profile", authenticateUser, async (req, res) => {
     try {

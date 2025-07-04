@@ -97,7 +97,6 @@ export const insertUserSchema = createInsertSchema(users).omit({
   balance: true,
   availableBalance: true,
   frozenBalance: true,
-  reputation: true,
   winLoseSetting: true,
   direction: true,
   accountStatus: true,

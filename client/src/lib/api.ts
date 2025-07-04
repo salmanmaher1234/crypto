@@ -9,6 +9,20 @@ export function useUsers() {
   });
 }
 
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (userData: { username: string; email: string; password: string; name: string; role?: string; reputation?: number }) => {
+      const response = await apiRequest("POST", "/api/users", userData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+  });
+}
+
 export function useUpdateUser() {
   const queryClient = useQueryClient();
   

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsers, useUpdateUser, useCreateTransaction, useTransactions, useUpdateTransaction } from "@/lib/api";
+import { useUsers, useUpdateUser, useCreateUser, useCreateTransaction, useTransactions, useUpdateTransaction } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export function MemberManagement() {
   const { data: users, isLoading } = useUsers();
   const { data: transactions } = useTransactions();
   const updateUser = useUpdateUser();
+  const createUser = useCreateUser();
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
   const { toast } = useToast();
@@ -33,6 +34,18 @@ export function MemberManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [depositAmount, setDepositAmount] = useState("");
   const [deductionAmount, setDeductionAmount] = useState("");
+  const [freezeDialogOpen, setFreezeDialogOpen] = useState(false);
+  const [freezeAmount, setFreezeAmount] = useState("");
+  const [unfreezeDialogOpen, setUnfreezeDialogOpen] = useState(false);
+  const [unfreezeAmount, setUnfreezeAmount] = useState("");
+  const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
+  const [newMemberData, setNewMemberData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    name: "",
+    reputation: 100 // Default VIP Level to 100
+  });
   const [bankAccountData, setBankAccountData] = useState({
     accountHolderName: "",
     accountNumber: "",
@@ -235,16 +248,80 @@ export function MemberManagement() {
     });
   };
 
-  const handleFreeze = (user: User, amount?: string) => {
-    const freezeAmount = amount || "100";
-    handleBalanceAction("freeze", freezeAmount, user.id);
+  const handleFreezeSubmit = () => {
+    if (!selectedUser || !freezeAmount) return;
+    const amount = parseFloat(freezeAmount);
+    if (amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount to freeze",
+        variant: "destructive",
+      });
+      return;
+    }
+    handleFreezeAmount(selectedUser, amount);
+    setFreezeAmount("");
+    setFreezeDialogOpen(false);
   };
 
-  const handleUnfreeze = (user: User) => {
-    const unfreezeAmount = parseFloat(user.frozenBalance || "0").toString();
-    if (parseFloat(unfreezeAmount) > 0) {
-      handleBalanceAction("unfreeze", unfreezeAmount, user.id);
+  const handleUnfreezeSubmit = () => {
+    if (!selectedUser || !unfreezeAmount) return;
+    const amount = parseFloat(unfreezeAmount);
+    if (amount <= 0) {
+      toast({
+        title: "Invalid amount", 
+        description: "Please enter a valid amount to unfreeze",
+        variant: "destructive",
+      });
+      return;
     }
+    handleUnfreezeAmount(selectedUser, amount);
+    setUnfreezeAmount("");
+    setUnfreezeDialogOpen(false);
+  };
+
+  const handleAddMember = () => {
+    const { username, email, password, name, reputation } = newMemberData;
+    
+    if (!username || !email || !password || !name) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createUser.mutate({
+      username,
+      email,
+      password,
+      name,
+      reputation, // Will default to 100
+      role: "customer"
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Member added successfully",
+          description: `${name} has been added with VIP Level ${reputation}`,
+        });
+        setNewMemberData({
+          username: "",
+          email: "",
+          password: "",
+          name: "",
+          reputation: 100
+        });
+        setAddMemberDialogOpen(false);
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Failed to add member",
+          description: error.message || "Please check the information and try again",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
 
@@ -304,10 +381,80 @@ export function MemberManagement() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-64"
               />
-              <Button className="bg-primary hover:bg-primary/90">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Add Member
-              </Button>
+              <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Add Member
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Add New Member</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        id="username"
+                        placeholder="Enter username"
+                        value={newMemberData.username}
+                        onChange={(e) => setNewMemberData({...newMemberData, username: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter email address"
+                        value={newMemberData.email}
+                        onChange={(e) => setNewMemberData({...newMemberData, email: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Enter password"
+                        value={newMemberData.password}
+                        onChange={(e) => setNewMemberData({...newMemberData, password: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        placeholder="Enter full name"
+                        value={newMemberData.name}
+                        onChange={(e) => setNewMemberData({...newMemberData, name: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="reputation">VIP Level (Reputation)</Label>
+                      <Input
+                        id="reputation"
+                        type="number"
+                        placeholder="100"
+                        value={newMemberData.reputation}
+                        onChange={(e) => setNewMemberData({...newMemberData, reputation: parseInt(e.target.value) || 100})}
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Default VIP Level is set to 100
+                      </p>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" onClick={() => setAddMemberDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddMember} className="bg-primary hover:bg-primary/90">
+                        Add Member
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </CardHeader>
@@ -774,28 +921,92 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* 6. Freeze Button */}
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
-                          onClick={() => handleFreezeAmount(user, 100)}
-                        >
-                          <Lock className="w-3 h-3 mr-1" />
-                          Freeze
-                        </Button>
+                        {/* 6. Freeze Dialog */}
+                        <Dialog open={freezeDialogOpen && selectedUser?.id === user.id} onOpenChange={setFreezeDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              onClick={() => setSelectedUser(user)}
+                            >
+                              <Lock className="w-3 h-3 mr-1" />
+                              Freeze
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Freeze Balance</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="freezeAmount">Amount to Freeze</Label>
+                                <Input
+                                  id="freezeAmount"
+                                  type="number"
+                                  placeholder="Enter amount to freeze"
+                                  value={freezeAmount}
+                                  onChange={(e) => setFreezeAmount(e.target.value)}
+                                />
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Available Balance: ${user.availableBalance}
+                                </p>
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setFreezeDialogOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button onClick={handleFreezeSubmit} className="bg-red-600 hover:bg-red-700">
+                                  Freeze Amount
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
 
-                        {/* 7. Unfreeze Button */}
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
-                          onClick={() => handleUnfreezeAmount(user, 100)}
-                          disabled={parseFloat(user.frozenBalance || "0") === 0}
-                        >
-                          <Unlock className="w-3 h-3 mr-1" />
-                          Unfreeze
-                        </Button>
+                        {/* 7. Unfreeze Dialog */}
+                        <Dialog open={unfreezeDialogOpen && selectedUser?.id === user.id} onOpenChange={setUnfreezeDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                              onClick={() => setSelectedUser(user)}
+                              disabled={parseFloat(user.frozenBalance || "0") === 0}
+                            >
+                              <Unlock className="w-3 h-3 mr-1" />
+                              Unfreeze
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Unfreeze Balance</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="unfreezeAmount">Amount to Unfreeze</Label>
+                                <Input
+                                  id="unfreezeAmount"
+                                  type="number"
+                                  placeholder="Enter amount to unfreeze"
+                                  value={unfreezeAmount}
+                                  onChange={(e) => setUnfreezeAmount(e.target.value)}
+                                />
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Frozen Balance: ${user.frozenBalance}
+                                </p>
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setUnfreezeDialogOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button onClick={handleUnfreezeSubmit} className="bg-green-600 hover:bg-green-700">
+                                  Unfreeze Amount
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
 
                         {/* 8. Change group Button */}
                         <Button size="sm" variant="outline" className="h-6 px-2 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100">
