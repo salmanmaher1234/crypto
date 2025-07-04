@@ -235,18 +235,18 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Image Slider */}
       <Card className="overflow-hidden">
-        <div className="relative h-32 sm:h-36 md:h-40 lg:h-48 xl:h-52">
+        <div className="relative">
           {sliderImages.map((image, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              className={`transition-opacity duration-1000 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
               }`}
             >
               <img 
                 src={image} 
                 alt={`Slide ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             </div>
           ))}
@@ -312,11 +312,11 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Trading Chart Banner */}
       <div className="relative">
-        <div className="rounded-xl overflow-hidden h-32 sm:h-36 md:h-40 lg:h-48 xl:h-52">
+        <div className="rounded-xl overflow-hidden">
           <img 
             src={bannerTradingImg} 
             alt="Trading Chart" 
-            className="w-full h-full object-cover"
+            className="w-full h-auto object-cover"
           />
         </div>
       </div>
