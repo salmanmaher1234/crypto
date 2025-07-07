@@ -35,11 +35,11 @@ export function Profile() {
   const { user, logout } = useAuth();
   const queryClient = useQueryClient();
   
-  // Auto-refresh user data every 5 seconds to catch balance updates
+  // Auto-refresh user data every 2 seconds to catch balance updates
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
   }, [queryClient]);
   

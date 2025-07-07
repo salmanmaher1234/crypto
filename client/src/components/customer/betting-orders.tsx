@@ -23,12 +23,13 @@ export function CustomerBettingOrders() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Auto-refresh betting orders every 5 seconds to catch completed orders
+  // Auto-refresh betting orders every 2 seconds to catch completed orders
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-    }, 5000); // Refresh every 5 seconds
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    }, 2000); // Refresh every 2 seconds
 
     return () => clearInterval(interval);
   }, []);

@@ -25,11 +25,11 @@ export function MemberManagement() {
   const updateTransaction = useUpdateTransaction();
   const { toast } = useToast();
 
-  // Auto-refresh user data every 5 seconds to catch balance updates
+  // Auto-refresh user data every 2 seconds to catch balance updates
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
