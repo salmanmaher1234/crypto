@@ -129,7 +129,7 @@ export class MemStorage implements IStorage {
       balance: "10500.00",
       availableBalance: "10000.00",
       frozenBalance: "500.00",
-      reputation: 85,
+      reputation: 100,
       winLoseSetting: "To Win",
       direction: "Actual",
       accountStatus: "Active",
@@ -269,7 +269,7 @@ export class MemStorage implements IStorage {
       balance: "0.00",
       availableBalance: "0.00",
       frozenBalance: "0.00",
-      reputation: insertUser.reputation || 85,
+      reputation: 100, // Always set to 100 for all new users
       winLoseSetting: "To Win",
       direction: "Actual",
       accountStatus: "Active",
@@ -382,10 +382,13 @@ export class MemStorage implements IStorage {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + insertOrder.duration * 1000);
     
+    // Generate static order ID that won't change
+    const orderNumber = `${insertOrder.asset.replace('/', '')}_${Date.now()}_${id}`;
+    
     const order: BettingOrder = {
       ...insertOrder,
       id,
-      orderId: `${insertOrder.asset.replace('/', '')}_${id}`,
+      orderId: orderNumber,
       status: "active",
       result: null,
       exitPrice: null,
@@ -393,7 +396,32 @@ export class MemStorage implements IStorage {
       expiresAt,
     };
     this.bettingOrders.set(id, order);
+    
+    // Set up automatic order expiration with precise timing
+    setTimeout(() => {
+      this.expireOrder(id);
+    }, insertOrder.duration * 1000);
+    
     return order;
+  }
+
+  private async expireOrder(orderId: number) {
+    const order = this.bettingOrders.get(orderId);
+    if (!order || order.status !== "active") return;
+    
+    // Calculate profit based on direction and random outcome
+    const isWin = Math.random() > 0.5; // 50% win rate simulation
+    const profitAmount = isWin ? parseFloat(order.amount) * 0.8 : -parseFloat(order.amount);
+    
+    const updatedOrder = {
+      ...order,
+      status: "completed" as const,
+      result: isWin ? "win" as const : "loss" as const,
+      exitPrice: order.entryPrice, // Using same price for simplicity
+    };
+    
+    this.bettingOrders.set(orderId, updatedOrder);
+    console.log(`Order ${order.orderId} expired and completed with result: ${updatedOrder.result}`);
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {

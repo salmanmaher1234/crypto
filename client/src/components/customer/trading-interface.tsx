@@ -9,6 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 
 const durations = [30, 60, 120, 180, 240];
 
+// Commission rates based on duration
+const getCommissionRate = (duration: number): number => {
+  switch (duration) {
+    case 30: return 20; // 20%
+    case 60: return 30; // 30%
+    case 120: return 40; // 40%
+    case 180: return 50; // 50%
+    case 240: return 60; // 60%
+    default: return 20; // Default to 20%
+  }
+};
+
 export function TradingInterface() {
   const [selectedAsset, setSelectedAsset] = useState("BTC/USD");
   const [amount, setAmount] = useState("");
@@ -17,6 +29,10 @@ export function TradingInterface() {
   const { data: prices } = useCryptoPrices();
   const createOrder = useCreateBettingOrder();
   const { toast } = useToast();
+
+  // Calculate commission amount
+  const commissionRate = getCommissionRate(duration);
+  const commissionAmount = amount ? (parseFloat(amount) * commissionRate / 100) : 0;
 
   const handleTrade = (direction: "Buy Up" | "Buy Down") => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -144,6 +160,31 @@ export function TradingInterface() {
               ))}
             </div>
           </div>
+
+          {/* Commission Information */}
+          {amount && parseFloat(amount) > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="text-sm font-medium text-gray-700 mb-2">Commission Details</div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Investment Amount:</span>
+                  <span className="font-medium">{parseFloat(amount).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Commission Rate ({duration}s):</span>
+                  <span className="font-medium text-green-600">{commissionRate}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Commission Amount:</span>
+                  <span className="font-medium text-green-600">+{commissionAmount.toFixed(2)}</span>
+                </div>
+                <div className="border-t border-blue-300 pt-2 flex justify-between font-medium">
+                  <span className="text-gray-700">Net Amount (Investment - Commission):</span>
+                  <span className="text-blue-600">{(parseFloat(amount) - commissionAmount).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Direction Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

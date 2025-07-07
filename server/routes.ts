@@ -229,24 +229,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const validatedData = insertBettingOrderSchema.parse(dataToValidate);
+      
+      // Calculate commission based on duration
+      const getCommissionRate = (duration: number): number => {
+        switch (duration) {
+          case 30: return 0.20; // 20%
+          case 60: return 0.30; // 30%
+          case 120: return 0.40; // 40%
+          case 180: return 0.50; // 50%
+          case 240: return 0.60; // 60%
+          default: return 0.20; // Default to 20%
+        }
+      };
+      
+      const orderAmount = parseFloat(validatedData.amount);
+      const commissionRate = getCommissionRate(validatedData.duration);
+      const commissionAmount = orderAmount * commissionRate;
+      
+      console.log(`Commission calculation: ${orderAmount} × ${commissionRate} = ${commissionAmount}`);
+      
       const order = await storage.createBettingOrder(validatedData);
       console.log("Created order:", order);
       
-      // Deduct amount from available balance
+      // Deduct amount from available balance and add commission
       const user = await storage.getUser(req.session.userId);
-      console.log("Current user:", user);
+      console.log("Current user before balance update:", user);
       
       if (user) {
-        const orderAmount = parseFloat(validatedData.amount);
         const currentBalance = parseFloat(user.availableBalance);
-        const newBalance = currentBalance - orderAmount;
+        const newBalance = currentBalance - orderAmount + commissionAmount;
         
-        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} = ${newBalance}`);
+        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} + ${commissionAmount} = ${newBalance}`);
         
         const updatedUser = await storage.updateUser(req.session.userId, {
           availableBalance: newBalance.toFixed(2),
         });
-        console.log("Balance updated successfully:", updatedUser);
+        console.log("Updated user:", updatedUser);
       }
       
       console.log("==== BETTING ORDER END ====");

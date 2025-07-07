@@ -148,6 +148,11 @@ Changelog:
 - July 4, 2025. Fixed slider and banner image container structure - now uses consistent fixed height containers with proper responsive scaling (h-32 to xl:h-52) ensuring all images have equal container sizes and full image height coverage with object-cover for all screen sizes
 - July 4, 2025. Updated slider and banner to use automatic height - containers now adapt to image content height with h-auto, allowing images to display their full natural height while maintaining responsive behavior
 - July 4, 2025. Set slider to fixed height 535.781px with responsive scaling - uses Tailwind classes h-[250px] on mobile up to xl:h-[535.781px] on extra large screens, both images now properly adjust to container with object-cover
+- July 7, 2025. Implemented commission logic for trading orders - 30s=20%, 60s=30%, 120s=40%, 180s=50%, 240s=60% commission rates applied to order amounts and added to available balance
+- July 7, 2025. Fixed order timing system with server-side setTimeout for exact duration completion - orders now close precisely at designated seconds instead of relying on frontend polling
+- July 7, 2025. Fixed order number stability - order IDs now use timestamp-based generation to prevent changes during order duration
+- July 7, 2025. Updated credit score system - all new members default to 100 reputation, existing customer updated from 85 to 100
+- July 7, 2025. Added commission display to frontend - both trading-interface and crypto-trading components now show commission details with rates, amounts, and net calculations
 
 ## User Preferences
 
