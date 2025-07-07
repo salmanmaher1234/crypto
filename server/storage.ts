@@ -449,12 +449,14 @@ export class MemStorage implements IStorage {
     const profitPercentage = this.getScaleBasedProfitPercentage(order.duration);
     const profitAmount = orderAmount * (profitPercentage / 100);
     
-    // Update user's available balance with profit
+    // Update user's available balance with original amount + profit
     const user = this.users.get(order.userId);
     if (user) {
       const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
-      const newAvailable = currentAvailable + profitAmount;
       const currentBalance = parseFloat(user.balance || "0");
+      // Return original order amount + profit to available balance
+      const newAvailable = currentAvailable + orderAmount + profitAmount;
+      // Only add profit to total balance since order amount was never deducted from it
       const newBalance = currentBalance + profitAmount;
       
       const updatedUser = {
