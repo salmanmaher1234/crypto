@@ -16,17 +16,7 @@ interface CryptoTradingProps {
   onOrderPlaced?: () => void;
 }
 
-// Commission rates based on duration
-const getCommissionRate = (period: string): number => {
-  switch (period) {
-    case "30s": return 20; // 20%
-    case "60s": return 30; // 30%
-    case "120s": return 40; // 40%
-    case "180s": return 50; // 50%
-    case "240s": return 60; // 60%
-    default: return 20; // Default to 20%
-  }
-};
+
 
 export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTradingProps) {
   const { user } = useAuth();
@@ -42,10 +32,6 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   const [selectedChartPeriod, setSelectedChartPeriod] = useState("1m");
   const [chartType, setChartType] = useState<"candlestick" | "line">("candlestick");
   const [chartKey, setChartKey] = useState(0);
-
-  // Calculate commission amount
-  const commissionRate = getCommissionRate(selectedPeriod);
-  const commissionAmount = orderAmount ? (parseFloat(orderAmount) * commissionRate / 100) : 0;
 
   // Real-time chart update effect
   useEffect(() => {
@@ -789,31 +775,6 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
                 </div>
               </div>
             </div>
-
-            {/* Commission Information */}
-            {orderAmount && parseFloat(orderAmount) > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="text-xs font-medium text-gray-700 mb-2">Commission Details</div>
-                <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Investment Amount:</span>
-                    <span className="font-medium">{parseFloat(orderAmount).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Commission Rate ({selectedPeriod}):</span>
-                    <span className="font-medium text-green-600">{commissionRate}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Commission Amount:</span>
-                    <span className="font-medium text-green-600">+{commissionAmount.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t border-blue-300 pt-1 flex justify-between font-medium">
-                    <span className="text-gray-700">Net Amount:</span>
-                    <span className="text-blue-600">{(parseFloat(orderAmount) - commissionAmount).toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Submit Button */}
             <Button

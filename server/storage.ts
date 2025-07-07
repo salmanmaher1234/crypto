@@ -379,8 +379,29 @@ export class MemStorage implements IStorage {
 
   async createBettingOrder(insertOrder: InsertBettingOrder): Promise<BettingOrder> {
     const id = this.currentId++;
+    const userId = insertOrder.userId;
     const now = new Date();
     const expiresAt = new Date(now.getTime() + insertOrder.duration * 1000);
+    
+    // Deduct amount from user's available balance
+    const user = this.users.get(userId);
+    if (!user) throw new Error("User not found");
+    
+    const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
+    const orderAmount = parseFloat(insertOrder.amount);
+    
+    if (orderAmount > currentAvailable) {
+      throw new Error("Insufficient balance");
+    }
+    
+    // Simply deduct order amount from available balance
+    const newAvailable = currentAvailable - orderAmount;
+    
+    const updatedUser = {
+      ...user,
+      availableBalance: newAvailable.toFixed(2),
+    };
+    this.users.set(userId, updatedUser);
     
     // Generate static order ID that won't change
     const orderNumber = `${insertOrder.asset.replace('/', '')}_${Date.now()}_${id}`;
@@ -397,6 +418,8 @@ export class MemStorage implements IStorage {
     };
     this.bettingOrders.set(id, order);
     
+    console.log(`Created order ${order.orderId} - deducted ${orderAmount} from available balance`);
+    
     // Set up automatic order expiration with precise timing
     setTimeout(() => {
       this.expireOrder(id);
@@ -409,19 +432,37 @@ export class MemStorage implements IStorage {
     const order = this.bettingOrders.get(orderId);
     if (!order || order.status !== "active") return;
     
-    // Calculate profit based on direction and random outcome
-    const isWin = Math.random() > 0.5; // 50% win rate simulation
-    const profitAmount = isWin ? parseFloat(order.amount) * 0.8 : -parseFloat(order.amount);
+    // Calculate profit: Order Amount x 20% (scale-based profit)
+    const orderAmount = parseFloat(order.amount);
+    const profitAmount = orderAmount * 0.20; // 20% profit on order amount
+    
+    // Update user's available balance with profit
+    const user = this.users.get(order.userId);
+    if (user) {
+      const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
+      const newAvailable = currentAvailable + profitAmount;
+      const currentBalance = parseFloat(user.balance || "0");
+      const newBalance = currentBalance + profitAmount;
+      
+      const updatedUser = {
+        ...user,
+        availableBalance: newAvailable.toFixed(2),
+        balance: newBalance.toFixed(2),
+      };
+      this.users.set(order.userId, updatedUser);
+      
+      console.log(`User ${user.username} balance updated: +${profitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}`);
+    }
     
     const updatedOrder = {
       ...order,
       status: "completed" as const,
-      result: isWin ? "win" as const : "loss" as const,
+      result: "win" as const, // Always win with 20% profit
       exitPrice: order.entryPrice, // Using same price for simplicity
     };
     
     this.bettingOrders.set(orderId, updatedOrder);
-    console.log(`Order ${order.orderId} expired and completed with result: ${updatedOrder.result}`);
+    console.log(`Order ${order.orderId} expired and completed with 20% profit: +${profitAmount.toFixed(2)}`);
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {
