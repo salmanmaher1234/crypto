@@ -428,13 +428,26 @@ export class MemStorage implements IStorage {
     return order;
   }
 
+  private getScaleBasedProfitPercentage(duration: number): number {
+    // Scale-based profit calculation based on duration
+    switch (duration) {
+      case 30: return 20;  // 30s = 20% profit
+      case 60: return 30;  // 60s = 30% profit
+      case 120: return 40; // 120s = 40% profit
+      case 180: return 50; // 180s = 50% profit
+      case 240: return 60; // 240s = 60% profit
+      default: return 20;  // Default to 20%
+    }
+  }
+
   private async expireOrder(orderId: number) {
     const order = this.bettingOrders.get(orderId);
     if (!order || order.status !== "active") return;
     
-    // Calculate profit: Order Amount x 20% (scale-based profit)
+    // Calculate profit based on duration scale (percentage)
     const orderAmount = parseFloat(order.amount);
-    const profitAmount = orderAmount * 0.20; // 20% profit on order amount
+    const profitPercentage = this.getScaleBasedProfitPercentage(order.duration);
+    const profitAmount = orderAmount * (profitPercentage / 100);
     
     // Update user's available balance with profit
     const user = this.users.get(order.userId);
@@ -462,7 +475,7 @@ export class MemStorage implements IStorage {
     };
     
     this.bettingOrders.set(orderId, updatedOrder);
-    console.log(`Order ${order.orderId} expired and completed with 20% profit: +${profitAmount.toFixed(2)}`);
+    console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: +${profitAmount.toFixed(2)}`);
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {

@@ -279,7 +279,8 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     }, {
       onSuccess: async (data) => {
         // Immediate cache clearing and refresh
-        queryClient.removeQueries({ queryKey: ["/api/auth/me"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
         queryClient.invalidateQueries({ queryKey: ["/api/users"] });
         
         // Fetch fresh user data immediately

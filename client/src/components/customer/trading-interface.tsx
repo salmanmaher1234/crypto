@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 const durations = [30, 60, 120, 180, 240];
 
@@ -47,6 +48,11 @@ export function TradingInterface() {
       entryPrice,
     }, {
       onSuccess: () => {
+        // Invalidate all relevant caches immediately
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+        
         toast({
           title: "Order placed",
           description: `${direction} order for ${selectedAsset} placed successfully`,

@@ -153,6 +153,10 @@ Changelog:
 - July 7, 2025. Fixed order number stability - order IDs now use timestamp-based generation to prevent changes during order duration
 - July 7, 2025. Updated credit score system - all new members default to 100 reputation, existing customer updated from 85 to 100
 - July 7, 2025. Added commission display to frontend - both trading-interface and crypto-trading components now show commission details with rates, amounts, and net calculations
+- July 7, 2025. Removed Commission Details section from Place Order dialogs per user request - simplified order placement interface
+- July 7, 2025. Implemented scale-based profit calculation - 30s=20%, 60s=30%, 120s=40%, 180s=50%, 240s=60% profit rates based on order duration
+- July 7, 2025. Fixed order cache invalidation - orders now appear immediately in pending section after placement without requiring logout/login
+- July 7, 2025. Enhanced balance synchronization - profits from closed orders automatically update Real Balance in profile and backend member management
 
 ## User Preferences
 
