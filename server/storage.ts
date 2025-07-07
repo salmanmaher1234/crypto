@@ -464,7 +464,8 @@ export class MemStorage implements IStorage {
       };
       this.users.set(order.userId, updatedUser);
       
-      console.log(`User ${user.username} balance updated: +${profitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}`);
+      console.log(`User ${user.username} balance updated: +${profitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
+      console.log(`Updated user object:`, JSON.stringify(updatedUser, null, 2));
     }
     
     const updatedOrder = {

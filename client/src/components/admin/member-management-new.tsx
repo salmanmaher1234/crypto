@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUsers, useUpdateUser, useCreateUser, useCreateTransaction, useTransactions, useUpdateTransaction } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,14 @@ export function MemberManagement() {
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
   const { toast } = useToast();
+
+  // Auto-refresh user data every 5 seconds to catch balance updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
