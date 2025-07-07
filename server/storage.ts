@@ -466,6 +466,7 @@ export class MemStorage implements IStorage {
       
       console.log(`User ${user.username} balance updated: +${profitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
       console.log(`Updated user object:`, JSON.stringify(updatedUser, null, 2));
+      console.log(`User ${order.userId} final balance: Total=${updatedUser.balance}, Available=${updatedUser.availableBalance}`);
     }
     
     const updatedOrder = {
@@ -477,7 +478,6 @@ export class MemStorage implements IStorage {
     
     this.bettingOrders.set(orderId, updatedOrder);
     console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: +${profitAmount.toFixed(2)}`);
-    console.log(`User ${order.userId} final balance: Total=${updatedUser.balance}, Available=${updatedUser.availableBalance}`);
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {
