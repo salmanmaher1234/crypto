@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
 import { FileText, Copy, ChevronRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
+import { queryClient } from "@/lib/queryClient";
 // import { useToast } from "@/hooks/use-toast";
 
 export function CustomerBettingOrders() {
@@ -21,6 +22,16 @@ export function CustomerBettingOrders() {
   const [showDetailView, setShowDetailView] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Auto-refresh betting orders every 5 seconds to catch completed orders
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    }, 5000); // Refresh every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Function to get payout percentage based on duration
   const getPayoutPercentage = (duration: number) => {
@@ -118,9 +129,24 @@ export function CustomerBettingOrders() {
   });
 
   const copyOrderDetails = (order: any) => {
-    const orderNumber = `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
-    const profit = order.result === "win" ? parseFloat(order.amount) * 0.8 : 
-                   order.result === "loss" ? -parseFloat(order.amount) : 100;
+    const orderNumber = order.orderId || `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
+    
+    // Calculate profit based on scale percentages
+    const getScaleProfitPercentage = (duration: number) => {
+      const profitMap: { [key: number]: number } = {
+        30: 20,   // 20%
+        60: 30,   // 30%
+        120: 40,  // 40%
+        180: 50,  // 50%
+        240: 60   // 60%
+      };
+      return profitMap[duration] || 30; // Default to 30%
+    };
+    
+    const profitPercentage = getScaleProfitPercentage(order.duration);
+    const profit = order.result === "win" ? parseFloat(order.amount) * (profitPercentage / 100) : 
+                   order.result === "loss" ? -parseFloat(order.amount) : 
+                   order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
     
     const details = `Order No.: ${orderNumber}
 Currency: ${order.asset}/USDT
@@ -152,9 +178,24 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
 
   // Detailed order view
   if (showDetailView && selectedOrder) {
-    const orderNumber = `B${Date.now().toString().slice(-12)}${selectedOrder.id.toString().padStart(3, '0')}`;
-    const profit = selectedOrder.result === "win" ? parseFloat(selectedOrder.amount) * 0.8 : 
-                   selectedOrder.result === "loss" ? -parseFloat(selectedOrder.amount) : 1200;
+    const orderNumber = selectedOrder.orderId || `B${Date.now().toString().slice(-12)}${selectedOrder.id.toString().padStart(3, '0')}`;
+    
+    // Calculate profit using same scale-based logic
+    const getScaleProfitPercentage = (duration: number) => {
+      const profitMap: { [key: number]: number } = {
+        30: 20,   // 20%
+        60: 30,   // 30%
+        120: 40,  // 40%
+        180: 50,  // 50%
+        240: 60   // 60%
+      };
+      return profitMap[duration] || 30; // Default to 30%
+    };
+    
+    const profitPercentage = getScaleProfitPercentage(selectedOrder.duration);
+    const profit = selectedOrder.result === "win" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 
+                   selectedOrder.result === "loss" ? -parseFloat(selectedOrder.amount) : 
+                   selectedOrder.status === "completed" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 0;
     
     return (
       <div className="p-4 bg-white min-h-screen">
@@ -302,9 +343,24 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
         ) : (
           <div className="space-y-3">
             {filteredOrders.map((order) => {
-              const orderNumber = `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
-              const profit = order.result === "win" ? parseFloat(order.amount) * 0.8 : 
-                           order.result === "loss" ? -parseFloat(order.amount) : 100;
+              const orderNumber = order.orderId || `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
+              
+              // Calculate profit using scale-based percentages
+              const getScaleProfitPercentage = (duration: number) => {
+                const profitMap: { [key: number]: number } = {
+                  30: 20,   // 20%
+                  60: 30,   // 30%
+                  120: 40,  // 40%
+                  180: 50,  // 50%
+                  240: 60   // 60%
+                };
+                return profitMap[duration] || 30; // Default to 30%
+              };
+              
+              const profitPercentage = getScaleProfitPercentage(order.duration);
+              const profit = order.result === "win" ? parseFloat(order.amount) * (profitPercentage / 100) : 
+                           order.result === "loss" ? -parseFloat(order.amount) : 
+                           order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
               const isProfit = profit > 0;
               
               return (

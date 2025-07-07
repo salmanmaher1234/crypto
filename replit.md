@@ -157,6 +157,8 @@ Changelog:
 - July 7, 2025. Implemented scale-based profit calculation - 30s=20%, 60s=30%, 120s=40%, 180s=50%, 240s=60% profit rates based on order duration
 - July 7, 2025. Fixed order cache invalidation - orders now appear immediately in pending section after placement without requiring logout/login
 - July 7, 2025. Enhanced balance synchronization - profits from closed orders automatically update Real Balance in profile and backend member management
+- July 7, 2025. Fixed automatic order completion display - orders now automatically move from pending to closed tab after billing time expires, implemented 5-second auto-refresh cache invalidation to ensure real-time updates across frontend
+- July 7, 2025. Updated all profit calculations to use scale-based percentages - 30s=20%, 60s=30%, 120s=40%, 180s=50%, 240s=60% consistently applied across order list view, detail view, and copy functionality
 
 ## User Preferences
 
