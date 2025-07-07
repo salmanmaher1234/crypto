@@ -161,6 +161,8 @@ Changelog:
 - July 7, 2025. Updated all profit calculations to use scale-based percentages - 30s=20%, 60s=30%, 120s=40%, 180s=50%, 240s=60% consistently applied across order list view, detail view, and copy functionality
 - July 7, 2025. Enhanced real-time balance synchronization with 2-second auto-refresh intervals - profile Real Balance, admin member management, and betting orders now sync automatically to show accurate balance updates after order completion
 - July 7, 2025. Fixed balance calculation issues - ensured exact order amount deduction (no double deduction) and proper profit amount addition to customer's Real Balance with comprehensive logging for debugging
+- July 7, 2025. Fixed order completion balance calculation - order amount plus profit now properly returns to available balance instead of just profit, ensuring correct balance restoration
+- July 7, 2025. Fixed admin panel total balance display - Total now correctly calculated as Available + Frozen balance instead of showing incorrect balance field value across member management and wallet management components
 
 ## User Preferences
 

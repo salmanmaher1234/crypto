@@ -89,7 +89,7 @@ export function WalletManagement() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold">{parseFloat(user.balance).toFixed(2)}</div>
+                      <div className="font-semibold">{(parseFloat(user.availableBalance) + parseFloat(user.frozenBalance || "0")).toFixed(2)}</div>
                       <div className="text-sm text-gray-500">
                         Available: {parseFloat(user.availableBalance).toFixed(2)}
                       </div>
