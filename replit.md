@@ -163,6 +163,7 @@ Changelog:
 - July 7, 2025. Fixed balance calculation issues - ensured exact order amount deduction (no double deduction) and proper profit amount addition to customer's Real Balance with comprehensive logging for debugging
 - July 7, 2025. Fixed order completion balance calculation - order amount plus profit now properly returns to available balance instead of just profit, ensuring correct balance restoration
 - July 7, 2025. Fixed admin panel total balance display - Total now correctly calculated as Available + Frozen balance instead of showing incorrect balance field value across member management and wallet management components
+- July 7, 2025. Fixed recharge functionality to prevent automatic balance updates - recharge now only shows processing dialog and confirmation message without updating user balance, requiring manual admin intervention for actual balance changes
 
 ## User Preferences
 

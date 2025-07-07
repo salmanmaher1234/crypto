@@ -762,76 +762,25 @@ export function Profile() {
                               // Stage 3: Processing
                               setRechargeStep('processing');
                               
-                              // Direct balance update instead of pending transaction
-                              const currentBalance = parseFloat(user.balance || "0");
-                              const currentAvailable = parseFloat(user.availableBalance || "0");
-                              const addAmount = parseFloat(rechargeAmount);
-                              
-                              // Use dedicated recharge endpoint instead of updateUser
-                              fetch('/api/recharge', {
-                                method: 'PATCH',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                },
-                                credentials: 'include',
-                                body: JSON.stringify({
-                                  balance: (currentBalance + addAmount).toString(),
-                                  availableBalance: (currentAvailable + addAmount).toString()
-                                })
-                              })
-                              .then(response => response.json())
-                              .then(data => {
-                                if (data.id) {
-                                  // Success - invalidate queries to refresh UI
-                                  queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-                                  
-                                  // Create a completed transaction record for history
-                                  createTransaction.mutate({
-                                    userId: user.id,
-                                    type: "deposit",
-                                    amount: rechargeAmount,
-                                    status: "completed",
-                                    description: `Recharge of ${rechargeAmount} USDT via ${selectedChannel || 'bank wallet'} - Balance updated`
-                                  });
-
-                                  // Reset states
-                                  setRechargeStep('idle');
-                                  setIsProcessingRecharge(false);
-                                  
-                                  toast({
-                                    title: "Recharge successful",
-                                    description: `${rechargeAmount} USDT added to your balance successfully.`,
-                                  });
-                                  setRechargeAmount("");
-                                  setSelectedChannel("");
-                                  setShowRechargeDialog(false);
-                                  // Show confirmation popup after successful transaction
-                                  setTimeout(() => {
-                                    setShowRechargeConfirmDialog(true);
-                                  }, 500);
-                                } else {
-                                  // Error handling
-                                  setRechargeStep('idle');
-                                  setIsProcessingRecharge(false);
-                                  
-                                  toast({
-                                    title: "Recharge failed",
-                                    description: "Unable to process recharge. Please try again.",
-                                    variant: "destructive",
-                                  });
-                                }
-                              })
-                              .catch(error => {
-                                // Reset states on error
+                              // Just show processing animation without actual balance update
+                              setTimeout(() => {
+                                // Reset states
                                 setRechargeStep('idle');
                                 setIsProcessingRecharge(false);
                                 
+                                // Show success message but don't update balance
                                 toast({
-                                  title: "Recharge failed",
-                                  description: "Unable to process recharge. Please try again.",
-                                  variant: "destructive",
+                                  title: "Recharge request submitted",
+                                  description: `Request for ${rechargeAmount} USDT has been submitted. Contact admin for processing.`,
                                 });
-                              });
+                                setRechargeAmount("");
+                                setSelectedChannel("");
+                                setShowRechargeDialog(false);
+                                // Show confirmation popup
+                                setTimeout(() => {
+                                  setShowRechargeConfirmDialog(true);
+                                }, 500);
+                              }, 1000);
                             }, 1000); // 1 second for submitting stage
                           }, 800); // 800ms for validation stage
                         }
