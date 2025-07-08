@@ -126,52 +126,8 @@ export function WalletManagement() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Digital Wallets */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wallet className="w-5 h-5" />
-              Digital Wallets
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {customers.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>No customer wallets</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {customers.map((user) => {
-                  const availableBalance = parseFloat(user.availableBalance || user.balance || "0");
-                  const frozenBalance = parseFloat(user.frozenBalance || "0");
-                  const totalBalance = availableBalance + frozenBalance;
-
-                  return (
-                    <div key={user.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                          <Wallet className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">{user.name}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium text-gray-900">{totalBalance.toFixed(2)}</div>
-                        <div className="text-sm text-gray-500">Total</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Pending Withdrawal Requests */}
+      {/* Pending Withdrawal Requests */}
+      <div className="grid grid-cols-1 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

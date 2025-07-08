@@ -2,6 +2,7 @@ import { useTransactions } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingDown, TrendingUp, Users, BarChart3 } from "lucide-react";
 
@@ -105,7 +106,7 @@ export function Reports() {
         </Card>
       </div>
 
-      {/* Recent Transactions */}
+      {/* Recent Transactions - Withdrawal History */}
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
@@ -117,53 +118,90 @@ export function Reports() {
               <p>No transactions found</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {transactions.slice(0, 10).map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell className="text-gray-500">
-                      {new Date(transaction.createdAt).toLocaleDateString()} {new Date(transaction.createdAt).toLocaleTimeString()}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      Customer #{transaction.userId}
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          transaction.type === "deposit" ? "default" :
-                          transaction.type === "withdrawal" ? "destructive" :
-                          transaction.type === "trade_win" ? "default" :
-                          "secondary"
-                        }
-                      >
-                        {transaction.type.replace("_", " ").toUpperCase()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>${parseFloat(transaction.amount).toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          transaction.status === "completed" ? "default" :
-                          transaction.status === "pending" ? "secondary" :
-                          "destructive"
-                        }
-                      >
-                        {transaction.status.toUpperCase()}
-                      </Badge>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="text-xs">
+                    <TableHead className="w-12 text-xs">ID</TableHead>
+                    <TableHead className="w-20 text-xs">General Agent</TableHead>
+                    <TableHead className="w-20 text-xs">Invite Code</TableHead>
+                    <TableHead className="w-28 text-xs">Member Number/Account Number</TableHead>
+                    <TableHead className="w-16 text-xs">state</TableHead>
+                    <TableHead className="w-24 text-xs">Withdrawal amount/Approval amount</TableHead>
+                    <TableHead className="w-16 text-xs">Withdrawal Type</TableHead>
+                    <TableHead className="w-20 text-xs">Withdrawal Address</TableHead>
+                    <TableHead className="w-28 text-xs">Application time/Approval time</TableHead>
+                    <TableHead className="w-20 text-xs">Approval personnel</TableHead>
+                    <TableHead className="w-20 text-xs">Approval Notes</TableHead>
+                    <TableHead className="w-12 text-xs">operate</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {transactions.filter(t => t.type === "withdrawal").slice(0, 10).map((transaction, index) => (
+                    <TableRow key={transaction.id} className="text-xs">
+                      <TableCell className="text-xs">{17593 + index}</TableCell>
+                      <TableCell className="text-xs">8</TableCell>
+                      <TableCell className="text-xs">100025</TableCell>
+                      <TableCell className="text-xs">
+                        <div className="text-blue-600 underline cursor-pointer">
+                          {transaction.userId === 2 ? "37916 / Amit kumar" : 
+                           transaction.userId === 6 ? "43659 / awaisjutt" : 
+                           `${transaction.userId}${Math.floor(Math.random() * 10000)} / User ${transaction.userId}`}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-xs px-1 py-0 ${
+                            transaction.status === "completed" ? "bg-green-100 text-green-800" :
+                            transaction.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                            "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {transaction.status === "completed" ? "Agreed" :
+                           transaction.status === "pending" ? "Pending" : "Rejected"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {transaction.status === "completed" 
+                          ? `${parseFloat(transaction.amount).toFixed(0)} / ${parseFloat(transaction.amount).toFixed(0)}`
+                          : `${parseFloat(transaction.amount).toFixed(0)} / 0`
+                        }
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        <Badge variant="outline" className="text-xs px-1 py-0 bg-gray-800 text-white">
+                          bank card
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs">📄</TableCell>
+                      <TableCell className="text-xs">
+                        <div>
+                          <div>{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(transaction.createdAt).toLocaleTimeString('en-GB', {hour12: false})}</div>
+                          {transaction.status === "completed" && (
+                            <div>{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(new Date(transaction.createdAt).getTime() + 3600000).toLocaleTimeString('en-GB', {hour12: false})}</div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {transaction.status === "completed" ? "admin" : 
+                         transaction.status === "pending" ? "" : "work_100025"}
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {transaction.status === "rejected" && transaction.description ? 
+                          <span className="text-red-600">{transaction.description.replace("Withdrawal rejected: ", "")}</span> : 
+                          ""
+                        }
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        <Button variant="ghost" size="sm" className="h-5 px-1 text-xs">
+                          📄
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -57,6 +57,14 @@ export function MemberManagement() {
   const [unfreezeAmount, setUnfreezeAmount] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
+  const [newMemberData, setNewMemberData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    name: "",
+    reputation: 100
+  });
 
   // Filter and sort users based on search term, ID descending (newest first)
   const filteredUsers = users?.filter(user => 
@@ -184,6 +192,30 @@ export function MemberManagement() {
     });
   };
 
+  const handleAddMember = () => {
+    createUser.mutate({
+      ...newMemberData,
+      role: "customer",
+      availableBalance: "0.00",
+      frozenBalance: "0.00",
+    }, {
+      onSuccess: () => {
+        toast({ title: "Member added successfully" });
+        setAddMemberDialogOpen(false);
+        setNewMemberData({
+          username: "",
+          email: "",
+          password: "",
+          name: "",
+          reputation: 100
+        });
+      },
+      onError: () => {
+        toast({ title: "Failed to add member", variant: "destructive" });
+      },
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -198,13 +230,96 @@ export function MemberManagement() {
       <Card>
         <CardHeader>
           <CardTitle>Member Management</CardTitle>
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-between">
             <Input
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
             />
+            <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Add New Member
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add New Member</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Username</Label>
+                    <Input 
+                      value={newMemberData.username}
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, username: e.target.value }))}
+                      placeholder="Enter username"
+                    />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input 
+                      type="email"
+                      value={newMemberData.email}
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="Enter email"
+                    />
+                  </div>
+                  <div>
+                    <Label>Password</Label>
+                    <Input 
+                      type="password"
+                      value={newMemberData.password}
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder="Enter password"
+                    />
+                  </div>
+                  <div>
+                    <Label>Full Name</Label>
+                    <Input 
+                      value={newMemberData.name}
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter full name"
+                    />
+                  </div>
+                  <div>
+                    <Label>VIP Level (Reputation)</Label>
+                    <Input 
+                      type="number"
+                      value={newMemberData.reputation}
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, reputation: parseInt(e.target.value) || 100 }))}
+                      placeholder="Enter reputation (1-100)"
+                      min="1"
+                      max="100"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setAddMemberDialogOpen(false);
+                        setNewMemberData({
+                          username: "",
+                          email: "",
+                          password: "",
+                          name: "",
+                          reputation: 100
+                        });
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleAddMember}
+                      disabled={!newMemberData.username || !newMemberData.email || !newMemberData.password || !newMemberData.name}
+                    >
+                      Add Member
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent>

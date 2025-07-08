@@ -71,7 +71,36 @@ export class DatabaseStorage implements IStorage {
         throw new Error("Cannot delete admin users");
       }
       
-      // Delete user
+      // Delete associated records first to handle foreign key constraints
+      // Order matters due to foreign key dependencies
+      
+      // Get user's bank account IDs first
+      const userBankAccounts = await db.select({ id: bankAccounts.id })
+        .from(bankAccounts)
+        .where(eq(bankAccounts.userId, id));
+      
+      // Delete withdrawal requests that reference these bank accounts
+      for (const account of userBankAccounts) {
+        await db.delete(withdrawalRequests).where(eq(withdrawalRequests.bankAccountId, account.id));
+      }
+      
+      // Delete withdrawal requests by userId as well (in case of any direct references)
+      await db.delete(withdrawalRequests).where(eq(withdrawalRequests.userId, id));
+      
+      // Delete bank accounts (after withdrawal requests)
+      await db.delete(bankAccounts).where(eq(bankAccounts.userId, id));
+      
+      // Delete transactions
+      await db.delete(transactions).where(eq(transactions.userId, id));
+      
+      // Delete betting orders
+      await db.delete(bettingOrders).where(eq(bettingOrders.userId, id));
+      
+      // Delete messages (both sent and received)
+      await db.delete(messages).where(eq(messages.fromUserId, id));
+      await db.delete(messages).where(eq(messages.toUserId, id));
+      
+      // Finally delete the user
       await db.delete(users).where(eq(users.id, id));
       return true;
     } catch (error) {
