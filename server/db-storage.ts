@@ -155,15 +155,15 @@ export class DatabaseStorage implements IStorage {
       const profitPercentage = this.getScaleBasedProfitPercentage(order.duration);
       const baseProfitAmount = orderAmount * (profitPercentage / 100);
       
-      // Apply direction-based profit calculation
+      // Apply direction-based profit calculation using order's direction, not user's direction
       let finalProfitAmount = baseProfitAmount;
       let result: "win" | "loss" = "win";
       
-      if (user.direction === "Buy Up") {
+      if (order.direction === "Buy Up") {
         // Buy Up = Profit is added (positive)
         finalProfitAmount = baseProfitAmount;
         result = "win";
-      } else if (user.direction === "Buy Down") {
+      } else if (order.direction === "Buy Down") {
         // Buy Down = Profit is subtracted (negative) 
         finalProfitAmount = -baseProfitAmount;
         result = "loss";
@@ -195,7 +195,7 @@ export class DatabaseStorage implements IStorage {
         exitPrice: order.entryPrice, // Using same price for simplicity
       }).where(eq(bettingOrders.id, orderId));
 
-      console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} (Direction: ${user.direction})`);
+      console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} (Direction: ${order.direction})`);
     } catch (error) {
       console.error('Error expiring order:', error);
     }
