@@ -75,29 +75,29 @@ export default function CustomerApp() {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-50 flex flex-col">
+    <div className="h-screen w-screen bg-gray-50 flex flex-col customer-app">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="w-full px-4 py-3">
+        <div className="w-full px-3 lg:px-4 xl:px-6 py-2 lg:py-3 xl:py-4 responsive-padding">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               {user?.profileImage ? (
                 <img 
                   src={user.profileImage} 
                   alt="Profile" 
-                  className="w-8 h-8 rounded-full object-cover mr-3"
+                  className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full object-cover mr-2 lg:mr-3 xl:mr-4"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-3">
+                <div className="w-6 h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-primary text-white flex items-center justify-center text-xs lg:text-sm xl:text-base font-medium mr-2 lg:mr-3 xl:mr-4">
                   {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
               <div>
-                <div className="text-sm font-medium text-gray-900">{user?.name || user?.username}</div>
-                <div className="text-xs text-gray-500">Welcome back</div>
+                <div className="text-sm lg:text-base xl:text-lg font-medium text-gray-900">{user?.name || user?.username}</div>
+                <div className="text-xs lg:text-sm xl:text-base text-gray-500">Welcome back</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 lg:space-x-2 xl:space-x-3">
               {user?.role === "admin" && (
                 <Button
                   variant="ghost"

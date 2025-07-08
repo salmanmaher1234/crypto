@@ -95,7 +95,45 @@ html, body {
   gap: 0.25rem !important;
 }
 
+/* Responsive design optimization for 1240px layout */
+@media (min-width: 1240px) {
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  
+  .admin-dashboard {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  
+  .customer-app {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
 
+/* Enhanced responsive padding and margins */
+@media (max-width: 1240px) {
+  .responsive-padding {
+    padding: 1rem;
+  }
+  
+  .responsive-margin {
+    margin: 0.5rem;
+  }
+}
+
+@media (min-width: 1241px) {
+  .responsive-padding {
+    padding: 2rem;
+  }
+  
+  .responsive-margin {
+    margin: 1rem;
+  }
+}
 
 :root {
   --background: hsl(0, 0%, 100%);
