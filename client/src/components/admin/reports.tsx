@@ -1,13 +1,16 @@
-import { useTransactions } from "@/lib/api";
+import { useTransactions, useBankAccountsWithUsers } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingDown, TrendingUp, Users, BarChart3 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function Reports() {
   const { data: transactions, isLoading } = useTransactions();
+  const { data: bankAccountsWithUsers } = useBankAccountsWithUsers();
+  const { toast } = useToast();
 
   // Calculate statistics
   const stats = transactions ? {
@@ -137,68 +140,134 @@ export function Reports() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.filter(t => t.type === "withdrawal").slice(0, 10).map((transaction, index) => (
-                    <TableRow key={transaction.id} className="text-xs">
-                      <TableCell className="text-xs">{17593 + index}</TableCell>
-                      <TableCell className="text-xs">8</TableCell>
-                      <TableCell className="text-xs">100025</TableCell>
-                      <TableCell className="text-xs">
-                        <div className="text-blue-600 underline cursor-pointer">
-                          {transaction.userId === 2 ? "37916 / Amit kumar" : 
-                           transaction.userId === 6 ? "43659 / awaisjutt" : 
-                           `${transaction.userId}${Math.floor(Math.random() * 10000)} / User ${transaction.userId}`}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-xs px-1 py-0 ${
-                            transaction.status === "completed" ? "bg-green-100 text-green-800" :
-                            transaction.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                            "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {transaction.status === "completed" ? "Agreed" :
-                           transaction.status === "pending" ? "Pending" : "Rejected"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {transaction.status === "completed" 
-                          ? `${parseFloat(transaction.amount).toFixed(0)} / ${parseFloat(transaction.amount).toFixed(0)}`
-                          : `${parseFloat(transaction.amount).toFixed(0)} / 0`
-                        }
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        <Badge variant="outline" className="text-xs px-1 py-0 bg-gray-800 text-white">
-                          bank card
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs">📄</TableCell>
-                      <TableCell className="text-xs">
-                        <div>
-                          <div>{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(transaction.createdAt).toLocaleTimeString('en-GB', {hour12: false})}</div>
-                          {transaction.status === "completed" && (
-                            <div>{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(new Date(transaction.createdAt).getTime() + 3600000).toLocaleTimeString('en-GB', {hour12: false})}</div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {transaction.status === "completed" ? "admin" : 
-                         transaction.status === "pending" ? "" : "work_100025"}
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {transaction.status === "rejected" && transaction.description ? 
-                          <span className="text-red-600">{transaction.description.replace("Withdrawal rejected: ", "")}</span> : 
-                          ""
-                        }
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        <Button variant="ghost" size="sm" className="h-5 px-1 text-xs">
-                          📄
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {transactions.filter(t => t.type === "withdrawal").slice(0, 10).map((transaction, index) => {
+                    // Find user details for this transaction
+                    const transactionUser = transactions.find(t => t.userId === transaction.userId);
+                    const userId = transaction.userId;
+                    
+                    // Get user details from context or create dynamic data
+                    const getUserDisplayName = (userId: number) => {
+                      if (userId === 2) return "37916 / Sarah Johnson";
+                      if (userId === 3) return "43658 / John Doe"; 
+                      if (userId === 4) return "43659 / Jane Smith";
+                      return `${userId}${Math.floor(Math.random() * 10000)} / User ${userId}`;
+                    };
+                    
+                    const getUserInviteCode = (userId: number) => {
+                      if (userId === 2) return "100026";
+                      if (userId === 3) return "100027";
+                      if (userId === 4) return "100028";
+                      return "100025";
+                    };
+                    
+                    return (
+                      <TableRow key={transaction.id} className="text-xs">
+                        <TableCell className="text-xs">{transaction.id}</TableCell>
+                        <TableCell className="text-xs">8</TableCell>
+                        <TableCell className="text-xs">{getUserInviteCode(userId)}</TableCell>
+                        <TableCell className="text-xs">
+                          <div className="text-blue-600 underline cursor-pointer">
+                            {getUserDisplayName(userId)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          <Badge 
+                            variant="secondary" 
+                            className={`text-xs px-1 py-0 ${
+                              transaction.status === "completed" ? "bg-green-100 text-green-800" :
+                              transaction.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                              "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {transaction.status === "completed" ? "Agreed" :
+                             transaction.status === "pending" ? "Pending" : "Rejected"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {transaction.status === "completed" 
+                            ? `${parseFloat(transaction.amount).toFixed(0)} / ${parseFloat(transaction.amount).toFixed(0)}`
+                            : transaction.status === "rejected"
+                            ? `${parseFloat(transaction.amount).toFixed(0)} / 0`
+                            : `${parseFloat(transaction.amount).toFixed(0)} / 0`
+                          }
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          <Badge variant="outline" className="text-xs px-1 py-0 bg-gray-800 text-white">
+                            bank card
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-5 px-1 text-xs"
+                            onClick={() => {
+                              // Find bank details for this customer
+                              const customerBankAccounts = bankAccountsWithUsers?.filter(acc => acc.userId === userId) || [];
+                              if (customerBankAccounts.length > 0) {
+                                const bankDetails = customerBankAccounts.map(acc => 
+                                  `Bank: ${acc.bankName}\nAccount Holder: ${acc.accountHolderName}\nAccount Number: ${acc.accountNumber}\nIFSC Code: ${acc.ifscCode}`
+                                ).join('\n\n---\n\n');
+                                
+                                // Copy to clipboard
+                                navigator.clipboard.writeText(bankDetails).then(() => {
+                                  toast({
+                                    title: "Bank details copied",
+                                    description: `Copied ${customerBankAccounts.length} bank account(s) to clipboard`,
+                                  });
+                                }).catch(() => {
+                                  alert(`Bank Details for Customer ${userId}:\n\n${bankDetails}`);
+                                });
+                              } else {
+                                toast({
+                                  title: "No bank details",
+                                  description: "This customer has no bank accounts on file",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                          >
+                            📄
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          <div>
+                            <div>{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(transaction.createdAt).toLocaleTimeString('en-GB', {hour12: false})}</div>
+                            {transaction.status === "completed" && (
+                              <div className="text-green-600">{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(new Date(transaction.createdAt).getTime() + 3600000).toLocaleTimeString('en-GB', {hour12: false})}</div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {transaction.status === "completed" ? "admin" : 
+                           transaction.status === "pending" ? "" : "admin"}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {transaction.status === "rejected" && transaction.description ? 
+                            <span className="text-red-600">{transaction.description.replace("Withdrawal rejected: ", "")}</span> : 
+                            ""
+                          }
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-5 px-1 text-xs"
+                            onClick={() => {
+                              // Show complete withdrawal history for this customer
+                              const withdrawalHistory = transactions
+                                .filter(t => t.userId === userId && t.type === "withdrawal")
+                                .map(t => `${t.id}: ${t.amount} - ${t.status} - ${new Date(t.createdAt).toLocaleDateString()}`)
+                                .join('\n');
+                              alert(`Withdrawal History for Customer ${userId}:\n\n${withdrawalHistory}`);
+                            }}
+                          >
+                            📄
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

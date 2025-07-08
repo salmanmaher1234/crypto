@@ -79,8 +79,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Check if account is banned (accountStatus = "Prohibit")
-      if (user.accountStatus === "Prohibit") {
+      // Check if account is banned
+      if (user.isBanned) {
         return res.status(403).json({ message: "Account has been suspended. Please contact support." });
       }
 
@@ -691,7 +691,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if withdrawals are prohibited for this user
-      if (user.withdrawalStatus === "Prohibit") {
+      if (user.withdrawalProhibited) {
         return res.status(403).json({ message: "Withdrawal is prohibited for this account. Please contact support." });
       }
 
