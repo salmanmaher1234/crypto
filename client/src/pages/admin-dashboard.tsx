@@ -45,29 +45,29 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-50 flex admin-dashboard">
+    <div className="h-screen w-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-48 sm:w-56 lg:w-64 xl:w-72 bg-white shadow-lg responsive-padding">
-        <div className="p-4 lg:p-6 xl:p-8 border-b responsive-padding">
+      <div className="w-48 sm:w-56 lg:w-64 bg-white shadow-lg">
+        <div className="p-6 border-b">
           <h1 className="text-lg sm:text-xl font-bold text-gray-900">SuperCoin Admin</h1>
           <p className="text-xs sm:text-sm text-gray-600">Management Dashboard</p>
         </div>
         
-        <nav className="mt-4 lg:mt-6 xl:mt-8">
-          <div className="px-4 lg:px-6 xl:px-8 space-y-1 lg:space-y-2 responsive-margin">
+        <nav className="mt-8">
+          <div className="px-6 space-y-2">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center px-3 lg:px-4 xl:px-6 py-2 lg:py-3 xl:py-4 text-left rounded-lg transition-colors text-sm lg:text-base xl:text-lg responsive-padding ${
+                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-sm sm:text-base ${
                     activeSection === section.id
                       ? "bg-primary text-white"
                       : "text-gray-700 hover:bg-primary hover:text-white"
                   }`}
                 >
-                  <Icon className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 mr-2 lg:mr-3 xl:mr-4 flex-shrink-0" />
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-3 flex-shrink-0" />
                   <span className="truncate">{section.label}</span>
                 </button>
               );
@@ -80,10 +80,10 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col min-w-0 h-screen">
         <div className="w-full flex flex-col flex-1">
           {/* Header */}
-          <div className="bg-white shadow-sm border-b p-4 lg:p-6 xl:p-8 responsive-padding">
+          <div className="bg-white shadow-sm border-b p-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg lg:text-xl xl:text-2xl 2xl:text-3xl font-bold text-gray-900 truncate">{getSectionTitle()}</h2>
-              <div className="flex items-center space-x-2 lg:space-x-4 xl:space-x-6">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{getSectionTitle()}</h2>
+              <div className="flex items-center space-x-4">
                 <Button
                   variant="outline"
                   onClick={() => setLocation("/customer")}
@@ -112,10 +112,8 @@ export default function AdminDashboard() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto p-3 lg:p-6 xl:p-8 responsive-padding">
-            <div className="responsive-margin">
-              {renderSection()}
-            </div>
+          <div className="flex-1 overflow-auto">
+            {renderSection()}
           </div>
         </div>
       </div>

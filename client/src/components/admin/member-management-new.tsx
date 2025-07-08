@@ -232,8 +232,8 @@ export function MemberManagement() {
   return (
     <div className="h-full">
       <Card className="h-full">
-        <CardHeader className="p-4 lg:p-6 xl:p-8 responsive-padding">
-          <CardTitle className="text-lg lg:text-xl xl:text-2xl">Member Management</CardTitle>
+        <CardHeader className="p-6">
+          <CardTitle>Member Management</CardTitle>
           <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
