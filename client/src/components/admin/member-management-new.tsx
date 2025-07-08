@@ -232,8 +232,8 @@ export function MemberManagement() {
   return (
     <div className="h-full">
       <Card className="h-full">
-        <CardHeader className="p-1">
-          <CardTitle className="text-sm">Member Management</CardTitle>
+        <CardHeader className="p-6">
+          <CardTitle>Member Management</CardTitle>
           <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
