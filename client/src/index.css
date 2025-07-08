@@ -8,92 +8,17 @@
   box-sizing: border-box;
 }
 
-html, body {
-  height: 100vh;
-  width: 100vw;
-  overflow-x: hidden;
-}
 
-#root {
-  height: 100vh;
-  width: 100vw;
-}
 
-/* Remove all default padding and margins from containers */
-.container {
-  max-width: none !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
 
-/* Minimize spacing in cards and components */
-.card {
-  margin: 0 !important;
-}
 
-.p-6 {
-  padding: 0.25rem !important;
-}
 
-.p-4 {
-  padding: 0.25rem !important;
-}
 
-.p-5 {
-  padding: 0.25rem !important;
-}
 
-.px-4 {
-  padding-left: 0.25rem !important;
-  padding-right: 0.25rem !important;
-}
 
-.px-6 {
-  padding-left: 0.25rem !important;
-  padding-right: 0.25rem !important;
-}
 
-.py-4 {
-  padding-top: 0.25rem !important;
-  padding-bottom: 0.25rem !important;
-}
 
-.py-6 {
-  padding-top: 0.25rem !important;
-  padding-bottom: 0.25rem !important;
-}
 
-.m-4 {
-  margin: 0.25rem !important;
-}
-
-.m-6 {
-  margin: 0.25rem !important;
-}
-
-.mb-6 {
-  margin-bottom: 0.25rem !important;
-}
-
-.mb-4 {
-  margin-bottom: 0.25rem !important;
-}
-
-.space-y-6 > * + * {
-  margin-top: 0.25rem !important;
-}
-
-.space-y-4 > * + * {
-  margin-top: 0.25rem !important;
-}
-
-.gap-6 {
-  gap: 0.25rem !important;
-}
-
-.gap-4 {
-  gap: 0.25rem !important;
-}
 
 
 
