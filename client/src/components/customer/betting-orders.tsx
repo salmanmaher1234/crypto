@@ -132,40 +132,9 @@ export function CustomerBettingOrders() {
   const copyOrderDetails = (order: any) => {
     const orderNumber = order.orderId || `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
     
-    // Calculate profit based on scale percentages
-    const getScaleProfitPercentage = (duration: number) => {
-      const profitMap: { [key: number]: number } = {
-        30: 20,   // 20%
-        60: 30,   // 30%
-        120: 40,  // 40%
-        180: 50,  // 50%
-        240: 60   // 60%
-      };
-      return profitMap[duration] || 30; // Default to 30%
-    };
-    
-    const profitPercentage = getScaleProfitPercentage(order.duration);
-    const profit = order.result === "win" ? parseFloat(order.amount) * (profitPercentage / 100) : 
-                   order.result === "loss" ? -parseFloat(order.amount) * (profitPercentage / 100) : 
-                   order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
-    
-    const details = `Order No.: ${orderNumber}
-Currency: ${order.asset}/USDT
-Buy Price: ${order.entryPrice}
-Close Price: ${order.exitPrice || order.entryPrice}
-Buy Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
-Close Time: ${order.status === 'completed' ? format(new Date(order.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending'}
-Billing Time: ${order.duration}s
-Order Amount: {order.amount}
-Order Status: ${order.status === 'active' ? 'Pending' : order.status}
-Profit Amount: ${profit > 0 ? '+' : ''}{profit.toFixed(0)}
-Scale: ${order.duration}s
-Buy Direction: ${order.direction}
-Actual Rise Fall: ${order.result === 'win' ? 'Rise' : order.result === 'loss' ? 'Fall' : 'Rise'}
-Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
-    
-    navigator.clipboard.writeText(details);
-    console.log("Order details copied:", details);
+    // Only copy Order No.
+    navigator.clipboard.writeText(orderNumber);
+    console.log("Order No. copied:", orderNumber);
   };
 
   const openDetailView = (order: any) => {
@@ -215,7 +184,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
             onClick={() => copyOrderDetails(selectedOrder)}
             className="text-blue-600"
           >
-            Copy
+            Copy Order No.
           </Button>
         </div>
 

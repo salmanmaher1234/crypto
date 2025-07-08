@@ -176,6 +176,7 @@ Changelog:
 - July 8, 2025. Fixed frontend profit display bug in Orders tab - profit amount now shows correct percentage-based calculation (-200 for 20% of 1000) instead of full order amount (-1000), fixed both list view and detail view profit calculations
 - July 8, 2025. Updated Profile tab credit score default to 100 - all users now display credit score as 100 by default in Profile section
 - July 8, 2025. Standardized all user reputation/VIP levels to 100 - updated all existing users to reputation 100, ensured in-memory storage defaults to 100 for new users, frontend Profile tab shows Credit Score 100, backend Member Management displays VIP Level 100/100
+- July 8, 2025. Implemented comprehensive admin panel enhancements - replaced "Change a Bank" with "Confidential" for password management, replaced "Change Group" with "Send a letter" for customer messaging, added delete member functionality with confirmation dialog, optimized homepage spacing and padding for better layout, fixed copy function to only copy Order No. from betting orders, made Member Management fully responsive to fit all options in single screen row without horizontal scrolling, fixed reload requirement issues through better state management
 
 ## User Preferences
 

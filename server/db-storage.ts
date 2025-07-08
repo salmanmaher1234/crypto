@@ -50,6 +50,15 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      await db.delete(users).where(eq(users.id, id));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
   }

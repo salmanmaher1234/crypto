@@ -187,6 +187,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/users/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const deleted = await storage.deleteUser(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "User not found or cannot delete admin user" });
+      }
+      
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
   // Admin create user endpoint
   app.post("/api/users", requireAdmin, async (req, res) => {
     try {
@@ -780,6 +795,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(announcement);
     } catch (error) {
       res.status(400).json({ message: "Invalid announcement data" });
+    }
+  });
+
+  app.post("/api/messages", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const { recipientId, title, content } = req.body;
+      const message = await storage.createMessage({
+        senderId: (req as any).userId,
+        recipientId,
+        title,
+        content,
+        isRead: false
+      });
+      res.json(message);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.delete("/api/users/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      await storage.deleteUser(userId);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete user" });
     }
   });
 

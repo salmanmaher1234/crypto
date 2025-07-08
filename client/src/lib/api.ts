@@ -37,6 +37,34 @@ export function useUpdateUser() {
   });
 }
 
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/users/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+  });
+}
+
+export function useCreateMessage() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (message: { recipientId: number; content: string; title: string }) => {
+      const response = await apiRequest("POST", "/api/messages", message);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+    },
+  });
+}
+
 // Transactions API
 export function useTransactions() {
   return useQuery<Transaction[]>({
@@ -228,6 +256,8 @@ export function useMarkMessageAsRead() {
     },
   });
 }
+
+
 
 // Bank Accounts API
 export function useBankAccounts() {

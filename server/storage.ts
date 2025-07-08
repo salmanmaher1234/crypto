@@ -29,6 +29,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
   getAllUsers(): Promise<User[]>;
   
   // Bank accounts
@@ -294,6 +295,44 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...updates };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    const user = this.users.get(id);
+    if (!user) return false;
+    
+    // Don't allow deleting admin users
+    if (user.role === "admin") return false;
+    
+    // Delete all related data
+    this.users.delete(id);
+    
+    // Remove user's bank accounts
+    Array.from(this.bankAccounts.entries())
+      .filter(([, account]) => account.userId === id)
+      .forEach(([accountId]) => this.bankAccounts.delete(accountId));
+    
+    // Remove user's transactions
+    Array.from(this.transactions.entries())
+      .filter(([, transaction]) => transaction.userId === id)
+      .forEach(([transactionId]) => this.transactions.delete(transactionId));
+    
+    // Remove user's betting orders
+    Array.from(this.bettingOrders.entries())
+      .filter(([, order]) => order.userId === id)
+      .forEach(([orderId]) => this.bettingOrders.delete(orderId));
+    
+    // Remove user's withdrawal requests
+    Array.from(this.withdrawalRequests.entries())
+      .filter(([, request]) => request.userId === id)
+      .forEach(([requestId]) => this.withdrawalRequests.delete(requestId));
+    
+    // Remove user's messages
+    Array.from(this.messages.entries())
+      .filter(([, message]) => message.recipientId === id || message.senderId === id)
+      .forEach(([messageId]) => this.messages.delete(messageId));
+    
+    return true;
   }
 
   async getAllUsers(): Promise<User[]> {
