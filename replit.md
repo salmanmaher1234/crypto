@@ -175,6 +175,7 @@ Changelog:
 - July 8, 2025. Implemented complete Member Management direction control system - direction setting in admin panel now overrides order type for profit calculation, Buy Down direction always produces negative profit regardless of order type (Buy Up/Buy Down), Buy Up direction always produces positive profit, Real Balance in Profile tab properly reflects direction-based profit deductions/additions
 - July 8, 2025. Fixed frontend profit display bug in Orders tab - profit amount now shows correct percentage-based calculation (-200 for 20% of 1000) instead of full order amount (-1000), fixed both list view and detail view profit calculations
 - July 8, 2025. Updated Profile tab credit score default to 100 - all users now display credit score as 100 by default in Profile section
+- July 8, 2025. Standardized all user reputation/VIP levels to 100 - updated all existing users to reputation 100, ensured in-memory storage defaults to 100 for new users, frontend Profile tab shows Credit Score 100, backend Member Management displays VIP Level 100/100
 
 ## User Preferences
 
