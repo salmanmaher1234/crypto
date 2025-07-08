@@ -48,12 +48,12 @@ export default function AdminDashboard() {
     <div className="h-screen w-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div className="w-48 sm:w-56 lg:w-64 bg-white shadow-lg">
-        <div className="p-2 border-b">
+        <div className="p-1 border-b">
           <h1 className="text-lg sm:text-xl font-bold text-gray-900">SuperCoin Admin</h1>
           <p className="text-xs sm:text-sm text-gray-600">Management Dashboard</p>
         </div>
         
-        <nav className="mt-2">
+        <nav className="mt-1">
           <div className="px-1 space-y-1">
             {sections.map((section) => {
               const Icon = section.icon;
@@ -61,13 +61,13 @@ export default function AdminDashboard() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center px-2 py-2 text-left rounded-lg transition-colors text-sm sm:text-base ${
+                  className={`w-full flex items-center px-1 py-1 text-left rounded-lg transition-colors text-sm sm:text-base ${
                     activeSection === section.id
                       ? "bg-primary text-white"
                       : "text-gray-700 hover:bg-primary hover:text-white"
                   }`}
                 >
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-1 flex-shrink-0" />
                   <span className="truncate">{section.label}</span>
                 </button>
               );
@@ -80,10 +80,10 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col min-w-0 h-screen">
         <div className="w-full flex flex-col flex-1">
           {/* Header */}
-          <div className="bg-white shadow-sm border-b p-2">
+          <div className="bg-white shadow-sm border-b p-1">
             <div className="flex justify-between items-center">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{getSectionTitle()}</h2>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <Button
                   variant="outline"
                   onClick={() => setLocation("/customer")}
