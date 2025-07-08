@@ -78,17 +78,17 @@ export default function CustomerApp() {
     <div className="h-screen w-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="w-full px-1 py-1">
+        <div className="w-full px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               {user?.profileImage ? (
                 <img 
                   src={user.profileImage} 
                   alt="Profile" 
-                  className="w-8 h-8 rounded-full object-cover mr-1"
+                  className="w-8 h-8 rounded-full object-cover mr-3"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-1">
+                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-3">
                   {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
@@ -97,7 +97,7 @@ export default function CustomerApp() {
                 <div className="text-xs text-gray-500">Welcome back</div>
               </div>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-2">
               {user?.role === "admin" && (
                 <Button
                   variant="ghost"
