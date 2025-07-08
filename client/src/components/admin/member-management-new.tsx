@@ -561,7 +561,7 @@ export function MemberManagement() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Buy Up">Buy Up</SelectItem>
-                          <SelectItem value="Buy the Dip">Buy the Dip</SelectItem>
+                          <SelectItem value="Buy Down">Buy Down</SelectItem>
                           <SelectItem value="Actual">Actual</SelectItem>
                         </SelectContent>
                       </Select>

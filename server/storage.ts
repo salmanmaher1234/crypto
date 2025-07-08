@@ -448,17 +448,36 @@ export class MemStorage implements IStorage {
     // Calculate profit based on duration scale (percentage)
     const orderAmount = parseFloat(order.amount);
     const profitPercentage = this.getScaleBasedProfitPercentage(order.duration);
-    const profitAmount = orderAmount * (profitPercentage / 100);
+    const baseProfitAmount = orderAmount * (profitPercentage / 100);
     
     // Update user's available balance with original amount + profit
     const user = this.users.get(order.userId);
     if (user) {
       const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
       const currentBalance = parseFloat(user.balance || "0");
-      // Return original order amount + profit to available balance
-      const newAvailable = currentAvailable + orderAmount + profitAmount;
-      // Only add profit to total balance since order amount was never deducted from it
-      const newBalance = currentBalance + profitAmount;
+      
+      // Apply direction-based profit calculation
+      let finalProfitAmount = baseProfitAmount;
+      let result: "win" | "loss" = "win";
+      
+      if (user.direction === "Buy Up") {
+        // Buy Up = Profit is added (positive)
+        finalProfitAmount = baseProfitAmount;
+        result = "win";
+      } else if (user.direction === "Buy Down") {
+        // Buy Down = Profit is subtracted (negative)
+        finalProfitAmount = -baseProfitAmount;
+        result = "loss";
+      } else {
+        // Default "Actual" behavior - always positive
+        finalProfitAmount = baseProfitAmount;
+        result = "win";
+      }
+      
+      // Return original order amount + calculated profit to available balance
+      const newAvailable = currentAvailable + orderAmount + finalProfitAmount;
+      // Add/subtract profit to/from total balance
+      const newBalance = currentBalance + finalProfitAmount;
       
       const updatedUser = {
         ...user,
@@ -467,20 +486,18 @@ export class MemStorage implements IStorage {
       };
       this.users.set(order.userId, updatedUser);
       
-      console.log(`User ${user.username} balance updated: +${profitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
-      console.log(`Updated user object:`, JSON.stringify(updatedUser, null, 2));
-      console.log(`User ${order.userId} final balance: Total=${updatedUser.balance}, Available=${updatedUser.availableBalance}`);
+      console.log(`User ${user.username} (Direction: ${user.direction}) balance updated: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
     }
     
     const updatedOrder = {
       ...order,
       status: "completed" as const,
-      result: "win" as const, // Always win with 20% profit
+      result, // Dynamic result based on direction
       exitPrice: order.entryPrice, // Using same price for simplicity
     };
     
     this.bettingOrders.set(orderId, updatedOrder);
-    console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: +${profitAmount.toFixed(2)}`);
+    console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} (Direction: ${user?.direction})`);
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {

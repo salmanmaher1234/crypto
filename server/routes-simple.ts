@@ -79,6 +79,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
+      // Check if account is banned (accountStatus = "Prohibit")
+      if (user.accountStatus === "Prohibit") {
+        return res.status(403).json({ message: "Account has been suspended. Please contact support." });
+      }
+
       const sessionId = createSession(user.id);
       res.cookie('sessionId', sessionId, { 
         httpOnly: true, 
@@ -646,9 +651,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/withdrawal-requests", authenticateUser, async (req, res) => {
     try {
+      const userId = (req as any).userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if withdrawals are prohibited for this user
+      if (user.withdrawalStatus === "Prohibit") {
+        return res.status(403).json({ message: "Withdrawal is prohibited for this account. Please contact support." });
+      }
+
       const validatedData = insertWithdrawalRequestSchema.parse({
         ...req.body,
-        userId: (req as any).userId,
+        userId,
       });
       
       const request = await storage.createWithdrawalRequest(validatedData);
