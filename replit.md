@@ -170,6 +170,7 @@ Changelog:
 - July 8, 2025. Fixed customer Assets withdrawal section to properly display admin rejection notes - rejection notes now show in both withdrawal list view (red highlighted boxes) and detail view comment field, improved status color coding (rejected=red, approved=green, pending=blue), fixed withdrawal detail comment field to display rejection reasons instead of "-"
 - July 8, 2025. Implemented comprehensive member control system - Direction dropdown (Buy Up=profit adds to balance, Buy Down=profit subtracts from balance, Actual=default positive), Ban toggle prevents customer login with "Account has been suspended" message, Withdrawal prohibition toggle blocks withdrawal requests with appropriate error message, all controls integrated into Member Management with real-time updates
 - July 8, 2025. Fixed critical withdrawal system bug - rejected withdrawal requests no longer deduct user balance, only approved withdrawals deduct balance correctly, rejection notes properly display to customers in Assets section, all withdrawal submissions properly show in Assets withdraws tab
+- July 8, 2025. Fixed order expiration timing system - resolved issue where orders weren't closing after their billing time duration, implemented robust periodic checker (every 10 seconds) to catch expired orders, added server restart resilience to process orders that expired during downtime, verified direction-based profit calculations work correctly (Buy Up=positive, Buy Down=negative, Actual=positive)
 
 ## User Preferences
 

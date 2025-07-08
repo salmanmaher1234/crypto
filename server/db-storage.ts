@@ -111,12 +111,30 @@ export class DatabaseStorage implements IStorage {
   async createBettingOrder(order: any): Promise<BettingOrder> {
     const result = await db.insert(bettingOrders).values(order).returning();
     
-    // Set up order expiration in memory since we're using database storage
+    // Set up order expiration with both setTimeout and periodic check
     setTimeout(async () => {
       await this.expireOrder(result[0].id);
     }, order.duration * 1000);
     
     return result[0];
+  }
+
+  // Periodic check for expired orders (called every 10 seconds)
+  async checkExpiredOrders(): Promise<void> {
+    try {
+      const activeOrders = await db.select()
+        .from(bettingOrders)
+        .where(eq(bettingOrders.status, "active"));
+
+      for (const order of activeOrders) {
+        if (order.expiresAt && new Date() > new Date(order.expiresAt)) {
+          console.log(`Found expired order: ${order.orderId}, expiring now...`);
+          await this.expireOrder(order.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking expired orders:', error);
+    }
   }
 
   private async expireOrder(orderId: number) {
