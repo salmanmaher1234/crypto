@@ -802,14 +802,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { recipientId, title, content } = req.body;
       const message = await storage.createMessage({
-        senderId: (req as any).userId,
-        recipientId,
+        fromUserId: (req as any).userId,
+        toUserId: recipientId,
         title,
         content,
+        type: "General",
         isRead: false
       });
       res.json(message);
     } catch (error) {
+      console.error("Message creation error:", error);
       res.status(500).json({ message: "Failed to send message" });
     }
   });
@@ -817,10 +819,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/users/:id", authenticateUser, requireAdmin, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      await storage.deleteUser(userId);
-      res.json({ message: "User deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete user" });
+      const success = await storage.deleteUser(userId);
+      if (success) {
+        res.json({ message: "User deleted successfully" });
+      } else {
+        res.status(404).json({ message: "User not found or cannot delete admin user" });
+      }
+    } catch (error: any) {
+      console.error("Delete user error:", error);
+      if (error.message.includes("User not found")) {
+        res.status(404).json({ message: "User not found or cannot delete admin user" });
+      } else {
+        res.status(500).json({ message: "Failed to delete user" });
+      }
     }
   });
 

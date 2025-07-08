@@ -46,16 +46,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
-    const result = await db.update(users).set(updates).where(eq(users.id, id)).returning();
-    return result[0];
+    try {
+      const result = await db.update(users).set(updates).where(eq(users.id, id)).returning();
+      return result[0];
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
   }
 
   async deleteUser(id: number): Promise<boolean> {
     try {
+      // Check if user exists first
+      const existingUser = await db.select().from(users).where(eq(users.id, id)).limit(1);
+      if (existingUser.length === 0) {
+        throw new Error("User not found");
+      }
+      
+      // Don't allow deleting admin users  
+      if (existingUser[0].role === "admin") {
+        throw new Error("Cannot delete admin users");
+      }
+      
+      // Delete user
       await db.delete(users).where(eq(users.id, id));
       return true;
-    } catch {
-      return false;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error;
     }
   }
 

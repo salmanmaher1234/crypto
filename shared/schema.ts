@@ -14,9 +14,9 @@ export const users = pgTable("users", {
   frozenBalance: decimal("frozen_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   reputation: integer("reputation").notNull().default(85),
   winLoseSetting: text("win_lose_setting").notNull().default("To Win"), // To Win, To Lose, Random
-  direction: text("direction").notNull().default("Actual"), // Buy Up, Buy the Dip, Actual
-  accountStatus: text("account_status").notNull().default("Active"), // Active, Prohibit
-  withdrawalStatus: text("withdrawal_status").notNull().default("Allowed"), // Allowed, Prohibit
+  direction: text("direction").notNull().default("Buy Up"), // Buy Up, Buy Down, Actual
+  isBanned: boolean("is_banned").notNull().default(false),
+  withdrawalProhibited: boolean("withdrawal_prohibited").notNull().default(false),
   fundPassword: text("fund_password"),
   agentInvitationCode: text("agent_invitation_code"),
   invitationCode: text("invitation_code"),
