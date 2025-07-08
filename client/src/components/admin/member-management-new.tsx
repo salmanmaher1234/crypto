@@ -230,10 +230,10 @@ export function MemberManagement() {
   }
 
   return (
-    <div className="h-full" data-component="member-management">
+    <div className="h-full">
       <Card className="h-full">
-        <CardHeader className="p-1">
-          <CardTitle className="ultra-compact">Member Management</CardTitle>
+        <CardHeader className="p-6">
+          <CardTitle>Member Management</CardTitle>
           <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
@@ -331,19 +331,19 @@ export function MemberManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40px] text-xs p-1">ID</TableHead>
-                  <TableHead className="w-[70px] text-xs p-1">Username</TableHead>
-                  <TableHead className="w-[80px] text-xs p-1">Balance</TableHead>
-                  <TableHead className="w-[50px] text-xs p-1">VIP</TableHead>
-                  <TableHead className="w-[60px] text-xs p-1">Agent</TableHead>
-                  <TableHead className="w-[60px] text-xs p-1">Code</TableHead>
-                  <TableHead className="w-[50px] text-xs p-1">Type</TableHead>
-                  <TableHead className="w-[60px] text-xs p-1">Direction</TableHead>
-                  <TableHead className="w-[40px] text-xs p-1">Ban</TableHead>
-                  <TableHead className="w-[60px] text-xs p-1">Withdraw</TableHead>
-                  <TableHead className="w-[80px] text-xs p-1">Registration</TableHead>
-                  <TableHead className="w-[60px] text-xs p-1">Remark</TableHead>
-                  <TableHead className="w-[280px] text-xs p-1">Operate</TableHead>
+                  <TableHead className="w-[60px]">ID</TableHead>
+                  <TableHead className="w-[100px]">Username</TableHead>
+                  <TableHead className="w-[120px]">Balance</TableHead>
+                  <TableHead className="w-[80px]">VIP Level</TableHead>
+                  <TableHead className="w-[100px]">General Agent</TableHead>
+                  <TableHead className="w-[100px]">Invitation Code</TableHead>
+                  <TableHead className="w-[80px]">Type</TableHead>
+                  <TableHead className="w-[80px]">Direction</TableHead>
+                  <TableHead className="w-[60px]">Ban</TableHead>
+                  <TableHead className="w-[80px]">Withdraw</TableHead>
+                  <TableHead className="w-[120px]">Registration Time</TableHead>
+                  <TableHead className="w-[100px]">Remark</TableHead>
+                  <TableHead className="min-w-[400px]">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -364,33 +364,19 @@ export function MemberManagement() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm">{user.reputation || 100}/100</span>
-                        <div className="w-12 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-600 h-2 rounded-full" 
-                            style={{ width: `${((user.reputation || 100) / 100) * 100}%` }}
-                          ></div>
-                        </div>
+                    <TableCell className="text-center">
+                      <Badge variant="outline" className="text-xs px-2 py-1">
+                        {user.reputation || 100}/100
+                      </Badge>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                        <div 
+                          className="bg-primary h-1.5 rounded-full transition-all duration-300" 
+                          style={{ width: `${user.reputation || 100}%` }}
+                        ></div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Input
-                        value={user.generalAgent || ""}
-                        onChange={(e) => handleQuickUpdate(user, { generalAgent: e.target.value })}
-                        className="w-24 h-8 text-xs"
-                        placeholder="Agent"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        value={user.invitationCode || ""}
-                        onChange={(e) => handleQuickUpdate(user, { invitationCode: e.target.value })}
-                        className="w-24 h-8 text-xs"
-                        placeholder="Code"
-                      />
-                    </TableCell>
+                    <TableCell className="text-sm">{user.generalAgent || "admin"}</TableCell>
+                    <TableCell className="text-sm">{user.invitationCode || "100025"}</TableCell>
                     <TableCell>
                       <Select
                         value={user.userType || "Normal"}
