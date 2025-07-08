@@ -230,10 +230,10 @@ export function MemberManagement() {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full" data-component="member-management">
       <Card className="h-full">
-        <CardHeader className="p-2">
-          <CardTitle className="text-sm">Member Management</CardTitle>
+        <CardHeader className="p-1">
+          <CardTitle className="ultra-compact">Member Management</CardTitle>
           <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
@@ -331,19 +331,19 @@ export function MemberManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">ID</TableHead>
-                  <TableHead className="w-[100px]">Username</TableHead>
-                  <TableHead className="w-[120px]">Balance</TableHead>
-                  <TableHead className="w-[80px]">VIP Level</TableHead>
-                  <TableHead className="w-[100px]">General Agent</TableHead>
-                  <TableHead className="w-[100px]">Invitation Code</TableHead>
-                  <TableHead className="w-[80px]">Type</TableHead>
-                  <TableHead className="w-[80px]">Direction</TableHead>
-                  <TableHead className="w-[60px]">Ban</TableHead>
-                  <TableHead className="w-[80px]">Withdraw</TableHead>
-                  <TableHead className="w-[120px]">Registration Time</TableHead>
-                  <TableHead className="w-[100px]">Remark</TableHead>
-                  <TableHead className="min-w-[400px]">Operate</TableHead>
+                  <TableHead className="w-[40px] text-xs p-1">ID</TableHead>
+                  <TableHead className="w-[70px] text-xs p-1">Username</TableHead>
+                  <TableHead className="w-[80px] text-xs p-1">Balance</TableHead>
+                  <TableHead className="w-[50px] text-xs p-1">VIP</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Agent</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Code</TableHead>
+                  <TableHead className="w-[50px] text-xs p-1">Type</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Direction</TableHead>
+                  <TableHead className="w-[40px] text-xs p-1">Ban</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Withdraw</TableHead>
+                  <TableHead className="w-[80px] text-xs p-1">Registration</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Remark</TableHead>
+                  <TableHead className="w-[280px] text-xs p-1">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

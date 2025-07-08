@@ -95,7 +95,110 @@ html, body {
   gap: 0.25rem !important;
 }
 
+/* Ultra compact buttons */
+button {
+  font-size: 0.5rem !important;
+  padding: 0.125rem 0.25rem !important;
+  height: auto !important;
+  min-height: 1.5rem !important;
+}
 
+/* Badge styling */
+.badge {
+  font-size: 0.5rem !important;
+  padding: 0.125rem 0.25rem !important;
+}
+
+/* Extremely compact table cells */
+.table-cell-compact {
+  padding: 0.125rem !important;
+  font-size: 0.5rem !important;
+  line-height: 1.2 !important;
+}
+
+/* Make everything super compact for Member Management */
+[data-component="member-management"] table {
+  font-size: 0.4rem !important;
+}
+
+[data-component="member-management"] th,
+[data-component="member-management"] td {
+  padding: 0.0625rem !important;
+  font-size: 0.4rem !important;
+  line-height: 1.1 !important;
+}
+
+[data-component="member-management"] button {
+  font-size: 0.4rem !important;
+  padding: 0.0625rem 0.125rem !important;
+  margin: 0.0625rem !important;
+}
+
+[data-component="member-management"] .badge {
+  font-size: 0.4rem !important;
+  padding: 0.0625rem 0.125rem !important;
+}
+
+/* Ultra compact text for Member Management */
+.ultra-compact {
+  font-size: 0.4rem !important;
+  line-height: 1.1 !important;
+  padding: 0.0625rem !important;
+}
+
+/* Ultra compact inputs */
+[data-component="member-management"] input {
+  font-size: 0.4rem !important;
+  padding: 0.0625rem !important;
+  height: 1rem !important;
+  min-height: 1rem !important;
+}
+
+/* Ultra compact selects */
+[data-component="member-management"] select {
+  font-size: 0.4rem !important;
+  padding: 0.0625rem !important;
+  height: 1rem !important;
+}
+
+/* Make column widths even smaller */
+[data-component="member-management"] .w-\[40px\] {
+  width: 30px !important;
+}
+
+[data-component="member-management"] .w-\[70px\] {
+  width: 50px !important;
+}
+
+[data-component="member-management"] .w-\[80px\] {
+  width: 60px !important;
+}
+
+[data-component="member-management"] .w-\[60px\] {
+  width: 45px !important;
+}
+
+[data-component="member-management"] .w-\[50px\] {
+  width: 40px !important;
+}
+
+[data-component="member-management"] .w-\[280px\] {
+  width: 200px !important;
+}
+
+/* Switch components smaller */
+[data-component="member-management"] .switch {
+  transform: scale(0.7) !important;
+}
+
+/* Select triggers ultra compact */
+[data-component="member-management"] [data-slot="trigger"] {
+  font-size: 0.4rem !important;
+  padding: 0.0625rem !important;
+  height: 1rem !important;
+  width: auto !important;
+  min-width: 2rem !important;
+}
 
 :root {
   --background: hsl(0, 0%, 100%);
