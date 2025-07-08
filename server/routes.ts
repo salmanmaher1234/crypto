@@ -326,12 +326,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/withdrawal-requests/:id", authenticateUser, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { status } = req.body;
+      const { status, note } = req.body;
       
-      const updatedRequest = await storage.updateWithdrawalRequest(id, {
+      const updateData: any = {
         status,
         processedAt: new Date(),
-      });
+      };
+      
+      if (note) {
+        updateData.note = note;
+      }
+      
+      const updatedRequest = await storage.updateWithdrawalRequest(id, updateData);
       
       if (!updatedRequest) {
         return res.status(404).json({ message: "Request not found" });

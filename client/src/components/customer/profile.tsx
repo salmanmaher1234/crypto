@@ -1032,15 +1032,7 @@ export function Profile() {
                           }, 1000); // 1 second for submitting stage
                         }, 800); // 800ms for validation stage
                       }}
-                      disabled={
-                        !withdrawAmount || 
-                        withdrawAmount.trim() === "" ||
-                        parseFloat(withdrawAmount) < 10 ||
-                        !selectedBankWallet || 
-                        selectedBankWallet.trim() === "" ||
-                        createWithdrawalRequest.isPending || 
-                        isProcessingWithdraw
-                      }
+                      disabled={false}
                     >
                       {withdrawStep === 'idle' ? (
                         'Submit'

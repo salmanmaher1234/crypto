@@ -164,6 +164,8 @@ Changelog:
 - July 7, 2025. Fixed order completion balance calculation - order amount plus profit now properly returns to available balance instead of just profit, ensuring correct balance restoration
 - July 7, 2025. Fixed admin panel total balance display - Total now correctly calculated as Available + Frozen balance instead of showing incorrect balance field value across member management and wallet management components
 - July 7, 2025. Fixed recharge functionality to prevent automatic balance updates - recharge now only shows processing dialog and confirmation message without updating user balance, requiring manual admin intervention for actual balance changes
+- July 7, 2025. Enhanced withdrawal system with comprehensive admin controls - withdraw button now always clickable, added note field to withdrawal requests schema, implemented Accept/Reject functionality with rejection reason notes in admin Wallet Management, rejection notes display to customers in Assets section
+- July 7, 2025. Added comprehensive Bank Account Details section to admin Wallet Management - displays all member bank accounts with owner details, account numbers, IFSC codes, and copy functionality for easy access to customer banking information
 
 ## User Preferences
 

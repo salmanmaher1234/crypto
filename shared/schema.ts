@@ -68,6 +68,7 @@ export const withdrawalRequests = pgTable("withdrawal_requests", {
   bankAccountId: integer("bank_account_id").notNull().references(() => bankAccounts.id),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: text("status").notNull().default("pending"), // pending, approved, rejected
+  note: text("note"), // admin note for rejection/approval
   createdAt: timestamp("created_at").notNull().defaultNow(),
   processedAt: timestamp("processed_at"),
 });

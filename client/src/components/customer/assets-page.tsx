@@ -484,6 +484,14 @@ export function AssetsPage() {
                             hour12: false
                           }).replace(',', '')}
                         </div>
+                        
+                        {/* Show rejection note if available */}
+                        {withdrawal.status === 'rejected' && withdrawal.note && (
+                          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                            <div className="text-xs text-red-600 font-medium mb-1">Rejection Reason:</div>
+                            <div className="text-xs text-red-700">{withdrawal.note}</div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
