@@ -198,6 +198,10 @@ export function MemberManagement() {
       role: "customer",
       availableBalance: "0.00",
       frozenBalance: "0.00",
+      invitationCode: `100${String(Date.now()).slice(-3)}`,
+      userType: "Normal",
+      generalAgent: "Agent001",
+      remark: "New Member",
     }, {
       onSuccess: () => {
         toast({ title: "Member added successfully" });
@@ -327,14 +331,19 @@ export function MemberManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[80px]">ID</TableHead>
-                  <TableHead className="w-[120px]">Username</TableHead>
-                  <TableHead className="w-[150px]">Balance</TableHead>
-                  <TableHead className="w-[100px]">VIP Level</TableHead>
-                  <TableHead className="w-[100px]">Direction</TableHead>
-                  <TableHead className="w-[80px]">Ban</TableHead>
-                  <TableHead className="w-[100px]">Withdraw</TableHead>
-                  <TableHead className="min-w-[600px]">Operate</TableHead>
+                  <TableHead className="w-[60px]">ID</TableHead>
+                  <TableHead className="w-[100px]">Username</TableHead>
+                  <TableHead className="w-[120px]">Balance</TableHead>
+                  <TableHead className="w-[80px]">VIP Level</TableHead>
+                  <TableHead className="w-[100px]">General Agent</TableHead>
+                  <TableHead className="w-[100px]">Invitation Code</TableHead>
+                  <TableHead className="w-[80px]">Type</TableHead>
+                  <TableHead className="w-[80px]">Direction</TableHead>
+                  <TableHead className="w-[60px]">Ban</TableHead>
+                  <TableHead className="w-[80px]">Withdraw</TableHead>
+                  <TableHead className="w-[120px]">Registration Time</TableHead>
+                  <TableHead className="w-[100px]">Remark</TableHead>
+                  <TableHead className="min-w-[400px]">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -367,11 +376,42 @@ export function MemberManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
+                      <Input
+                        value={user.generalAgent || ""}
+                        onChange={(e) => handleQuickUpdate(user, { generalAgent: e.target.value })}
+                        className="w-24 h-8 text-xs"
+                        placeholder="Agent"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={user.invitationCode || ""}
+                        onChange={(e) => handleQuickUpdate(user, { invitationCode: e.target.value })}
+                        className="w-24 h-8 text-xs"
+                        placeholder="Code"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={user.userType || "Normal"}
+                        onValueChange={(value) => handleQuickUpdate(user, { userType: value })}
+                      >
+                        <SelectTrigger className="w-20 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Normal">Normal</SelectItem>
+                          <SelectItem value="VIP">VIP</SelectItem>
+                          <SelectItem value="Agent">Agent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
                       <Select
                         value={user.direction || "Buy Up"}
                         onValueChange={(value) => handleQuickUpdate(user, { direction: value })}
                       >
-                        <SelectTrigger className="w-24 h-8 text-xs">
+                        <SelectTrigger className="w-20 h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -391,6 +431,22 @@ export function MemberManagement() {
                       <Switch
                         checked={user.withdrawalProhibited || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { withdrawalProhibited: checked })}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-xs">
+                        {user.registrationTime ? 
+                          new Date(user.registrationTime).toLocaleDateString('en-GB') : 
+                          new Date().toLocaleDateString('en-GB')
+                        }
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={user.remark || ""}
+                        onChange={(e) => handleQuickUpdate(user, { remark: e.target.value })}
+                        className="w-24 h-8 text-xs"
+                        placeholder="Remark"
                       />
                     </TableCell>
                     <TableCell>

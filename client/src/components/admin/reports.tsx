@@ -154,10 +154,11 @@ export function Reports() {
                     };
                     
                     const getUserInviteCode = (userId: number) => {
-                      if (userId === 2) return "100026";
-                      if (userId === 3) return "100027";
-                      if (userId === 4) return "100028";
-                      return "100025";
+                      if (userId === 1) return "100025"; // Admin
+                      if (userId === 2) return "100026"; // Sarah
+                      if (userId === 3) return "100027"; // John
+                      if (userId === 4) return "100028"; // Jane
+                      return `1000${userId + 24}`; // Dynamic code for other users
                     };
                     
                     return (

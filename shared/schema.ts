@@ -20,6 +20,10 @@ export const users = pgTable("users", {
   fundPassword: text("fund_password"),
   agentInvitationCode: text("agent_invitation_code"),
   invitationCode: text("invitation_code"),
+  userType: text("user_type").notNull().default("Normal"), // Normal, VIP, Agent
+  generalAgent: text("general_agent"),
+  remark: text("remark"),
+  registrationTime: timestamp("registration_time").notNull().defaultNow(),
   profileImage: text("profile_image"),
   signatureData: text("signature_data"),
   signatureName: text("signature_name"),
