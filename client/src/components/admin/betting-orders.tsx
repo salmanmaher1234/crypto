@@ -94,9 +94,9 @@ export function BettingOrders() {
   }
 
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
+    <div className="p-1 h-full">
+      <Card className="h-full">
+        <CardHeader className="p-2">
           <CardTitle>Active Betting Orders</CardTitle>
           <div className="flex flex-wrap gap-2">
             <Button variant="default" size="sm">All Orders</Button>

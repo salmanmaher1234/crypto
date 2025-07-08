@@ -75,36 +75,36 @@ export default function CustomerApp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen w-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="w-full px-2 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               {user?.profileImage ? (
                 <img 
                   src={user.profileImage} 
                   alt="Profile" 
-                  className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full object-cover mr-3"
+                  className="w-8 h-8 rounded-full object-cover mr-2"
                 />
               ) : (
-                <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm sm:text-base font-medium mr-3">
+                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-2">
                   {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
               <div>
-                <div className="text-sm sm:text-base font-medium text-gray-900">{user?.name || user?.username}</div>
-                <div className="text-xs sm:text-sm text-gray-500">Welcome back</div>
+                <div className="text-sm font-medium text-gray-900">{user?.name || user?.username}</div>
+                <div className="text-xs text-gray-500">Welcome back</div>
               </div>
             </div>
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex items-center space-x-1">
               {user?.role === "admin" && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setLocation("/admin")}
                 >
-                  <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Settings className="w-4 h-4" />
                 </Button>
               )}
               <Button
@@ -112,7 +112,7 @@ export default function CustomerApp() {
                 size="sm"
                 onClick={() => logout()}
               >
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                <LogOut className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -120,16 +120,16 @@ export default function CustomerApp() {
       </header>
 
       {/* Main Content */}
-      <main className="pb-20 lg:pb-24">
-        <div className="w-full max-w-[1240px] mx-auto">
+      <main className="flex-1 overflow-auto pb-16">
+        <div className="w-full h-full">
           {renderSection()}
         </div>
       </main>
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="w-full max-w-[1240px] mx-auto">
-          <div className="grid grid-cols-5 py-2">
+        <div className="w-full">
+          <div className="grid grid-cols-5 py-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
@@ -145,8 +145,8 @@ export default function CustomerApp() {
                       : "text-gray-500"
                   }`}
                 >
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-                  <span className="text-xs sm:text-sm">{section.label}</span>
+                  <Icon className="w-4 h-4 mb-1" />
+                  <span className="text-xs">{section.label}</span>
                 </button>
               );
             })}

@@ -49,7 +49,7 @@ export function Reports() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-1 h-full">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>

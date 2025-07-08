@@ -94,7 +94,7 @@ export function Announcements() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-1 h-full">
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">

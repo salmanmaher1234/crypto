@@ -230,9 +230,9 @@ export function MemberManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
+    <div className="h-full">
+      <Card className="h-full">
+        <CardHeader className="p-2">
           <CardTitle>Member Management</CardTitle>
           <div className="flex gap-4 justify-between">
             <Input

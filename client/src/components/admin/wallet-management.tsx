@@ -125,7 +125,7 @@ export function WalletManagement() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-1 h-full">
       {/* Pending Withdrawal Requests */}
       <div className="grid grid-cols-1 gap-6">
         <Card>
