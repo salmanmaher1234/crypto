@@ -25,11 +25,12 @@ export function MemberManagement() {
   const updateTransaction = useUpdateTransaction();
   const { toast } = useToast();
 
-  // Auto-refresh user data every 2 seconds to catch balance updates
+  // Auto-refresh user data every 30 seconds to catch balance updates
+  // Reduced frequency to prevent interference with manual toggles
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    }, 2000);
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -93,17 +94,24 @@ export function MemberManagement() {
   };
 
   const handleQuickUpdate = (user: User, updates: Partial<User>) => {
+    // Optimistic update - immediately update the local data
+    queryClient.setQueryData(['/api/users'], (oldData: User[] | undefined) => {
+      if (!oldData) return oldData;
+      return oldData.map(u => 
+        u.id === user.id ? { ...u, ...updates } : u
+      );
+    });
+
     updateUser.mutate({ id: user.id, updates }, {
       onSuccess: () => {
-        // Invalidate users cache to refresh data instantly
-        queryClient.invalidateQueries({ queryKey: ['/api/users'] });
-        
         toast({
           title: "Updated successfully",
           description: "User setting has been updated",
         });
       },
       onError: () => {
+        // Revert optimistic update on error
+        queryClient.invalidateQueries({ queryKey: ['/api/users'] });
         toast({
           title: "Update failed",
           description: "Failed to update user setting",
