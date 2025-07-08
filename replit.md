@@ -167,6 +167,7 @@ Changelog:
 - July 7, 2025. Enhanced withdrawal system with comprehensive admin controls - withdraw button now always clickable, added note field to withdrawal requests schema, implemented Accept/Reject functionality with rejection reason notes in admin Wallet Management, rejection notes display to customers in Assets section
 - July 7, 2025. Added comprehensive Bank Account Details section to admin Wallet Management - displays all member bank accounts with owner details, account numbers, IFSC codes, and copy functionality for easy access to customer banking information
 - July 8, 2025. Fixed all major issues: implemented member search functionality with accordion layout for bank details, enhanced withdrawal requests with complete bank account information display, fixed balance updates after withdrawal approval (deducts from both available and total balance), enabled real-time updates across all components with 30-second auto-refresh, fixed withdrawal request display in customer Assets section with rejection notes
+- July 8, 2025. Fixed critical withdrawal system bug - rejected withdrawal requests no longer deduct user balance, only approved withdrawals deduct balance correctly, rejection notes properly display to customers in Assets section, all withdrawal submissions properly show in Assets withdraws tab
 
 ## User Preferences
 

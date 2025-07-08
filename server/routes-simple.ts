@@ -676,7 +676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Request not found" });
       }
       
-      // If approved, create withdrawal transaction and update user balance
+      // Only process transactions and balance changes for approved requests
       if (status === "approved") {
         await storage.createTransaction({
           userId: updatedRequest.userId,
@@ -686,7 +686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "Withdrawal approved",
         });
         
-        // Deduct withdrawal amount from user's available balance
+        // Deduct withdrawal amount from user's available balance ONLY for approved requests
         const user = await storage.getUser(updatedRequest.userId);
         if (user) {
           const withdrawalAmount = parseFloat(updatedRequest.amount);
@@ -701,6 +701,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             balance: newTotal.toFixed(2),
           });
         }
+      } else if (status === "rejected") {
+        // For rejected requests, only create a transaction record but don't deduct balance
+        await storage.createTransaction({
+          userId: updatedRequest.userId,
+          type: "withdrawal",
+          amount: updatedRequest.amount,
+          status: "rejected",
+          description: `Withdrawal rejected: ${note || "No reason provided"}`,
+        });
       }
       
       res.json(updatedRequest);
