@@ -146,7 +146,7 @@ export function CustomerBettingOrders() {
     
     const profitPercentage = getScaleProfitPercentage(order.duration);
     const profit = order.result === "win" ? parseFloat(order.amount) * (profitPercentage / 100) : 
-                   order.result === "loss" ? -parseFloat(order.amount) : 
+                   order.result === "loss" ? -parseFloat(order.amount) * (profitPercentage / 100) : 
                    order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
     
     const details = `Order No.: ${orderNumber}
@@ -195,7 +195,7 @@ Order Time: ${format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}`;
     
     const profitPercentage = getScaleProfitPercentage(selectedOrder.duration);
     const profit = selectedOrder.result === "win" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 
-                   selectedOrder.result === "loss" ? -parseFloat(selectedOrder.amount) : 
+                   selectedOrder.result === "loss" ? -parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 
                    selectedOrder.status === "completed" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 0;
     
     return (

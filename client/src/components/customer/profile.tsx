@@ -585,7 +585,7 @@ export function Profile() {
                   Frozen Amount: {hideBalance ? "****" : parseFloat(user.frozenBalance || "0").toFixed(0)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  Credit Score: {hideBalance ? "**" : user.reputation || 85}
+                  Credit Score: {hideBalance ? "**" : user.reputation || 100}
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setHideBalance(!hideBalance)}>
