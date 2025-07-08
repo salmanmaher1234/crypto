@@ -230,11 +230,11 @@ export function MemberManagement() {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full" data-component="member-management">
       <Card className="h-full">
-        <CardHeader className="p-2">
-          <CardTitle>Member Management</CardTitle>
-          <div className="flex gap-4 justify-between">
+        <CardHeader className="p-1">
+          <CardTitle className="ultra-compact">Member Management</CardTitle>
+          <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
               value={searchTerm}
@@ -331,63 +331,57 @@ export function MemberManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">ID</TableHead>
-                  <TableHead className="w-[100px]">Username</TableHead>
-                  <TableHead className="w-[120px]">Balance</TableHead>
-                  <TableHead className="w-[80px]">VIP Level</TableHead>
-                  <TableHead className="w-[100px]">General Agent</TableHead>
-                  <TableHead className="w-[100px]">Invitation Code</TableHead>
-                  <TableHead className="w-[80px]">Type</TableHead>
-                  <TableHead className="w-[80px]">Direction</TableHead>
-                  <TableHead className="w-[60px]">Ban</TableHead>
-                  <TableHead className="w-[80px]">Withdraw</TableHead>
-                  <TableHead className="w-[120px]">Registration Time</TableHead>
-                  <TableHead className="w-[100px]">Remark</TableHead>
-                  <TableHead className="min-w-[400px]">Operate</TableHead>
+                  <TableHead className="w-[40px] text-xs p-1">ID</TableHead>
+                  <TableHead className="w-[70px] text-xs p-1">Username</TableHead>
+                  <TableHead className="w-[80px] text-xs p-1">Balance</TableHead>
+                  <TableHead className="w-[50px] text-xs p-1">VIP</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Agent</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Code</TableHead>
+                  <TableHead className="w-[50px] text-xs p-1">Type</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Direction</TableHead>
+                  <TableHead className="w-[40px] text-xs p-1">Ban</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Withdraw</TableHead>
+                  <TableHead className="w-[80px] text-xs p-1">Registration</TableHead>
+                  <TableHead className="w-[60px] text-xs p-1">Remark</TableHead>
+                  <TableHead className="w-[280px] text-xs p-1">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell className="font-mono text-sm">{user.id}</TableCell>
-                    <TableCell className="font-medium">{user.username}</TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="text-sm">
-                          Total: {(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(2)}
+                    <TableCell className="font-mono table-cell-compact">{user.id}</TableCell>
+                    <TableCell className="font-medium table-cell-compact">{user.username}</TableCell>
+                    <TableCell className="table-cell-compact">
+                      <div className="space-y-0">
+                        <div className="table-cell-compact">
+                          T:{(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(0)}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Available: {parseFloat(user.availableBalance || "0").toFixed(2)}
+                        <div className="table-cell-compact text-gray-600">
+                          A:{parseFloat(user.availableBalance || "0").toFixed(0)}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Frozen: {parseFloat(user.frozenBalance || "0").toFixed(2)}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm">{user.reputation || 100}/100</span>
-                        <div className="w-12 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-600 h-2 rounded-full" 
-                            style={{ width: `${((user.reputation || 100) / 100) * 100}%` }}
-                          ></div>
+                        <div className="table-cell-compact text-gray-600">
+                          F:{parseFloat(user.frozenBalance || "0").toFixed(0)}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="ultra-compact">
+                      <div className="ultra-compact">
+                        {user.reputation || 100}
+                      </div>
+                    </TableCell>
+                    <TableCell className="ultra-compact">
                       <Input
                         value={user.generalAgent || ""}
                         onChange={(e) => handleQuickUpdate(user, { generalAgent: e.target.value })}
-                        className="w-24 h-8 text-xs"
+                        className="w-12 h-4 ultra-compact"
                         placeholder="Agent"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="ultra-compact">
                       <Input
                         value={user.invitationCode || ""}
                         onChange={(e) => handleQuickUpdate(user, { invitationCode: e.target.value })}
-                        className="w-24 h-8 text-xs"
+                        className="w-12 h-4 ultra-compact"
                         placeholder="Code"
                       />
                     </TableCell>
