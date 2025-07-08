@@ -328,47 +328,61 @@ export function MemberManagement() {
         </CardHeader>
         <CardContent className="p-2">
           <div className="overflow-x-auto">
-            <Table className="min-w-[1000px]">
+            <Table className="min-w-[1400px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40px] text-xs">ID</TableHead>
-                  <TableHead className="w-[70px] text-xs">User</TableHead>
-                  <TableHead className="w-[90px] text-xs">Balance</TableHead>
-                  <TableHead className="w-[50px] text-xs">VIP</TableHead>
-                  <TableHead className="w-[60px] text-xs">Agent</TableHead>
-                  <TableHead className="w-[60px] text-xs">Code</TableHead>
-                  <TableHead className="w-[50px] text-xs">Type</TableHead>
-                  <TableHead className="w-[50px] text-xs">Dir</TableHead>
-                  <TableHead className="w-[40px] text-xs">Ban</TableHead>
-                  <TableHead className="w-[50px] text-xs">With</TableHead>
-                  <TableHead className="w-[80px] text-xs">Reg Date</TableHead>
-                  <TableHead className="w-[60px] text-xs">Remark</TableHead>
-                  <TableHead className="w-[280px] text-xs">Operate</TableHead>
+                  <TableHead className="w-[60px]">ID</TableHead>
+                  <TableHead className="w-[100px]">Username</TableHead>
+                  <TableHead className="w-[120px]">Balance</TableHead>
+                  <TableHead className="w-[80px]">VIP Level</TableHead>
+                  <TableHead className="w-[100px]">General Agent</TableHead>
+                  <TableHead className="w-[100px]">Invitation Code</TableHead>
+                  <TableHead className="w-[80px]">Type</TableHead>
+                  <TableHead className="w-[80px]">Direction</TableHead>
+                  <TableHead className="w-[60px]">Ban</TableHead>
+                  <TableHead className="w-[80px]">Withdraw</TableHead>
+                  <TableHead className="w-[120px]">Registration Time</TableHead>
+                  <TableHead className="w-[100px]">Remark</TableHead>
+                  <TableHead className="w-[400px]">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell className="font-mono text-xs p-1">{user.id}</TableCell>
-                    <TableCell className="font-medium text-xs p-1">{user.username}</TableCell>
-                    <TableCell className="p-1">
-                      <div className="text-xs space-y-0.5">
-                        <div>T: {(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(0)}</div>
-                        <div className="text-gray-600">A: {parseFloat(user.availableBalance || "0").toFixed(0)}</div>
-                        <div className="text-gray-600">F: {parseFloat(user.frozenBalance || "0").toFixed(0)}</div>
+                    <TableCell className="font-mono text-sm">{user.id}</TableCell>
+                    <TableCell className="font-medium">{user.username}</TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="text-sm">
+                          Total: {(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(2)}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Available: {parseFloat(user.availableBalance || "0").toFixed(2)}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Frozen: {parseFloat(user.frozenBalance || "0").toFixed(2)}
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center p-1">
-                      <div className="text-xs">{user.reputation || 100}</div>
+                    <TableCell className="text-center">
+                      <Badge variant="outline" className="text-xs px-2 py-1">
+                        {user.reputation || 100}/100
+                      </Badge>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                        <div 
+                          className="bg-primary h-1.5 rounded-full transition-all duration-300" 
+                          style={{ width: `${user.reputation || 100}%` }}
+                        ></div>
+                      </div>
                     </TableCell>
-                    <TableCell className="text-xs p-1">{user.generalAgent || "admin"}</TableCell>
-                    <TableCell className="text-xs p-1">{user.invitationCode || "100025"}</TableCell>
-                    <TableCell className="p-1">
+                    <TableCell className="text-sm">{user.generalAgent || "admin"}</TableCell>
+                    <TableCell className="text-sm">{user.invitationCode || "100025"}</TableCell>
+                    <TableCell>
                       <Select
                         value={user.userType || "Normal"}
                         onValueChange={(value) => handleQuickUpdate(user, { userType: value })}
                       >
-                        <SelectTrigger className="w-16 h-6 text-xs">
+                        <SelectTrigger className="w-20 h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -378,52 +392,50 @@ export function MemberManagement() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell>
                       <Select
                         value={user.direction || "Buy Up"}
                         onValueChange={(value) => handleQuickUpdate(user, { direction: value })}
                       >
-                        <SelectTrigger className="w-16 h-6 text-xs">
+                        <SelectTrigger className="w-20 h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Buy Up">Up</SelectItem>
-                          <SelectItem value="Buy Down">Down</SelectItem>
-                          <SelectItem value="Actual">Act</SelectItem>
+                          <SelectItem value="Buy Up">Buy Up</SelectItem>
+                          <SelectItem value="Buy Down">Buy Down</SelectItem>
+                          <SelectItem value="Actual">Actual</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell>
                       <Switch
                         checked={user.isBanned || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { isBanned: checked })}
-                        className="scale-75"
                       />
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell>
                       <Switch
                         checked={user.withdrawalProhibited || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { withdrawalProhibited: checked })}
-                        className="scale-75"
                       />
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell>
                       <div className="text-xs">
                         {user.registrationTime ? 
-                          new Date(user.registrationTime).toLocaleDateString('en-GB').replace(/\//g, '/') : 
-                          new Date().toLocaleDateString('en-GB').replace(/\//g, '/')
+                          new Date(user.registrationTime).toLocaleDateString('en-GB') : 
+                          new Date().toLocaleDateString('en-GB')
                         }
                       </div>
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell>
                       <Input
                         value={user.remark || ""}
                         onChange={(e) => handleQuickUpdate(user, { remark: e.target.value })}
-                        className="w-16 h-6 text-xs"
-                        placeholder="Note"
+                        className="w-24 h-8 text-xs"
+                        placeholder="Remark"
                       />
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {/* Password Management Button */}
                         <Dialog open={passwordDialogOpen && selectedUser?.id === user.id} onOpenChange={setPasswordDialogOpen}>
@@ -431,10 +443,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                              className="h-6 px-2 text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Key className="w-3 h-3" />
+                              <Key className="w-3 h-3 mr-1" />
+                              Confidential
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-md">
@@ -508,10 +521,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                              className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <CheckCircle className="w-3 h-3" />
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Details
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl">
@@ -579,10 +593,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                              className="h-6 px-2 text-xs bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Plus className="w-3 h-3" />
+                              <Plus className="w-3 h-3 mr-1" />
+                              Deposit
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-md">
@@ -620,10 +635,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Minus className="w-3 h-3" />
+                              <Minus className="w-3 h-3 mr-1" />
+                              Deduction
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-md">
@@ -663,10 +679,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                              className="h-6 px-2 text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Lock className="w-3 h-3" />
+                              <Lock className="w-3 h-3 mr-1" />
+                              Freeze
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -708,10 +725,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                              className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Unlock className="w-3 h-3" />
+                              <Unlock className="w-3 h-3 mr-1" />
+                              Unfreeze
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -750,10 +768,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100"
+                              className="h-6 px-2 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Send className="w-3 h-3" />
+                              <Send className="w-3 h-3 mr-1" />
+                              Send a letter
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-md">
@@ -796,10 +815,11 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-5 px-1 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
                               onClick={() => setSelectedUser(user)}
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              Delete
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-md">
