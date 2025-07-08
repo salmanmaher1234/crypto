@@ -117,12 +117,10 @@ export const insertTransactionSchema = createInsertSchema(transactions).omit({
 
 export const insertBettingOrderSchema = createInsertSchema(bettingOrders).omit({
   id: true,
-  orderId: true,
   exitPrice: true,
   status: true,
   result: true,
   createdAt: true,
-  expiresAt: true,
 });
 
 export const insertWithdrawalRequestSchema = createInsertSchema(withdrawalRequests).omit({

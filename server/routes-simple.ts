@@ -581,13 +581,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("User ID:", (req as any).userId);
       console.log("Order data:", req.body);
       
-      const validatedData = insertBettingOrderSchema.parse({
-        ...req.body,
-        userId: (req as any).userId,
-      });
-      console.log("Validated data:", validatedData);
+      // Generate unique order ID
+      const orderId = `ORD${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
       
-      const order = await storage.createBettingOrder(validatedData);
+      // Manually validate required fields
+      const { asset, amount: orderAmount, direction, duration, entryPrice } = req.body;
+      if (!asset || !orderAmount || !direction || !duration || !entryPrice) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Prepare complete order data with all required fields
+      const orderData = {
+        userId: (req as any).userId,
+        asset,
+        amount: orderAmount,
+        direction,
+        duration: parseInt(duration),
+        entryPrice,
+        orderId,
+        expiresAt: new Date(Date.now() + parseInt(duration) * 1000),
+      };
+      
+      console.log("Order data:", orderData);
+      
+      const order = await storage.createBettingOrder(orderData);
       console.log("Created order:", order);
       
       // Deduct amount from available balance
@@ -595,11 +612,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Current user before balance update:", user);
       
       if (user) {
-        const amount = parseFloat(validatedData.amount);
+        const amountNumber = parseFloat(orderAmount);
         const currentBalance = parseFloat(user.availableBalance);
-        const newBalance = currentBalance - amount;
+        const newBalance = currentBalance - amountNumber;
         
-        console.log(`BALANCE UPDATE: ${currentBalance} - ${amount} = ${newBalance}`);
+        console.log(`BALANCE UPDATE: ${currentBalance} - ${amountNumber} = ${newBalance}`);
         
         const updatedUser = await storage.updateUser((req as any).userId, {
           availableBalance: newBalance.toFixed(2),

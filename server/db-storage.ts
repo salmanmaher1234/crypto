@@ -108,9 +108,90 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(bettingOrders).where(eq(bettingOrders.userId, userId)).orderBy(desc(bettingOrders.createdAt));
   }
 
-  async createBettingOrder(order: InsertBettingOrder): Promise<BettingOrder> {
+  async createBettingOrder(order: any): Promise<BettingOrder> {
     const result = await db.insert(bettingOrders).values(order).returning();
+    
+    // Set up order expiration in memory since we're using database storage
+    setTimeout(async () => {
+      await this.expireOrder(result[0].id);
+    }, order.duration * 1000);
+    
     return result[0];
+  }
+
+  private async expireOrder(orderId: number) {
+    try {
+      const orderResult = await db.select().from(bettingOrders).where(eq(bettingOrders.id, orderId));
+      const order = orderResult[0];
+      
+      if (!order || order.status !== "active") return;
+
+      // Get user for direction-based profit calculation
+      const userResult = await db.select().from(users).where(eq(users.id, order.userId));
+      const user = userResult[0];
+      
+      if (!user) return;
+
+      // Calculate profit based on duration scale (percentage)
+      const orderAmount = parseFloat(order.amount);
+      const profitPercentage = this.getScaleBasedProfitPercentage(order.duration);
+      const baseProfitAmount = orderAmount * (profitPercentage / 100);
+      
+      // Apply direction-based profit calculation
+      let finalProfitAmount = baseProfitAmount;
+      let result: "win" | "loss" = "win";
+      
+      if (user.direction === "Buy Up") {
+        // Buy Up = Profit is added (positive)
+        finalProfitAmount = baseProfitAmount;
+        result = "win";
+      } else if (user.direction === "Buy Down") {
+        // Buy Down = Profit is subtracted (negative) 
+        finalProfitAmount = -baseProfitAmount;
+        result = "loss";
+      } else {
+        // Default "Actual" behavior - always positive
+        finalProfitAmount = baseProfitAmount;
+        result = "win";
+      }
+
+      // Update user's balance
+      const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
+      const currentBalance = parseFloat(user.balance || "0");
+      
+      // Return original order amount + calculated profit to available balance
+      const newAvailable = currentAvailable + orderAmount + finalProfitAmount;
+      // Add/subtract profit to/from total balance
+      const newBalance = currentBalance + finalProfitAmount;
+
+      // Update user balance
+      await db.update(users).set({
+        availableBalance: newAvailable.toFixed(2),
+        balance: newBalance.toFixed(2),
+      }).where(eq(users.id, order.userId));
+
+      // Update order status
+      await db.update(bettingOrders).set({
+        status: "completed",
+        result,
+        exitPrice: order.entryPrice, // Using same price for simplicity
+      }).where(eq(bettingOrders.id, orderId));
+
+      console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} (Direction: ${user.direction})`);
+    } catch (error) {
+      console.error('Error expiring order:', error);
+    }
+  }
+
+  private getScaleBasedProfitPercentage(duration: number): number {
+    switch (duration) {
+      case 30: return 20;   // 30 seconds = 20%
+      case 60: return 30;   // 60 seconds = 30%
+      case 120: return 40;  // 120 seconds = 40%
+      case 180: return 50;  // 180 seconds = 50%
+      case 240: return 60;  // 240 seconds = 60%
+      default: return 20;   // Default to 20%
+    }
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {
