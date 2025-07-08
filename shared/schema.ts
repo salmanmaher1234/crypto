@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   balance: decimal("balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   availableBalance: decimal("available_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   frozenBalance: decimal("frozen_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
-  reputation: integer("reputation").notNull().default(85),
+  reputation: integer("reputation").notNull().default(100),
   winLoseSetting: text("win_lose_setting").notNull().default("To Win"), // To Win, To Lose, Random
   direction: text("direction").notNull().default("Buy Up"), // Buy Up, Buy Down, Actual
   isBanned: boolean("is_banned").notNull().default(false),

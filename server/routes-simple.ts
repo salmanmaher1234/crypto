@@ -801,13 +801,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/messages", authenticateUser, requireAdmin, async (req, res) => {
     try {
       const { recipientId, title, content } = req.body;
+      const adminUserId = getSessionUserId(req);
+      if (!adminUserId) {
+        return res.status(401).json({ message: "Admin user not found" });
+      }
+      
       const message = await storage.createMessage({
-        fromUserId: (req as any).userId,
+        fromUserId: adminUserId,
         toUserId: recipientId,
         title,
         content,
-        type: "General",
-        isRead: false
+        type: "General"
       });
       res.json(message);
     } catch (error) {

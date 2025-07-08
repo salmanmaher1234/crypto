@@ -200,7 +200,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   }, [cryptoData.length]);
 
   return (
-    <div className="w-full max-w-[1240px] mx-auto px-2 sm:px-3 lg:px-4 space-y-3">
+    <div className="w-full max-w-[1240px] mx-auto px-2 sm:px-3 lg:px-4 space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between py-1">
         <Avatar 

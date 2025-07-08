@@ -27,11 +27,13 @@ export function MemberManagement() {
   const createMessage = useCreateMessage();
   const { toast } = useToast();
 
-  // Auto-refresh user data every 30 seconds to catch balance updates
+  // Auto-refresh user data every 5 seconds for real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    }, 30000);
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -56,12 +58,12 @@ export function MemberManagement() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Filter users based on search term
+  // Filter and sort users based on search term, ID descending (newest first)
   const filteredUsers = users?.filter(user => 
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  ).sort((a, b) => b.id - a.id) || [];
 
   const handleQuickUpdate = (user: User, updates: Partial<User>) => {
     updateUser.mutate(
@@ -266,14 +268,14 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell>
                       <Switch
-                        checked={!user.isBanned}
-                        onCheckedChange={(checked) => handleQuickUpdate(user, { isBanned: !checked })}
+                        checked={user.isBanned || false}
+                        onCheckedChange={(checked) => handleQuickUpdate(user, { isBanned: checked })}
                       />
                     </TableCell>
                     <TableCell>
                       <Switch
-                        checked={!user.withdrawalProhibited}
-                        onCheckedChange={(checked) => handleQuickUpdate(user, { withdrawalProhibited: !checked })}
+                        checked={user.withdrawalProhibited || false}
+                        onCheckedChange={(checked) => handleQuickUpdate(user, { withdrawalProhibited: checked })}
                       />
                     </TableCell>
                     <TableCell>
@@ -426,32 +428,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* Order Button */}
-                        <Dialog open={orderDialogOpen && selectedUser?.id === user.id} onOpenChange={setOrderDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="h-6 px-2 text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100"
-                              onClick={() => setSelectedUser(user)}
-                            >
-                              <Wallet className="w-3 h-3 mr-1" />
-                              Order
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-3xl">
-                            <DialogHeader>
-                              <DialogTitle>User Orders: {selectedUser?.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="text-center py-8 text-gray-500">
-                                <Wallet className="w-12 h-12 mx-auto mb-2" />
-                                <p>No orders found for this user</p>
-                                <p className="text-sm">Orders and trading history will appear here</p>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+
 
                         {/* Deposit Button */}
                         <Dialog open={depositDialogOpen && selectedUser?.id === user.id} onOpenChange={setDepositDialogOpen}>
@@ -537,32 +514,7 @@ export function MemberManagement() {
                           </DialogContent>
                         </Dialog>
 
-                        {/* Other/Edit Button */}
-                        <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="h-6 px-2 text-xs bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                              onClick={() => setSelectedUser(user)}
-                            >
-                              <Edit className="w-3 h-3 mr-1" />
-                              Other
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Edit User: {selectedUser?.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="text-center py-8 text-gray-500">
-                                <Edit className="w-12 h-12 mx-auto mb-2" />
-                                <p>Additional user settings</p>
-                                <p className="text-sm">Advanced configuration options will appear here</p>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+
 
                         {/* Freeze Button */}
                         <Dialog open={freezeDialogOpen && selectedUser?.id === user.id} onOpenChange={setFreezeDialogOpen}>

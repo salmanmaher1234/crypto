@@ -5,7 +5,8 @@ import {
   transactions, 
   bettingOrders, 
   withdrawalRequests, 
-  announcements 
+  announcements,
+  messages 
 } from "@shared/schema";
 import type { 
   User, 
@@ -19,7 +20,9 @@ import type {
   WithdrawalRequest, 
   InsertWithdrawalRequest, 
   Announcement, 
-  InsertAnnouncement 
+  InsertAnnouncement,
+  Message,
+  InsertMessage 
 } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { IStorage } from "./storage";
@@ -209,10 +212,21 @@ export class DatabaseStorage implements IStorage {
       // Add/subtract profit to/from total balance
       const newBalance = currentBalance + finalProfitAmount;
 
-      // Update user balance
+      // Update VIP Level based on profit/loss (5 points increase/decrease, max 100)
+      let newReputation = user.reputation || 100;
+      if (finalProfitAmount > 0) {
+        // Profit: increase VIP level by 5 (max 100)
+        newReputation = Math.min(100, newReputation + 5);
+      } else if (finalProfitAmount < 0) {
+        // Loss: decrease VIP level by 5 (min 0)
+        newReputation = Math.max(0, newReputation - 5);
+      }
+
+      // Update user balance and reputation
       await db.update(users).set({
         availableBalance: newAvailable.toFixed(2),
         balance: newBalance.toFixed(2),
+        reputation: newReputation,
       }).where(eq(users.id, order.userId));
 
       // Update order status
@@ -306,5 +320,24 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(bankAccounts, eq(users.id, bankAccounts.userId))
       .where(eq(users.role, "customer"))
       .orderBy(users.id, bankAccounts.id);
+  }
+
+  // Messages
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const result = await db.insert(messages).values(insertMessage).returning();
+    return result[0];
+  }
+
+  async getMessagesByUserId(userId: number): Promise<Message[]> {
+    return await db.select().from(messages).where(eq(messages.toUserId, userId)).orderBy(desc(messages.createdAt));
+  }
+
+  async markMessageAsRead(id: number): Promise<boolean> {
+    try {
+      await db.update(messages).set({ isRead: true }).where(eq(messages.id, id));
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
