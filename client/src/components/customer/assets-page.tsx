@@ -178,7 +178,9 @@ export function AssetsPage() {
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600">Comment</span>
-                  <span className="text-gray-900">-</span>
+                  <span className={selectedWithdraw.status === 'rejected' && selectedWithdraw.note ? "text-red-600" : "text-gray-900"}>
+                    {selectedWithdraw.status === 'rejected' && selectedWithdraw.note ? selectedWithdraw.note : "-"}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -357,8 +359,15 @@ export function AssetsPage() {
                           {/* Status Column */}
                           <div>
                             <div className="text-sm text-gray-600 mb-1">Status</div>
-                            <div className="text-sm text-blue-600 font-medium">
-                              {withdrawal.status === 'pending' ? 'Applied' : withdrawal.status}
+                            <div className={`text-sm font-medium ${
+                              withdrawal.status === 'rejected' ? 'text-red-600' : 
+                              withdrawal.status === 'approved' ? 'text-green-600' : 
+                              'text-blue-600'
+                            }`}>
+                              {withdrawal.status === 'pending' ? 'Applied' : 
+                               withdrawal.status === 'approved' ? 'Approved' : 
+                               withdrawal.status === 'rejected' ? 'Rejected' : 
+                               withdrawal.status}
                             </div>
                           </div>
                           
@@ -389,6 +398,14 @@ export function AssetsPage() {
                             <ChevronRight className="w-5 h-5" />
                           </button>
                         </div>
+                        
+                        {/* Show rejection note if available */}
+                        {withdrawal.status === 'rejected' && withdrawal.note && (
+                          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                            <div className="text-xs text-red-600 font-medium mb-1">Rejection Reason:</div>
+                            <div className="text-xs text-red-700">{withdrawal.note}</div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -459,8 +476,15 @@ export function AssetsPage() {
                           {/* Status Column */}
                           <div>
                             <div className="text-sm text-gray-600 mb-1">Status</div>
-                            <div className="text-sm text-blue-600 font-medium">
-                              {withdrawal.status === 'pending' ? 'Applied' : withdrawal.status}
+                            <div className={`text-sm font-medium ${
+                              withdrawal.status === 'rejected' ? 'text-red-600' : 
+                              withdrawal.status === 'approved' ? 'text-green-600' : 
+                              'text-blue-600'
+                            }`}>
+                              {withdrawal.status === 'pending' ? 'Applied' : 
+                               withdrawal.status === 'approved' ? 'Approved' : 
+                               withdrawal.status === 'rejected' ? 'Rejected' : 
+                               withdrawal.status}
                             </div>
                           </div>
                           
