@@ -53,6 +53,8 @@ export function MemberManagement() {
   const [freezeAmount, setFreezeAmount] = useState("");
   const [unfreezeDialogOpen, setUnfreezeDialogOpen] = useState(false);
   const [unfreezeAmount, setUnfreezeAmount] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Filter users based on search term
   const filteredUsers = users?.filter(user => 
@@ -63,7 +65,7 @@ export function MemberManagement() {
 
   const handleQuickUpdate = (user: User, updates: Partial<User>) => {
     updateUser.mutate(
-      { id: user.id, ...updates },
+      { id: user.id, updates },
       {
         onSuccess: () => {
           toast({ title: "User updated successfully" });
@@ -294,10 +296,61 @@ export function MemberManagement() {
                               <DialogTitle>Password Management</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4">
-                              <div className="text-center py-8 text-gray-500">
-                                <Key className="w-12 h-12 mx-auto mb-2" />
-                                <p>Password management functionality</p>
-                                <p className="text-sm">This feature will be implemented soon</p>
+                              <div className="space-y-4">
+                                <div>
+                                  <Label htmlFor="new-password">New Password</Label>
+                                  <Input
+                                    id="new-password"
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="Enter new password"
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                                  <Input
+                                    id="confirm-password"
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Confirm new password"
+                                  />
+                                </div>
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setPasswordDialogOpen(false);
+                                      setNewPassword("");
+                                      setConfirmPassword("");
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      if (newPassword !== confirmPassword) {
+                                        toast({ title: "Passwords do not match", variant: "destructive" });
+                                        return;
+                                      }
+                                      if (newPassword.length < 4) {
+                                        toast({ title: "Password must be at least 4 characters", variant: "destructive" });
+                                        return;
+                                      }
+                                      if (selectedUser) {
+                                        handleQuickUpdate(selectedUser, { password: newPassword });
+                                        setPasswordDialogOpen(false);
+                                        setNewPassword("");
+                                        setConfirmPassword("");
+                                        toast({ title: "Password updated successfully" });
+                                      }
+                                    }}
+                                    disabled={!newPassword || !confirmPassword}
+                                  >
+                                    Update Password
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </DialogContent>
