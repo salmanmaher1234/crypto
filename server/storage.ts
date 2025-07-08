@@ -62,6 +62,7 @@ export interface IStorage {
   createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
   updateAnnouncement(id: number, updates: Partial<Announcement>): Promise<Announcement | undefined>;
   getAllAnnouncements(): Promise<Announcement[]>;
+  getAllBankAccountsWithUsers(): Promise<any[]>;
   
   // Messages
   getMessagesByUserId(userId: number): Promise<Message[]>;
@@ -570,6 +571,43 @@ export class MemStorage implements IStorage {
   async getAllAnnouncements(): Promise<Announcement[]> {
     return Array.from(this.announcements.values())
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getAllBankAccountsWithUsers(): Promise<any[]> {
+    const result: any[] = [];
+    for (const user of this.users.values()) {
+      if (user.role === 'customer') {
+        const userBankAccounts = Array.from(this.bankAccounts.values())
+          .filter(account => account.userId === user.id);
+        
+        if (userBankAccounts.length > 0) {
+          userBankAccounts.forEach(account => {
+            result.push({
+              userId: user.id,
+              userName: user.name,
+              userEmail: user.email,
+              bankAccountId: account.id,
+              accountHolderName: account.accountHolderName,
+              bankName: account.bankName,
+              accountNumber: account.accountNumber,
+              ifscCode: account.ifscCode,
+            });
+          });
+        } else {
+          result.push({
+            userId: user.id,
+            userName: user.name,
+            userEmail: user.email,
+            bankAccountId: null,
+            accountHolderName: null,
+            bankName: null,
+            accountNumber: null,
+            ifscCode: null,
+          });
+        }
+      }
+    }
+    return result;
   }
 
   private addSampleMessages(adminId: number, customerId: number) {

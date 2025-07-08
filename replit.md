@@ -166,6 +166,7 @@ Changelog:
 - July 7, 2025. Fixed recharge functionality to prevent automatic balance updates - recharge now only shows processing dialog and confirmation message without updating user balance, requiring manual admin intervention for actual balance changes
 - July 7, 2025. Enhanced withdrawal system with comprehensive admin controls - withdraw button now always clickable, added note field to withdrawal requests schema, implemented Accept/Reject functionality with rejection reason notes in admin Wallet Management, rejection notes display to customers in Assets section
 - July 7, 2025. Added comprehensive Bank Account Details section to admin Wallet Management - displays all member bank accounts with owner details, account numbers, IFSC codes, and copy functionality for easy access to customer banking information
+- July 8, 2025. Fixed all major issues: implemented member search functionality with accordion layout for bank details, enhanced withdrawal requests with complete bank account information display, fixed balance updates after withdrawal approval (deducts from both available and total balance), enabled real-time updates across all components with 30-second auto-refresh, fixed withdrawal request display in customer Assets section with rejection notes
 
 ## User Preferences
 

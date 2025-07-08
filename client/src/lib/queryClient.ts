@@ -64,12 +64,12 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchIntervalInBackground: false,
-      staleTime: 30 * 60 * 1000, // 30 minutes
+      refetchInterval: 30000, // Auto-refetch every 30 seconds
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      refetchIntervalInBackground: true,
+      staleTime: 5 * 1000, // 5 seconds
       gcTime: 60 * 60 * 1000, // 1 hour
       retry: 1,
     },
@@ -78,3 +78,11 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Auto-invalidate key queries every 10 seconds for real-time updates
+setInterval(() => {
+  queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+  queryClient.invalidateQueries({ queryKey: ["/api/withdrawal-requests"] });
+  queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+  queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+}, 10000);

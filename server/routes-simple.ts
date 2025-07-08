@@ -274,10 +274,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
-      const bankAccounts = await storage.getBankAccountsByUserId((req as any).userId);
+      const user = await storage.getUser((req as any).userId);
+      let bankAccounts;
+      
+      if (user?.role === "admin") {
+        // For admin, get all bank accounts
+        const allUsers = await storage.getAllUsers();
+        bankAccounts = [];
+        for (const user of allUsers) {
+          const userAccounts = await storage.getBankAccountsByUserId(user.id);
+          bankAccounts.push(...userAccounts);
+        }
+      } else {
+        bankAccounts = await storage.getBankAccountsByUserId((req as any).userId);
+      }
+      
       res.json(bankAccounts);
     } catch (error) {
       res.status(500).json({ message: "Failed to get bank accounts" });
+    }
+  });
+
+  app.get("/api/bank-accounts-with-users", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const accountsWithUsers = await storage.getAllBankAccountsWithUsers();
+      res.json(accountsWithUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get bank accounts with users" });
     }
   });
 
@@ -636,18 +659,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/withdrawal-requests/:id", authenticateUser, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { status } = req.body;
+      const { status, note } = req.body;
       
-      const updatedRequest = await storage.updateWithdrawalRequest(id, {
+      const updateData: any = {
         status,
         processedAt: new Date(),
-      });
+      };
+      
+      if (note) {
+        updateData.note = note;
+      }
+      
+      const updatedRequest = await storage.updateWithdrawalRequest(id, updateData);
       
       if (!updatedRequest) {
         return res.status(404).json({ message: "Request not found" });
       }
       
-      // If approved, create withdrawal transaction
+      // If approved, create withdrawal transaction and update user balance
       if (status === "approved") {
         await storage.createTransaction({
           userId: updatedRequest.userId,
@@ -656,6 +685,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: "completed",
           description: "Withdrawal approved",
         });
+        
+        // Deduct withdrawal amount from user's available balance
+        const user = await storage.getUser(updatedRequest.userId);
+        if (user) {
+          const withdrawalAmount = parseFloat(updatedRequest.amount);
+          const currentAvailable = parseFloat(user.availableBalance);
+          const currentTotal = parseFloat(user.balance);
+          
+          const newAvailable = Math.max(0, currentAvailable - withdrawalAmount);
+          const newTotal = Math.max(0, currentTotal - withdrawalAmount);
+          
+          await storage.updateUser(updatedRequest.userId, {
+            availableBalance: newAvailable.toFixed(2),
+            balance: newTotal.toFixed(2),
+          });
+        }
       }
       
       res.json(updatedRequest);

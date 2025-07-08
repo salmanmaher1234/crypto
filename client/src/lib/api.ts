@@ -154,6 +154,7 @@ export function useCreateWithdrawalRequest() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/withdrawal-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
     },
   });
 }
@@ -162,12 +163,19 @@ export function useUpdateWithdrawalRequest() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await apiRequest("PATCH", `/api/withdrawal-requests/${id}`, { status });
+    mutationFn: async ({ id, status, note }: { id: number; status: string; note?: string }) => {
+      const updateData: any = { status };
+      if (note) {
+        updateData.note = note;
+      }
+      const response = await apiRequest("PATCH", `/api/withdrawal-requests/${id}`, updateData);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/withdrawal-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
     },
   });
 }
@@ -225,6 +233,12 @@ export function useMarkMessageAsRead() {
 export function useBankAccounts() {
   return useQuery<BankAccount[]>({
     queryKey: ["/api/bank-accounts"],
+  });
+}
+
+export function useBankAccountsWithUsers() {
+  return useQuery<any[]>({
+    queryKey: ["/api/bank-accounts-with-users"],
   });
 }
 

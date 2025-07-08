@@ -163,4 +163,22 @@ export class DatabaseStorage implements IStorage {
   async getAllAnnouncements(): Promise<Announcement[]> {
     return await db.select().from(announcements).orderBy(desc(announcements.createdAt));
   }
+
+  async getAllBankAccountsWithUsers(): Promise<any[]> {
+    return await db
+      .select({
+        userId: users.id,
+        userName: users.name,
+        userEmail: users.email,
+        bankAccountId: bankAccounts.id,
+        accountHolderName: bankAccounts.accountHolderName,
+        bankName: bankAccounts.bankName,
+        accountNumber: bankAccounts.accountNumber,
+        ifscCode: bankAccounts.ifscCode,
+      })
+      .from(users)
+      .leftJoin(bankAccounts, eq(users.id, bankAccounts.userId))
+      .where(eq(users.role, "customer"))
+      .orderBy(users.id, bankAccounts.id);
+  }
 }
