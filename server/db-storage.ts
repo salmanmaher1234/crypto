@@ -215,20 +215,22 @@ export class DatabaseStorage implements IStorage {
       const baseProfitAmount = orderAmount * (profitPercentage / 100);
       
       // Apply direction-based profit calculation using user's Member Management direction setting
-      let finalProfitAmount = baseProfitAmount;
+      // Customer profits are always positive, but balance impact varies by direction
+      let finalProfitAmount = baseProfitAmount; // Always positive for customer display
       let result: "win" | "loss" = "win";
+      let balanceImpact = baseProfitAmount; // This affects actual balance calculation
       
       if (user.direction === "Buy Up") {
-        // Buy Up = Profit is added (positive)
-        finalProfitAmount = baseProfitAmount;
+        // Buy Up = Profit is added to balance (positive impact)
+        balanceImpact = baseProfitAmount;
         result = "win";
       } else if (user.direction === "Buy Down") {
-        // Buy Down = Profit is subtracted (negative) 
-        finalProfitAmount = -baseProfitAmount;
-        result = "loss";
+        // Buy Down = Profit is subtracted from balance (negative impact) but shown as positive to customer
+        balanceImpact = -baseProfitAmount;
+        result = "loss"; // For display purposes, but profit amount stays positive
       } else {
         // Default "Actual" behavior - always positive
-        finalProfitAmount = baseProfitAmount;
+        balanceImpact = baseProfitAmount;
         result = "win";
       }
 
@@ -236,17 +238,17 @@ export class DatabaseStorage implements IStorage {
       const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
       const currentBalance = parseFloat(user.balance || "0");
       
-      // Return original order amount + calculated profit to available balance
-      const newAvailable = currentAvailable + orderAmount + finalProfitAmount;
-      // Add/subtract profit to/from total balance
-      const newBalance = currentBalance + finalProfitAmount;
+      // Return original order amount + calculated profit to available balance (using balanceImpact)
+      const newAvailable = currentAvailable + orderAmount + balanceImpact;
+      // Add/subtract profit to/from total balance (using balanceImpact)
+      const newBalance = currentBalance + balanceImpact;
 
       // Update VIP Level based on profit/loss (5 points increase/decrease, max 100)
       let newReputation = user.reputation || 100;
-      if (finalProfitAmount > 0) {
+      if (balanceImpact > 0) {
         // Profit: increase VIP level by 5 (max 100)
         newReputation = Math.min(100, newReputation + 5);
-      } else if (finalProfitAmount < 0) {
+      } else if (balanceImpact < 0) {
         // Loss: decrease VIP level by 5 (min 0)
         newReputation = Math.max(0, newReputation - 5);
       }
@@ -265,7 +267,7 @@ export class DatabaseStorage implements IStorage {
         exitPrice: order.entryPrice, // Using same price for simplicity
       }).where(eq(bettingOrders.id, orderId));
 
-      console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} (User Direction: ${user.direction})`);
+      console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: +${finalProfitAmount.toFixed(2)} (User Direction: ${user.direction}, Balance Impact: ${balanceImpact >= 0 ? '+' : ''}${balanceImpact.toFixed(2)})`);
     } catch (error) {
       console.error('Error expiring order:', error);
     }

@@ -163,9 +163,8 @@ export function CustomerBettingOrders() {
     };
     
     const profitPercentage = getScaleProfitPercentage(selectedOrder.duration);
-    const profit = selectedOrder.result === "win" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 
-                   selectedOrder.result === "loss" ? -parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 
-                   selectedOrder.status === "completed" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 0;
+    // Customer profits are always positive regardless of result
+    const profit = selectedOrder.status === "completed" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 0;
     
     return (
       <div className="p-4 bg-white min-h-screen">
@@ -328,9 +327,8 @@ export function CustomerBettingOrders() {
               };
               
               const profitPercentage = getScaleProfitPercentage(order.duration);
-              const profit = order.result === "win" ? parseFloat(order.amount) * (profitPercentage / 100) : 
-                           order.result === "loss" ? -parseFloat(order.amount) : 
-                           order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
+              // Customer profits are always positive regardless of result  
+              const profit = order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
               const isProfit = profit > 0;
               
               return (

@@ -188,6 +188,7 @@ Changelog:
 - July 9, 2025. Fixed credit score editing functionality in Member Management "Other" button - added proper state management with local creditScore state, implemented Save/Cancel buttons with validation, credit scores now properly editable and updatable (0-100 range) with real-time feedback and toast notifications
 - July 9, 2025. Enhanced mobile UI spacing across all customer components - increased bottom padding to pb-[90px] on mobile and pb-[100px] on small screens, enhanced navigation bar height with min-height controls, improved touch-friendly button sizing and spacing to prevent content overlap with bottom navigation tabs
 - July 9, 2025. Fixed order direction display in customer betting orders view - orders now display user's current backend-managed direction setting instead of stored order direction, ensuring consistent Buy Up/Buy Down display that reflects admin panel direction controls for both list view and detail view
+- July 9, 2025. Fixed customer profit display to never show negative values - customer profits are always displayed as positive amounts regardless of direction, while backend maintains direction-based balance calculations for actual balance impact, ensuring customer experience shows only positive profit values
 
 ## User Preferences
 

@@ -496,27 +496,29 @@ export class MemStorage implements IStorage {
       const currentBalance = parseFloat(user.balance || "0");
       
       // Apply direction-based profit calculation
-      let finalProfitAmount = baseProfitAmount;
+      // Customer profits are always positive, but balance impact varies by direction
+      let finalProfitAmount = baseProfitAmount; // Always positive for customer display
       let result: "win" | "loss" = "win";
+      let balanceImpact = baseProfitAmount; // This affects actual balance calculation
       
       if (user.direction === "Buy Up") {
-        // Buy Up = Profit is added (positive)
-        finalProfitAmount = baseProfitAmount;
+        // Buy Up = Profit is added to balance (positive impact)
+        balanceImpact = baseProfitAmount;
         result = "win";
       } else if (user.direction === "Buy Down") {
-        // Buy Down = Profit is subtracted (negative)
-        finalProfitAmount = -baseProfitAmount;
-        result = "loss";
+        // Buy Down = Profit is subtracted from balance (negative impact) but shown as positive to customer
+        balanceImpact = -baseProfitAmount;
+        result = "loss"; // For display purposes, but profit amount stays positive
       } else {
         // Default "Actual" behavior - always positive
-        finalProfitAmount = baseProfitAmount;
+        balanceImpact = baseProfitAmount;
         result = "win";
       }
       
-      // Return original order amount + calculated profit to available balance
-      const newAvailable = currentAvailable + orderAmount + finalProfitAmount;
-      // Add/subtract profit to/from total balance
-      const newBalance = currentBalance + finalProfitAmount;
+      // Return original order amount + calculated profit to available balance (using balanceImpact)
+      const newAvailable = currentAvailable + orderAmount + balanceImpact;
+      // Add/subtract profit to/from total balance (using balanceImpact)
+      const newBalance = currentBalance + balanceImpact;
       
       const updatedUser = {
         ...user,
@@ -525,7 +527,7 @@ export class MemStorage implements IStorage {
       };
       this.users.set(order.userId, updatedUser);
       
-      console.log(`User ${user.username} (Direction: ${user.direction}) balance updated: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} profit. New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
+      console.log(`User ${user.username} (Direction: ${user.direction}) balance updated: +${finalProfitAmount.toFixed(2)} profit (Balance Impact: ${balanceImpact >= 0 ? '+' : ''}${balanceImpact.toFixed(2)}). New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
     }
     
     const updatedOrder = {
@@ -536,7 +538,7 @@ export class MemStorage implements IStorage {
     };
     
     this.bettingOrders.set(orderId, updatedOrder);
-    console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: ${finalProfitAmount >= 0 ? '+' : ''}${finalProfitAmount.toFixed(2)} (Direction: ${user?.direction})`);
+    console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: +${finalProfitAmount.toFixed(2)} (User Direction: ${user?.direction}, Balance Impact: ${balanceImpact >= 0 ? '+' : ''}${balanceImpact.toFixed(2)})`);
   }
 
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {
