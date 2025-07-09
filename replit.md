@@ -185,6 +185,8 @@ Changelog:
 - July 9, 2025. Removed specified cryptocurrency markets (PSG/USDT, JUV/USDT, ATM/USDT, EOS/USDT) from both crypto-home and crypto-trading components as requested
 - July 9, 2025. Added "Other" button to Member Management with Settings icon - provides configurable credit score management (0-100) for individual customers from admin panel
 - July 9, 2025. Implemented backend-managed Buy Up/Down direction system - admin-set direction in Member Management now overrides customer's trading interface choices, ensuring all orders use the direction configured by admin rather than customer selection
+- July 9, 2025. Fixed credit score editing functionality in Member Management "Other" button - added proper state management with local creditScore state, implemented Save/Cancel buttons with validation, credit scores now properly editable and updatable (0-100 range) with real-time feedback and toast notifications
+- July 9, 2025. Enhanced mobile UI spacing across all customer components - increased bottom padding to pb-[90px] on mobile and pb-[100px] on small screens, enhanced navigation bar height with min-height controls, improved touch-friendly button sizing and spacing to prevent content overlap with bottom navigation tabs
 
 ## User Preferences
 
