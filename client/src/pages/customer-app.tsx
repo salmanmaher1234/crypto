@@ -120,9 +120,9 @@ export default function CustomerApp() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto pb-20 sm:pb-24 md:pb-16">
+      <main className="flex-1 overflow-auto pb-[90px] sm:pb-[100px] md:pb-[80px]">
         <div className="w-full h-full">
-          <div className="pb-4 sm:pb-6 md:pb-8">
+          <div className="pb-6 sm:pb-8 md:pb-10">
             {renderSection()}
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function CustomerApp() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-inset">
         <div className="w-full max-w-screen-xl mx-auto">
-          <div className="grid grid-cols-5 py-2 sm:py-3">
+          <div className="grid grid-cols-5 py-3 sm:py-4 min-h-[70px] sm:min-h-[80px]">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
@@ -141,13 +141,13 @@ export default function CustomerApp() {
                     setSelectedCurrency(null);
                     setActiveSection(section.id);
                   }}
-                  className={`flex flex-col items-center py-2 px-1 transition-colors duration-200 ${
+                  className={`flex flex-col items-center justify-center py-2 px-1 transition-colors duration-200 ${
                     activeSection === section.id && !selectedCurrency
                       ? "text-primary bg-primary/5"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-1" />
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 mb-1" />
                   <span className="text-xs sm:text-sm font-medium">{section.label}</span>
                 </button>
               );
