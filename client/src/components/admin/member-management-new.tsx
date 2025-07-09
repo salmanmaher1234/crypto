@@ -57,6 +57,7 @@ export function MemberManagement() {
   const [unfreezeAmount, setUnfreezeAmount] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [otherDialogOpen, setOtherDialogOpen] = useState(false);
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
   const [newMemberData, setNewMemberData] = useState({
     username: "",
@@ -803,6 +804,52 @@ export function MemberManagement() {
                                 </Button>
                                 <Button onClick={handleSendMessage} disabled={!messageTitle || !messageContent}>
                                   Send Message
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+
+                        {/* Other Button */}
+                        <Dialog open={otherDialogOpen && selectedUser?.id === user.id} onOpenChange={setOtherDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-6 px-2 text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100"
+                              onClick={() => setSelectedUser(user)}
+                            >
+                              <Settings className="w-3 h-3 mr-1" />
+                              Other
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Other Settings for {selectedUser?.name}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label>Credit Score</Label>
+                                <Input
+                                  type="number"
+                                  value={selectedUser?.reputation || 100}
+                                  onChange={(e) => {
+                                    const newScore = parseInt(e.target.value);
+                                    if (newScore >= 0 && newScore <= 100 && selectedUser) {
+                                      handleQuickUpdate(selectedUser, { reputation: newScore });
+                                    }
+                                  }}
+                                  min="0"
+                                  max="100"
+                                  placeholder="Credit Score (0-100)"
+                                />
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Set customer credit score (0-100)
+                                </p>
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setOtherDialogOpen(false)}>
+                                  Close
                                 </Button>
                               </div>
                             </div>

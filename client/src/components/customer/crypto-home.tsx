@@ -125,42 +125,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       icon: "₿",
       color: "green"
     },
-    {
-      symbol: "PSG/USDT",
-      name: "Paris Saint-Germain",
-      price: cryptoPrices?.["PSG/USD"]?.price || "1.417",
-      change: cryptoPrices?.["PSG/USD"]?.change || "-2.01%",
-      isPositive: cryptoPrices?.["PSG/USD"]?.change ? !cryptoPrices["PSG/USD"].change.startsWith('-') : false,
-      icon: "⚽",
-      color: "blue"
-    },
-    {
-      symbol: "JUV/USDT",
-      name: "Juventus",
-      price: cryptoPrices?.["JUV/USD"]?.price || "0.901",
-      change: cryptoPrices?.["JUV/USD"]?.change || "-1.42%",
-      isPositive: cryptoPrices?.["JUV/USD"]?.change ? !cryptoPrices["JUV/USD"].change.startsWith('-') : false,
-      icon: "⚽",
-      color: "black"
-    },
-    {
-      symbol: "ATM/USDT",
-      name: "Atletico Madrid",
-      price: cryptoPrices?.["ATM/USD"]?.price || "0.999",
-      change: cryptoPrices?.["ATM/USD"]?.change || "-1.87%",
-      isPositive: cryptoPrices?.["ATM/USD"]?.change ? !cryptoPrices["ATM/USD"].change.startsWith('-') : false,
-      icon: "⚽",
-      color: "red"
-    },
-    {
-      symbol: "EOS/USDT",
-      name: "EOS",
-      price: cryptoPrices?.["EOS/USD"]?.price || "0.75",
-      change: cryptoPrices?.["EOS/USD"]?.change || "0.00%",
-      isPositive: cryptoPrices?.["EOS/USD"]?.change ? !cryptoPrices["EOS/USD"].change.startsWith('-') : true,
-      icon: "◉",
-      color: "gray"
-    },
+
     {
       symbol: "TRX/USDT",
       name: "TRON",

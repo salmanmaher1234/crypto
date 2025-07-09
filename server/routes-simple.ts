@@ -597,6 +597,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("User ID:", (req as any).userId);
       console.log("Order data:", req.body);
       
+      // Get user to check their direction setting from admin panel
+      const user = await storage.getUser((req as any).userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
       // Generate unique order ID
       const orderId = `ORD${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
       
@@ -606,12 +612,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields" });
       }
       
+      // Use admin-managed direction from user profile instead of customer's choice
+      const effectiveDirection = user.direction || "Buy Up";
+      console.log(`Using admin-managed direction: ${effectiveDirection} (original customer choice: ${direction})`);
+      
       // Prepare complete order data with all required fields
       const orderData = {
         userId: (req as any).userId,
         asset,
         amount: orderAmount,
-        direction,
+        direction: effectiveDirection, // Use backend-managed direction
         duration: parseInt(duration),
         entryPrice,
         orderId,
@@ -624,7 +634,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Created order:", order);
       
       // Deduct amount from available balance
-      const user = await storage.getUser((req as any).userId);
       console.log("Current user before balance update:", user);
       
       if (user) {

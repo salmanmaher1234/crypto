@@ -137,54 +137,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
       volumeBTC: "3456",
       transactions: "678901"
     },
-    "PSG": {
-      name: "Paris Saint-Germain",
-      symbol: "PSG/USDT",
-      price: "1.417",
-      change: "-2.01%",
-      isPositive: false,
-      highestPrice: "1.520",
-      lowestPrice: "1.380",
-      volume24h: "456789G7I",
-      volumeBTC: "567",
-      transactions: "345678"
-    },
-    "JUV": {
-      name: "Juventus",
-      symbol: "JUV/USDT",
-      price: "0.901",
-      change: "-1.42%",
-      isPositive: false,
-      highestPrice: "0.950",
-      lowestPrice: "0.880",
-      volume24h: "567890H8J",
-      volumeBTC: "678",
-      transactions: "456789"
-    },
-    "ATM": {
-      name: "Atletico Madrid",
-      symbol: "ATM/USDT",
-      price: "0.999",
-      change: "-1.87%",
-      isPositive: false,
-      highestPrice: "1.050",
-      lowestPrice: "0.950",
-      volume24h: "678901I9K",
-      volumeBTC: "789",
-      transactions: "567890"
-    },
-    "EOS": {
-      name: "EOS",
-      symbol: "EOS/USDT",
-      price: "0",
-      change: "0.00%",
-      isPositive: true,
-      highestPrice: "0.80",
-      lowestPrice: "0.70",
-      volume24h: "789012J0L",
-      volumeBTC: "890",
-      transactions: "678901"
-    },
+
     "TRX": {
       name: "TRON",
       symbol: "TRX/USDT",
