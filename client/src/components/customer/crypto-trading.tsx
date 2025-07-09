@@ -278,7 +278,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8 sm:pb-12 md:pb-16">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={onBack}>

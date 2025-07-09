@@ -192,7 +192,7 @@ export function AssetsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="p-4">
+      <div className="p-4 pb-8 sm:pb-12 md:pb-16">
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">

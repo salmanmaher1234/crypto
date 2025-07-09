@@ -551,7 +551,7 @@ export function Profile() {
   // Main Profile View
   if (currentView === 'main') {
     return (
-      <div className="min-h-screen bg-gray-100 p-4">
+      <div className="min-h-screen bg-gray-100 p-4 pb-8 sm:pb-12 md:pb-16">
         <Card className="max-w-md mx-auto">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-lg font-medium">Profile</CardTitle>
@@ -1782,7 +1782,7 @@ export function Profile() {
 
   // Other views (Personal Info, Security, etc.)
   const renderSubView = (title: string, content: React.ReactNode) => (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-4 pb-8 sm:pb-12 md:pb-16">
       <Card className="max-w-md mx-auto">
         <CardHeader className="flex flex-row items-center space-y-0 pb-4">
           <Button variant="ghost" size="sm" onClick={() => setCurrentView('main')}>
