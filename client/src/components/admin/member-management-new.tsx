@@ -330,13 +330,13 @@ export function MemberManagement() {
         </CardHeader>
         <CardContent className="p-2">
           <div className="overflow-x-auto">
-            <Table className="min-w-[1600px] table-fixed">
+            <Table className="min-w-[1700px] table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px] text-center">ID</TableHead>
                   <TableHead className="w-[100px]">Username</TableHead>
                   <TableHead className="w-[180px]">Balance</TableHead>
-                  <TableHead className="w-[100px] text-center">VIP Level</TableHead>
+                  <TableHead className="w-[120px] text-center">VIP Level</TableHead>
                   <TableHead className="w-[100px] text-center">General Agent</TableHead>
                   <TableHead className="w-[100px] text-center">Invitation Code</TableHead>
                   <TableHead className="w-[80px] text-center">Type</TableHead>
@@ -366,15 +366,17 @@ export function MemberManagement() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center w-[100px]">
-                      <Badge variant="outline" className="text-xs px-1 py-0.5">
-                        {user.reputation || 5}/5
-                      </Badge>
-                      <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                        <div 
-                          className="bg-primary h-1 rounded-full transition-all duration-300" 
-                          style={{ width: `${((user.reputation || 5) / 5) * 100}%` }}
-                        ></div>
+                    <TableCell className="text-center w-[120px] p-2">
+                      <div className="flex flex-col items-center space-y-1">
+                        <Badge variant="outline" className="text-xs px-1 py-0.5 whitespace-nowrap">
+                          {user.reputation || 5}/5
+                        </Badge>
+                        <div className="w-16 bg-gray-200 rounded-full h-1">
+                          <div 
+                            className="bg-primary h-1 rounded-full transition-all duration-300" 
+                            style={{ width: `${((user.reputation || 5) / 5) * 100}%` }}
+                          ></div>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-xs text-center w-[100px] truncate">{user.generalAgent || "admin"}</TableCell>
