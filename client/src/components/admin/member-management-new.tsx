@@ -842,9 +842,6 @@ export function MemberManagement() {
                                   max="5"
                                   placeholder="Credit Score (0-5)"
                                 />
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  Set customer credit score (0-5)
-                                </p>
                               </div>
                               <div className="flex justify-end gap-2">
                                 <Button variant="outline" onClick={() => {

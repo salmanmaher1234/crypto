@@ -146,6 +146,33 @@ export class MemStorage implements IStorage {
     };
     this.users.set(customerId, customer);
 
+    // Create additional customer user
+    const johnId = this.currentId++;
+    const john: User = {
+      id: johnId,
+      username: "john",
+      email: "john@email.com",
+      password: "password123",
+      name: "John Smith", 
+      role: "customer",
+      balance: "8500.00",
+      availableBalance: "8000.00",
+      frozenBalance: "500.00",
+      reputation: 5,
+      winLoseSetting: "To Win",
+      direction: "Actual",
+      accountStatus: "Active",
+      withdrawalStatus: "Allowed",
+      fundPassword: null,
+      invitationCode: null,
+      agentInvitationCode: null,
+      profileImage: null,
+      signatureData: null,
+      signatureName: null,
+      isActive: true,
+    };
+    this.users.set(johnId, john);
+
     // Add sample betting orders for sarah - use hard-coded ID 2 since that's the second user
     this.addSampleBettingOrders(2);
     

@@ -14,7 +14,7 @@ export const users = pgTable("users", {
   frozenBalance: decimal("frozen_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   reputation: integer("reputation").notNull().default(5),
   winLoseSetting: text("win_lose_setting").notNull().default("To Win"), // To Win, To Lose, Random
-  direction: text("direction").notNull().default("Buy Up"), // Buy Up, Buy Down, Actual
+  direction: text("direction").notNull().default("Actual"), // Buy Up, Buy Down, Actual
   isBanned: boolean("is_banned").notNull().default(false),
   withdrawalProhibited: boolean("withdrawal_prohibited").notNull().default(false),
   fundPassword: text("fund_password"),

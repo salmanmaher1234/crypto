@@ -117,7 +117,7 @@ export function BettingOrders() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order ID</TableHead>
+                  <TableHead>Customer Name</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Asset</TableHead>
                   <TableHead>Amount</TableHead>
