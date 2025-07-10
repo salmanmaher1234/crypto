@@ -190,6 +190,7 @@ Changelog:
 - July 9, 2025. Fixed order direction display in customer betting orders view - orders now display user's current backend-managed direction setting instead of stored order direction, ensuring consistent Buy Up/Buy Down display that reflects admin panel direction controls for both list view and detail view
 - July 9, 2025. Fixed customer profit display to never show negative values - customer profits are always displayed as positive amounts regardless of direction, while backend maintains direction-based balance calculations for actual balance impact, ensuring customer experience shows only positive profit values
 - July 9, 2025. Created comprehensive Hostinger deployment guide and automation script - added HOSTINGER_DEPLOYMENT.md with step-by-step instructions for hosting the application on Hostinger servers, including database setup, Node.js configuration, and deployment automation script for easy server deployment
+- July 10, 2025. Made requested UI improvements - removed help text from "Other" dialog in member management, changed betting orders to display customer names instead of order IDs with updated column heading, set default direction to "Actual" for all new members, fixed member management table design with proper column widths, improved alignment, and responsive layout
 
 ## User Preferences
 

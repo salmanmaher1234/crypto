@@ -330,61 +330,61 @@ export function MemberManagement() {
         </CardHeader>
         <CardContent className="p-2">
           <div className="overflow-x-auto">
-            <Table className="min-w-[1400px]">
+            <Table className="min-w-[1600px] table-fixed">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">ID</TableHead>
+                  <TableHead className="w-[50px] text-center">ID</TableHead>
                   <TableHead className="w-[100px]">Username</TableHead>
-                  <TableHead className="w-[120px]">Balance</TableHead>
-                  <TableHead className="w-[80px]">VIP Level</TableHead>
-                  <TableHead className="w-[100px]">General Agent</TableHead>
-                  <TableHead className="w-[100px]">Invitation Code</TableHead>
-                  <TableHead className="w-[80px]">Type</TableHead>
-                  <TableHead className="w-[80px]">Direction</TableHead>
-                  <TableHead className="w-[60px]">Ban</TableHead>
-                  <TableHead className="w-[80px]">Withdraw</TableHead>
-                  <TableHead className="w-[120px]">Registration Time</TableHead>
-                  <TableHead className="w-[100px]">Remark</TableHead>
-                  <TableHead className="w-[400px]">Operate</TableHead>
+                  <TableHead className="w-[180px]">Balance</TableHead>
+                  <TableHead className="w-[100px] text-center">VIP Level</TableHead>
+                  <TableHead className="w-[100px] text-center">General Agent</TableHead>
+                  <TableHead className="w-[100px] text-center">Invitation Code</TableHead>
+                  <TableHead className="w-[80px] text-center">Type</TableHead>
+                  <TableHead className="w-[90px] text-center">Direction</TableHead>
+                  <TableHead className="w-[60px] text-center">Ban</TableHead>
+                  <TableHead className="w-[80px] text-center">Withdraw</TableHead>
+                  <TableHead className="w-[110px] text-center">Registration Time</TableHead>
+                  <TableHead className="w-[100px] text-center">Remark</TableHead>
+                  <TableHead className="w-[500px] text-center">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell className="font-mono text-sm">{user.id}</TableCell>
-                    <TableCell className="font-medium">{user.username}</TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="text-sm">
+                    <TableCell className="font-mono text-sm text-center w-[50px]">{user.id}</TableCell>
+                    <TableCell className="font-medium w-[100px] truncate">{user.username}</TableCell>
+                    <TableCell className="w-[180px]">
+                      <div className="space-y-1 text-xs">
+                        <div>
                           Total: {(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(2)}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-gray-600">
                           Available: {parseFloat(user.availableBalance || "0").toFixed(2)}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-gray-600">
                           Frozen: {parseFloat(user.frozenBalance || "0").toFixed(2)}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="outline" className="text-xs px-2 py-1">
+                    <TableCell className="text-center w-[100px]">
+                      <Badge variant="outline" className="text-xs px-1 py-0.5">
                         {user.reputation || 5}/5
                       </Badge>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
                         <div 
-                          className="bg-primary h-1.5 rounded-full transition-all duration-300" 
+                          className="bg-primary h-1 rounded-full transition-all duration-300" 
                           style={{ width: `${((user.reputation || 5) / 5) * 100}%` }}
                         ></div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">{user.generalAgent || "admin"}</TableCell>
-                    <TableCell className="text-sm">{user.invitationCode || "100025"}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs text-center w-[100px] truncate">{user.generalAgent || "admin"}</TableCell>
+                    <TableCell className="text-xs text-center w-[100px] truncate">{user.invitationCode || "100025"}</TableCell>
+                    <TableCell className="w-[80px]">
                       <Select
                         value={user.userType || "Normal"}
                         onValueChange={(value) => handleQuickUpdate(user, { userType: value })}
                       >
-                        <SelectTrigger className="w-20 h-8 text-xs">
+                        <SelectTrigger className="w-full h-7 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -394,12 +394,12 @@ export function MemberManagement() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-[90px]">
                       <Select
-                        value={user.direction || "Buy Up"}
+                        value={user.direction || "Actual"}
                         onValueChange={(value) => handleQuickUpdate(user, { direction: value })}
                       >
-                        <SelectTrigger className="w-20 h-8 text-xs">
+                        <SelectTrigger className="w-full h-7 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -409,36 +409,38 @@ export function MemberManagement() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center w-[60px]">
                       <Switch
                         checked={user.isBanned || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { isBanned: checked })}
+                        className="scale-75"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center w-[80px]">
                       <Switch
                         checked={user.withdrawalProhibited || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { withdrawalProhibited: checked })}
+                        className="scale-75"
                       />
                     </TableCell>
-                    <TableCell>
-                      <div className="text-xs">
+                    <TableCell className="w-[110px]">
+                      <div className="text-xs text-center">
                         {user.registrationTime ? 
                           new Date(user.registrationTime).toLocaleDateString('en-GB') : 
                           new Date().toLocaleDateString('en-GB')
                         }
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-[100px]">
                       <Input
                         value={user.remark || ""}
                         onChange={(e) => handleQuickUpdate(user, { remark: e.target.value })}
-                        className="w-24 h-8 text-xs"
+                        className="w-full h-7 text-xs"
                         placeholder="Remark"
                       />
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
+                    <TableCell className="w-[500px]">
+                      <div className="flex flex-wrap gap-1 justify-start">
                         {/* Password Management Button */}
                         <Dialog open={passwordDialogOpen && selectedUser?.id === user.id} onOpenChange={setPasswordDialogOpen}>
                           <DialogTrigger asChild>
