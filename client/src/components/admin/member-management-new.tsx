@@ -369,12 +369,12 @@ export function MemberManagement() {
                     <TableCell className="text-center w-[120px] p-2">
                       <div className="flex flex-col items-center space-y-1">
                         <Badge variant="outline" className="text-xs px-1 py-0.5 whitespace-nowrap">
-                          {user.reputation || 5}/5
+                          {user.reputation || 100}/100
                         </Badge>
                         <div className="w-16 bg-gray-200 rounded-full h-1">
                           <div 
                             className="bg-primary h-1 rounded-full transition-all duration-300" 
-                            style={{ width: `${((user.reputation || 5) / 5) * 100}%` }}
+                            style={{ width: `${Math.min(100, Math.max(0, (user.reputation || 100)))}%` }}
                           ></div>
                         </div>
                       </div>
