@@ -12,12 +12,20 @@ function generateSessionId(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
+// Enhanced session validation with better error handling
 function getSessionUserId(req: any): number | null {
   const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
   if (!sessionId) return null;
   
   const session = sessions.get(sessionId);
-  if (!session || session.expires < Date.now()) {
+  if (!session) {
+    // Session not found - this is normal after server restart
+    console.log(`Session ${sessionId} not found in memory store`);
+    return null;
+  }
+  
+  if (session.expires < Date.now()) {
+    console.log(`Session ${sessionId} expired`);
     sessions.delete(sessionId);
     return null;
   }
@@ -34,6 +42,7 @@ function createSession(userId: number): string {
     userId,
     expires: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 days
   });
+  console.log(`Created session ${sessionId} for user ${userId}`);
   return sessionId;
 }
 
@@ -145,17 +154,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getSessionUserId(req);
       if (!userId) {
+        // Clear any existing cookie if session is invalid
+        res.clearCookie('sessionId');
         return res.status(401).json({ message: "Unauthorized" });
       }
       
       const user = await storage.getUser(userId);
       if (!user) {
+        // Clear session if user no longer exists
+        const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
+        if (sessionId) {
+          sessions.delete(sessionId);
+        }
+        res.clearCookie('sessionId');
         return res.status(404).json({ message: "User not found" });
       }
       
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error) {
+      console.error("Auth me error:", error);
       res.status(500).json({ message: "Failed to get user" });
     }
   });

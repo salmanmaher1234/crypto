@@ -19,6 +19,12 @@ export function useAuth() {
       queryClient.setQueryDefaults(["/api/auth/me"], { enabled: true });
       queryClient.refetchQueries({ queryKey: ["/api/auth/me"] }).then(() => {
         setIsInitialized(true);
+      }).catch((error) => {
+        console.log("Session validation failed on mount:", error);
+        // Clear invalid session and mark as initialized
+        localStorage.removeItem('sessionId');
+        queryClient.setQueryData(["/api/auth/me"], null);
+        setIsInitialized(true);
       });
     } else {
       setIsInitialized(true);
@@ -43,12 +49,10 @@ export function useAuth() {
       });
 
       if (response.status === 401) {
-        // Only clear session if we're sure it's invalid
-        // Don't clear on network errors or temporary issues
-        const text = await response.text();
-        if (text.includes("Unauthorized") || text.includes("Invalid")) {
-          localStorage.removeItem('sessionId');
-        }
+        // Session is invalid or expired - clear it
+        console.log("Session unauthorized, clearing localStorage");
+        localStorage.removeItem('sessionId');
+        queryClient.setQueryDefaults(["/api/auth/me"], { enabled: false });
         return null;
       }
 
