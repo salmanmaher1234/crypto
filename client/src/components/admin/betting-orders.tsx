@@ -133,7 +133,7 @@ export function BettingOrders() {
                   
                   return (
                     <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.orderId}</TableCell>
+                      <TableCell className="font-medium">{(order as any).username || `User${order.userId}`}</TableCell>
                       <TableCell>Customer #{order.userId}</TableCell>
                       <TableCell>
                         <div>

@@ -164,7 +164,29 @@ export class DatabaseStorage implements IStorage {
 
   // Betting orders
   async getBettingOrdersByUserId(userId: number): Promise<BettingOrder[]> {
-    return await db.select().from(bettingOrders).where(eq(bettingOrders.userId, userId)).orderBy(desc(bettingOrders.createdAt));
+    const result = await db
+      .select({
+        id: bettingOrders.id,
+        userId: bettingOrders.userId,
+        username: users.username,
+        orderId: bettingOrders.orderId,
+        asset: bettingOrders.asset,
+        amount: bettingOrders.amount,
+        direction: bettingOrders.direction,
+        duration: bettingOrders.duration,
+        entryPrice: bettingOrders.entryPrice,
+        exitPrice: bettingOrders.exitPrice,
+        status: bettingOrders.status,
+        result: bettingOrders.result,
+        createdAt: bettingOrders.createdAt,
+        expiresAt: bettingOrders.expiresAt,
+      })
+      .from(bettingOrders)
+      .leftJoin(users, eq(bettingOrders.userId, users.id))
+      .where(eq(bettingOrders.userId, userId))
+      .orderBy(desc(bettingOrders.createdAt));
+    
+    return result as BettingOrder[];
   }
 
   async createBettingOrder(order: any): Promise<BettingOrder> {
@@ -243,14 +265,14 @@ export class DatabaseStorage implements IStorage {
       // Add/subtract profit to/from total balance (using balanceImpact)
       const newBalance = currentBalance + balanceImpact;
 
-      // Update VIP Level based on profit/loss (5 points increase/decrease, max 100)
-      let newReputation = user.reputation || 100;
+      // Update VIP Level based on profit/loss (1 point increase/decrease, max 5)
+      let newReputation = user.reputation || 5;
       if (balanceImpact > 0) {
-        // Profit: increase VIP level by 5 (max 100)
-        newReputation = Math.min(100, newReputation + 5);
+        // Profit: increase VIP level by 1 (max 5)
+        newReputation = Math.min(5, newReputation + 1);
       } else if (balanceImpact < 0) {
-        // Loss: decrease VIP level by 5 (min 0)
-        newReputation = Math.max(0, newReputation - 5);
+        // Loss: decrease VIP level by 1 (min 0)
+        newReputation = Math.max(0, newReputation - 1);
       }
 
       // Update user balance and reputation
@@ -290,11 +312,54 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllBettingOrders(): Promise<BettingOrder[]> {
-    return await db.select().from(bettingOrders).orderBy(desc(bettingOrders.createdAt));
+    const result = await db
+      .select({
+        id: bettingOrders.id,
+        userId: bettingOrders.userId,
+        username: users.username,
+        orderId: bettingOrders.orderId,
+        asset: bettingOrders.asset,
+        amount: bettingOrders.amount,
+        direction: bettingOrders.direction,
+        duration: bettingOrders.duration,
+        entryPrice: bettingOrders.entryPrice,
+        exitPrice: bettingOrders.exitPrice,
+        status: bettingOrders.status,
+        result: bettingOrders.result,
+        createdAt: bettingOrders.createdAt,
+        expiresAt: bettingOrders.expiresAt,
+      })
+      .from(bettingOrders)
+      .leftJoin(users, eq(bettingOrders.userId, users.id))
+      .orderBy(desc(bettingOrders.createdAt));
+    
+    return result as BettingOrder[];
   }
 
   async getActiveBettingOrders(): Promise<BettingOrder[]> {
-    return await db.select().from(bettingOrders).where(eq(bettingOrders.status, "active")).orderBy(desc(bettingOrders.createdAt));
+    const result = await db
+      .select({
+        id: bettingOrders.id,
+        userId: bettingOrders.userId,
+        username: users.username,
+        orderId: bettingOrders.orderId,
+        asset: bettingOrders.asset,
+        amount: bettingOrders.amount,
+        direction: bettingOrders.direction,
+        duration: bettingOrders.duration,
+        entryPrice: bettingOrders.entryPrice,
+        exitPrice: bettingOrders.exitPrice,
+        status: bettingOrders.status,
+        result: bettingOrders.result,
+        createdAt: bettingOrders.createdAt,
+        expiresAt: bettingOrders.expiresAt,
+      })
+      .from(bettingOrders)
+      .leftJoin(users, eq(bettingOrders.userId, users.id))
+      .where(eq(bettingOrders.status, "active"))
+      .orderBy(desc(bettingOrders.createdAt));
+    
+    return result as BettingOrder[];
   }
 
   // Withdrawal requests

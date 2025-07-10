@@ -65,7 +65,7 @@ export function MemberManagement() {
     email: "",
     password: "",
     name: "",
-    reputation: 100
+    reputation: 5
   });
 
   // Filter and sort users based on search term, ID descending (newest first)
@@ -213,7 +213,7 @@ export function MemberManagement() {
           email: "",
           password: "",
           name: "",
-          reputation: 100
+          reputation: 5
         });
       },
       onError: () => {
@@ -294,10 +294,10 @@ export function MemberManagement() {
                     <Input 
                       type="number"
                       value={newMemberData.reputation}
-                      onChange={(e) => setNewMemberData(prev => ({ ...prev, reputation: parseInt(e.target.value) || 100 }))}
-                      placeholder="Enter reputation (1-100)"
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, reputation: parseInt(e.target.value) || 5 }))}
+                      placeholder="Enter reputation (1-5)"
                       min="1"
-                      max="100"
+                      max="5"
                     />
                   </div>
                   <div className="flex justify-end gap-2">
@@ -310,7 +310,7 @@ export function MemberManagement() {
                           email: "",
                           password: "",
                           name: "",
-                          reputation: 100
+                          reputation: 5
                         });
                       }}
                     >
@@ -368,12 +368,12 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className="text-xs px-2 py-1">
-                        {user.reputation || 100}/100
+                        {user.reputation || 5}/5
                       </Badge>
                       <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
                         <div 
                           className="bg-primary h-1.5 rounded-full transition-all duration-300" 
-                          style={{ width: `${user.reputation || 100}%` }}
+                          style={{ width: `${((user.reputation || 5) / 5) * 100}%` }}
                         ></div>
                       </div>
                     </TableCell>
@@ -836,14 +836,14 @@ export function MemberManagement() {
                                 <Label>Credit Score</Label>
                                 <Input
                                   type="number"
-                                  value={creditScore || selectedUser?.reputation || 100}
+                                  value={creditScore || selectedUser?.reputation || 5}
                                   onChange={(e) => setCreditScore(e.target.value)}
                                   min="0"
-                                  max="100"
-                                  placeholder="Credit Score (0-100)"
+                                  max="5"
+                                  placeholder="Credit Score (0-5)"
                                 />
                                 <p className="text-sm text-muted-foreground mt-1">
-                                  Set customer credit score (0-100)
+                                  Set customer credit score (0-5)
                                 </p>
                               </div>
                               <div className="flex justify-end gap-2">
@@ -855,7 +855,7 @@ export function MemberManagement() {
                                 </Button>
                                 <Button onClick={() => {
                                   const newScore = parseInt(creditScore);
-                                  if (newScore >= 0 && newScore <= 100 && selectedUser) {
+                                  if (newScore >= 0 && newScore <= 5 && selectedUser) {
                                     handleQuickUpdate(selectedUser, { reputation: newScore });
                                     setOtherDialogOpen(false);
                                     setCreditScore("");

@@ -104,7 +104,7 @@ export class MemStorage implements IStorage {
       balance: "10000.00",
       availableBalance: "10000.00",
       frozenBalance: "0.00",
-      reputation: 100,
+      reputation: 5,
       winLoseSetting: "To Win",
       direction: "Actual",
       accountStatus: "Active",
@@ -131,7 +131,7 @@ export class MemStorage implements IStorage {
       balance: "10500.00",
       availableBalance: "10000.00",
       frozenBalance: "500.00",
-      reputation: 100,
+      reputation: 5,
       winLoseSetting: "To Win",
       direction: "Actual",
       accountStatus: "Active",
@@ -271,7 +271,7 @@ export class MemStorage implements IStorage {
       balance: "0.00",
       availableBalance: "0.00",
       frozenBalance: "0.00",
-      reputation: 100, // Always set to 100 for all new users
+      reputation: 5, // Always set to 5 for all new users
       winLoseSetting: "To Win",
       direction: "Actual",
       accountStatus: "Active",
@@ -414,6 +414,13 @@ export class MemStorage implements IStorage {
   async getBettingOrdersByUserId(userId: number): Promise<BettingOrder[]> {
     return Array.from(this.bettingOrders.values())
       .filter(order => order.userId === userId)
+      .map(order => {
+        const user = this.users.get(order.userId);
+        return {
+          ...order,
+          username: user?.username || `User${order.userId}`
+        };
+      })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
@@ -552,12 +559,26 @@ export class MemStorage implements IStorage {
 
   async getAllBettingOrders(): Promise<BettingOrder[]> {
     return Array.from(this.bettingOrders.values())
+      .map(order => {
+        const user = this.users.get(order.userId);
+        return {
+          ...order,
+          username: user?.username || `User${order.userId}`
+        };
+      })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   async getActiveBettingOrders(): Promise<BettingOrder[]> {
     return Array.from(this.bettingOrders.values())
       .filter(order => order.status === "active")
+      .map(order => {
+        const user = this.users.get(order.userId);
+        return {
+          ...order,
+          username: user?.username || `User${order.userId}`
+        };
+      })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
