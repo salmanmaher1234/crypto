@@ -330,13 +330,14 @@ export function MemberManagement() {
         </CardHeader>
         <CardContent className="p-2">
           <div className="overflow-x-auto">
-            <Table className="min-w-[1700px] table-fixed">
+            <Table className="min-w-[1780px] table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px] text-center">ID</TableHead>
                   <TableHead className="w-[100px]">Username</TableHead>
                   <TableHead className="w-[180px]">Balance</TableHead>
                   <TableHead className="w-[120px] text-center">VIP Level</TableHead>
+                  <TableHead className="w-[80px] text-center">Credit Score</TableHead>
                   <TableHead className="w-[100px] text-center">General Agent</TableHead>
                   <TableHead className="w-[100px] text-center">Invitation Code</TableHead>
                   <TableHead className="w-[80px] text-center">Type</TableHead>
@@ -378,6 +379,11 @@ export function MemberManagement() {
                           ></div>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell className="text-center w-[80px]">
+                      <Badge variant="outline" className="text-xs px-1 py-0.5">
+                        {user.reputation || 100}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-center w-[100px] truncate">{user.generalAgent || "admin"}</TableCell>
                     <TableCell className="text-xs text-center w-[100px] truncate">{user.invitationCode || "100025"}</TableCell>

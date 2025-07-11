@@ -667,30 +667,32 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
             <div>
               <h4 className="text-sm font-medium mb-3">Select order period</h4>
               <div className="grid grid-cols-5 gap-2">
-                {periods.map((period) => (
-                  <Button
-                    key={period.value}
-                    variant={selectedPeriod === period.value ? "default" : "outline"}
-                    size="sm"
-                    className={`h-12 flex-col text-xs ${
-                      selectedPeriod === period.value 
-                        ? period.value === "60s" 
-                          ? "bg-green-500 hover:bg-green-600" 
-                          : "bg-primary"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedPeriod(period.value)}
-                  >
-                    <div>{period.label}</div>
-                    <div className={
-                      selectedPeriod === period.value 
-                        ? "text-white" 
-                        : "text-red-500"
-                    }>
-                      {period.payout}
-                    </div>
-                  </Button>
-                ))}
+                {periods.map((period) => {
+                  const isSelected = selectedPeriod === period.value;
+                  const baseColor = orderType === "down" ? "red" : "green";
+                  const colorClasses = isSelected
+                    ? orderType === "down"
+                      ? "bg-red-500 hover:bg-red-600 text-white border-red-500"
+                      : "bg-green-500 hover:bg-green-600 text-white border-green-500"
+                    : orderType === "down"
+                      ? "border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50"
+                      : "border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50";
+                  
+                  return (
+                    <Button
+                      key={period.value}
+                      variant="outline"
+                      size="sm"
+                      className={`h-12 flex-col text-xs border-2 ${colorClasses}`}
+                      onClick={() => setSelectedPeriod(period.value)}
+                    >
+                      <div>{period.label}</div>
+                      <div className={isSelected ? "text-white" : orderType === "down" ? "text-red-500" : "text-green-500"}>
+                        {period.payout}
+                      </div>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 

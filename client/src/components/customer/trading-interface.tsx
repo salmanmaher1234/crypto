@@ -14,6 +14,7 @@ export function TradingInterface() {
   const [selectedAsset, setSelectedAsset] = useState("BTC/USD");
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState(60);
+  const [selectedDirection, setSelectedDirection] = useState<"Buy Up" | "Buy Down" | null>(null);
   const [validationError, setValidationError] = useState("");
   const { data: prices } = useCryptoPrices();
   const createOrder = useCreateBettingOrder();
@@ -131,45 +132,81 @@ export function TradingInterface() {
             )}
           </div>
 
+          {/* Direction Selection */}
+          <div>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Trading Direction</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <Button
+                onClick={() => setSelectedDirection("Buy Up")}
+                variant={selectedDirection === "Buy Up" ? "default" : "outline"}
+                className={`h-12 flex items-center justify-center ${
+                  selectedDirection === "Buy Up" 
+                    ? "bg-green-500 hover:bg-green-600 text-white border-green-500" 
+                    : "border-green-500 text-green-500 hover:bg-green-50"
+                }`}
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Buy Up
+              </Button>
+              <Button
+                onClick={() => setSelectedDirection("Buy Down")}
+                variant={selectedDirection === "Buy Down" ? "default" : "outline"}
+                className={`h-12 flex items-center justify-center ${
+                  selectedDirection === "Buy Down" 
+                    ? "bg-red-500 hover:bg-red-600 text-white border-red-500" 
+                    : "border-red-500 text-red-500 hover:bg-red-50"
+                }`}
+              >
+                <TrendingDown className="w-4 h-4 mr-2" />
+                Buy Down
+              </Button>
+            </div>
+          </div>
+
           {/* Duration Selection */}
           <div>
             <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Trading Duration</label>
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              {durations.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDuration(d)}
-                  className={`py-2 px-2 sm:px-3 text-xs sm:text-sm rounded-lg border-2 transition-colors ${
-                    duration === d
-                      ? "border-primary bg-blue-50"
-                      : "border-gray-300 hover:border-gray-400"
-                  }`}
-                >
-                  {d}s
-                </button>
-              ))}
+              {durations.map((d) => {
+                const isSelected = duration === d;
+                const baseColor = selectedDirection === "Buy Down" ? "red" : "green";
+                const colorClasses = selectedDirection
+                  ? isSelected
+                    ? selectedDirection === "Buy Down"
+                      ? "bg-red-500 border-red-500 text-white"
+                      : "bg-green-500 border-green-500 text-white"
+                    : selectedDirection === "Buy Down"
+                      ? "border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50"
+                      : "border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50"
+                  : isSelected
+                    ? "border-primary bg-blue-50"
+                    : "border-gray-300 hover:border-gray-400";
+                
+                return (
+                  <button
+                    key={d}
+                    onClick={() => setDuration(d)}
+                    className={`py-2 px-2 sm:px-3 text-xs sm:text-sm rounded-lg border-2 transition-colors ${colorClasses}`}
+                  >
+                    {d}s
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Direction Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          {/* Place Order Button */}
+          <div>
             <Button
-              onClick={() => handleTrade("Buy Up")}
-              disabled={createOrder.isPending}
-              className="bg-success hover:bg-success/90 text-success-foreground h-16 sm:h-20 flex flex-col"
+              onClick={() => selectedDirection && handleTrade(selectedDirection)}
+              disabled={createOrder.isPending || !selectedDirection || !amount || parseFloat(amount) < 1000}
+              className={`w-full h-16 text-lg font-medium ${
+                selectedDirection === "Buy Down"
+                  ? "bg-red-500 hover:bg-red-600 text-white"
+                  : "bg-green-500 hover:bg-green-600 text-white"
+              }`}
             >
-              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 mb-1" />
-              <div className="font-medium text-sm sm:text-base">Buy Up</div>
-              <div className="text-xs sm:text-sm opacity-90">Price will rise</div>
-            </Button>
-            <Button
-              onClick={() => handleTrade("Buy Down")}
-              disabled={createOrder.isPending}
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-16 sm:h-20 flex flex-col"
-            >
-              <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 mb-1" />
-              <div className="font-medium text-sm sm:text-base">Buy Down</div>
-              <div className="text-xs sm:text-sm opacity-90">Price will fall</div>
+              {createOrder.isPending ? "Placing Order..." : `Place ${selectedDirection || "Order"}`}
             </Button>
           </div>
         </CardContent>

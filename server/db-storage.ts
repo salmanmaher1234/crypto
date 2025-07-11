@@ -237,12 +237,16 @@ export class DatabaseStorage implements IStorage {
       const baseProfitAmount = orderAmount * (profitPercentage / 100);
       
       // Apply direction-based profit calculation using user's Member Management direction setting
-      // Customer profits are always positive, but balance impact varies by direction
       let finalProfitAmount = baseProfitAmount; // Always positive for customer display
       let result: "win" | "loss" = "win";
       let balanceImpact = baseProfitAmount; // This affects actual balance calculation
       
-      if (user.direction === "Buy Up") {
+      if (user.direction === "Actual") {
+        // Actual = No profit/loss, only return original amount
+        finalProfitAmount = 0;
+        balanceImpact = 0;
+        result = "win";
+      } else if (user.direction === "Buy Up") {
         // Buy Up = Profit is added to balance (positive impact)
         balanceImpact = baseProfitAmount;
         result = "win";
@@ -250,10 +254,6 @@ export class DatabaseStorage implements IStorage {
         // Buy Down = Profit is subtracted from balance (negative impact) but shown as positive to customer
         balanceImpact = -baseProfitAmount;
         result = "loss"; // For display purposes, but profit amount stays positive
-      } else {
-        // Default "Actual" behavior - always positive
-        balanceImpact = baseProfitAmount;
-        result = "win";
       }
 
       // Update user's balance
@@ -265,14 +265,17 @@ export class DatabaseStorage implements IStorage {
       // Add/subtract profit to/from total balance (using balanceImpact)
       const newBalance = currentBalance + balanceImpact;
 
-      // Update VIP Level based on profit/loss (1 point increase/decrease, max 5)
-      let newReputation = user.reputation || 5;
-      if (balanceImpact > 0) {
-        // Profit: increase VIP level by 1 (max 5)
-        newReputation = Math.min(5, newReputation + 1);
+      // Update VIP Level based on profit/loss (5 point increase/decrease, max 100)
+      let newReputation = user.reputation || 100;
+      if (user.direction === "Actual") {
+        // Actual direction: no change to reputation
+        newReputation = user.reputation || 100;
+      } else if (balanceImpact > 0) {
+        // Profit: increase VIP level by 5 (max 100)
+        newReputation = Math.min(100, newReputation + 5);
       } else if (balanceImpact < 0) {
-        // Loss: decrease VIP level by 1 (min 0)
-        newReputation = Math.max(0, newReputation - 1);
+        // Loss: decrease VIP level by 5 (min 0)
+        newReputation = Math.max(0, newReputation - 5);
       }
 
       // Update user balance and reputation
