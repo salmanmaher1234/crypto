@@ -27,13 +27,13 @@ export function MemberManagement() {
   const createMessage = useCreateMessage();
   const { toast } = useToast();
 
-  // Auto-refresh user data every 5 seconds for real-time updates
+  // Auto-refresh user data every 2 seconds for real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -81,6 +81,9 @@ export function MemberManagement() {
       {
         onSuccess: () => {
           toast({ title: "User updated successfully" });
+          // Immediately refresh the data for real-time updates
+          queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
         },
         onError: () => {
           toast({ title: "Failed to update user", variant: "destructive" });
@@ -167,6 +170,8 @@ export function MemberManagement() {
         toast({ title: "User deleted successfully" });
         setDeleteDialogOpen(false);
         setSelectedUser(null);
+        // Immediately refresh the data for real-time updates
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       },
       onError: () => {
         toast({ title: "Failed to delete user", variant: "destructive" });
@@ -187,6 +192,8 @@ export function MemberManagement() {
         setMessageTitle("");
         setMessageContent("");
         setMessageDialogOpen(false);
+        // Immediately refresh the data for real-time updates
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
       },
       onError: () => {
         toast({ title: "Failed to send message", variant: "destructive" });
@@ -213,8 +220,10 @@ export function MemberManagement() {
           email: "",
           password: "",
           name: "",
-          reputation: 5
+          reputation: 100
         });
+        // Immediately refresh the data for real-time updates
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       },
       onError: () => {
         toast({ title: "Failed to add member", variant: "destructive" });
@@ -846,11 +855,11 @@ export function MemberManagement() {
                                 <Label>Credit Score</Label>
                                 <Input
                                   type="number"
-                                  value={creditScore || selectedUser?.reputation || 5}
+                                  value={creditScore || selectedUser?.reputation || 100}
                                   onChange={(e) => setCreditScore(e.target.value)}
                                   min="0"
-                                  max="5"
-                                  placeholder="Credit Score (0-5)"
+                                  max="100"
+                                  placeholder="Credit Score (0-100)"
                                 />
                               </div>
                               <div className="flex justify-end gap-2">
@@ -862,7 +871,7 @@ export function MemberManagement() {
                                 </Button>
                                 <Button onClick={() => {
                                   const newScore = parseInt(creditScore);
-                                  if (newScore >= 0 && newScore <= 5 && selectedUser) {
+                                  if (newScore >= 0 && newScore <= 100 && selectedUser) {
                                     handleQuickUpdate(selectedUser, { reputation: newScore });
                                     setOtherDialogOpen(false);
                                     setCreditScore("");
