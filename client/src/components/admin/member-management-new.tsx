@@ -65,7 +65,8 @@ export function MemberManagement() {
     email: "",
     password: "",
     name: "",
-    reputation: 100
+    reputation: 100,
+    creditScore: 100
   });
 
   // Filter and sort users based on search term, ID descending (newest first)
@@ -211,6 +212,7 @@ export function MemberManagement() {
       userType: "Normal",
       generalAgent: "Agent001",
       remark: "New Member",
+      creditScore: newMemberData.creditScore || 100,
     }, {
       onSuccess: () => {
         toast({ title: "Member added successfully" });
@@ -220,7 +222,8 @@ export function MemberManagement() {
           email: "",
           password: "",
           name: "",
-          reputation: 100
+          reputation: 100,
+          creditScore: 100
         });
         // Immediately refresh the data for real-time updates
         queryClient.invalidateQueries({ queryKey: ["/api/users"] });
@@ -319,7 +322,8 @@ export function MemberManagement() {
                           email: "",
                           password: "",
                           name: "",
-                          reputation: 5
+                          reputation: 100,
+                          creditScore: 100
                         });
                       }}
                     >
@@ -391,7 +395,7 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell className="text-center w-[80px]">
                       <Badge variant="outline" className="text-xs px-1 py-0.5">
-                        {user.reputation || 100}
+                        {user.creditScore || 100}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-center w-[100px] truncate">{user.generalAgent || "admin"}</TableCell>
@@ -855,7 +859,7 @@ export function MemberManagement() {
                                 <Label>Credit Score</Label>
                                 <Input
                                   type="number"
-                                  value={creditScore || selectedUser?.reputation || 100}
+                                  value={creditScore || selectedUser?.creditScore || 100}
                                   onChange={(e) => setCreditScore(e.target.value)}
                                   min="0"
                                   max="100"
@@ -872,7 +876,7 @@ export function MemberManagement() {
                                 <Button onClick={() => {
                                   const newScore = parseInt(creditScore);
                                   if (newScore >= 0 && newScore <= 100 && selectedUser) {
-                                    handleQuickUpdate(selectedUser, { reputation: newScore });
+                                    handleQuickUpdate(selectedUser, { creditScore: newScore });
                                     setOtherDialogOpen(false);
                                     setCreditScore("");
                                     toast({ title: "Credit score updated successfully" });

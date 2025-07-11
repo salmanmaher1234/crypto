@@ -12,7 +12,8 @@ export const users = pgTable("users", {
   balance: decimal("balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   availableBalance: decimal("available_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   frozenBalance: decimal("frozen_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
-  reputation: integer("reputation").notNull().default(5),
+  reputation: integer("reputation").notNull().default(100), // VIP Level (auto-adjusted by betting outcomes)
+  creditScore: integer("credit_score").notNull().default(100), // Credit Score (manually set by admin)
   winLoseSetting: text("win_lose_setting").notNull().default("To Win"), // To Win, To Lose, Random
   direction: text("direction").notNull().default("Actual"), // Buy Up, Buy Down, Actual
   isBanned: boolean("is_banned").notNull().default(false),
