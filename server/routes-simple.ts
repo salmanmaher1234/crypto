@@ -922,6 +922,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Database seeding endpoint
+  app.post("/api/seed-database", async (req, res) => {
+    try {
+      // Create test users
+      const testUsers = [
+        {
+          username: "admin",
+          email: "admin@cryptoinvest.com",
+          password: "admin123",
+          name: "Administrator",
+          role: "admin",
+          balance: "10000.00",
+          availableBalance: "10000.00",
+          frozenBalance: "0.00",
+          reputation: 100,
+          winLoseSetting: "To Win",
+          direction: "Actual",
+          isActive: true,
+          isBanned: false,
+          withdrawalProhibited: false,
+          invitationCode: "100025",
+          type: "Admin",
+          generalAgent: "System",
+          registrationTime: new Date(),
+          remark: "System Administrator"
+        },
+        {
+          username: "sarah",
+          email: "sarah@email.com",
+          password: "password123",
+          name: "Sarah Johnson",
+          role: "customer",
+          balance: "10500.00",
+          availableBalance: "10000.00",
+          frozenBalance: "500.00",
+          reputation: 100,
+          winLoseSetting: "To Win",
+          direction: "Actual",
+          isActive: true,
+          isBanned: false,
+          withdrawalProhibited: false,
+          invitationCode: "100026",
+          type: "VIP",
+          generalAgent: "Admin",
+          registrationTime: new Date(),
+          remark: "VIP Customer"
+        },
+        {
+          username: "john",
+          email: "john@email.com",
+          password: "password123",
+          name: "John Smith",
+          role: "customer",
+          balance: "8500.00",
+          availableBalance: "8000.00",
+          frozenBalance: "500.00",
+          reputation: 100,
+          winLoseSetting: "To Win",
+          direction: "Actual",
+          isActive: true,
+          isBanned: false,
+          withdrawalProhibited: false,
+          invitationCode: "100027",
+          type: "Normal",
+          generalAgent: "Admin",
+          registrationTime: new Date(),
+          remark: "Regular Customer"
+        }
+      ];
+
+      let created = 0;
+      for (const userData of testUsers) {
+        try {
+          const existingUser = await storage.getUserByUsername(userData.username);
+          if (!existingUser) {
+            await storage.createUser(userData);
+            created++;
+          }
+        } catch (error) {
+          console.log(`User ${userData.username} already exists`);
+        }
+      }
+
+      res.json({ message: `Database seeded successfully. Created ${created} new users.` });
+    } catch (error) {
+      console.error("Database seeding error:", error);
+      res.status(500).json({ message: "Failed to seed database" });
+    }
+  });
+
   // Real-time crypto prices endpoint using CoinGecko API
   app.get("/api/crypto-prices", async (req, res) => {
     try {
