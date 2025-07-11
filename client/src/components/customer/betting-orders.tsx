@@ -148,7 +148,7 @@ export function CustomerBettingOrders() {
 
   // Detailed order view
   if (showDetailView && selectedOrder) {
-    const orderNumber = (selectedOrder as any).username || `User${selectedOrder.userId}`;
+    const orderNumber = selectedOrder.orderId || `${selectedOrder.id}`;
     
     // Calculate profit using same scale-based logic
     const getScaleProfitPercentage = (duration: number) => {
@@ -312,7 +312,7 @@ export function CustomerBettingOrders() {
         ) : (
           <div className="space-y-3">
             {filteredOrders.map((order) => {
-              const orderNumber = (order as any).username || `User${order.userId}`;
+              const orderNumber = order.orderId || `${order.id}`;
               
               // Calculate profit using scale-based percentages
               const getScaleProfitPercentage = (duration: number) => {
