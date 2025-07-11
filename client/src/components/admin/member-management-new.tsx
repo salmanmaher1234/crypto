@@ -65,7 +65,7 @@ export function MemberManagement() {
     email: "",
     password: "",
     name: "",
-    reputation: 5
+    reputation: 100
   });
 
   // Filter and sort users based on search term, ID descending (newest first)
@@ -294,10 +294,10 @@ export function MemberManagement() {
                     <Input 
                       type="number"
                       value={newMemberData.reputation}
-                      onChange={(e) => setNewMemberData(prev => ({ ...prev, reputation: parseInt(e.target.value) || 5 }))}
-                      placeholder="Enter reputation (1-5)"
-                      min="1"
-                      max="5"
+                      onChange={(e) => setNewMemberData(prev => ({ ...prev, reputation: parseInt(e.target.value) || 100 }))}
+                      placeholder="Enter reputation (0-100)"
+                      min="0"
+                      max="100"
                     />
                   </div>
                   <div className="flex justify-end gap-2">
