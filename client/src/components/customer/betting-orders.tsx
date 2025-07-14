@@ -191,7 +191,7 @@ export function CustomerBettingOrders() {
         <div className="space-y-4">
           {[
             { label: "Order No.", value: orderNumber },
-            { label: "Currency", value: `${selectedOrder.asset}/USDT` },
+            { label: "Currency", value: selectedOrder.asset.includes("/") ? selectedOrder.asset : `${selectedOrder.asset}/USDT` },
             { label: "Buy Price", value: selectedOrder.entryPrice },
             { label: "Close Price", value: selectedOrder.exitPrice || selectedOrder.entryPrice },
             { label: "Buy Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') },
@@ -201,7 +201,7 @@ export function CustomerBettingOrders() {
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
             { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}{profit.toFixed(0)}`, isProfit: true },
             { label: "Scale", value: "20%" },
-            { label: "Buy Direction", value: user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
+            { label: "Buy Direction", value: user?.direction === "Actual" ? "Actual" : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
             { label: "Order Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
           ].map((item, index) => (
@@ -342,7 +342,7 @@ export function CustomerBettingOrders() {
                           <tbody>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4 w-24">Currency</td>
-                              <td className="font-medium text-sm py-1">{order.asset}/USDT</td>
+                              <td className="font-medium text-sm py-1">{order.asset.includes("/") ? order.asset : `${order.asset}/USDT`}</td>
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Order No.</td>
@@ -360,8 +360,8 @@ export function CustomerBettingOrders() {
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Buy Direction</td>
-                              <td className={`font-medium text-sm py-1 ${user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500'}`}>
-                                {user?.direction === "Buy Up" ? "Buy Up" : "Buy Down"}
+                              <td className={`font-medium text-sm py-1 ${user?.direction === 'Buy Up' ? 'text-green-500' : user?.direction === 'Actual' ? 'text-blue-500' : 'text-red-500'}`}>
+                                {user?.direction === "Actual" ? "Actual" : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down"}
                               </td>
                             </tr>
                             <tr className="h-8">

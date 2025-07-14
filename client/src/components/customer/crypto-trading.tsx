@@ -669,14 +669,10 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
               <div className="grid grid-cols-5 gap-2">
                 {periods.map((period) => {
                   const isSelected = selectedPeriod === period.value;
-                  const baseColor = orderType === "down" ? "red" : "green";
+                  const baseColor = "green";
                   const colorClasses = isSelected
-                    ? orderType === "down"
-                      ? "bg-red-500 hover:bg-red-600 text-white border-red-500"
-                      : "bg-green-500 hover:bg-green-600 text-white border-green-500"
-                    : orderType === "down"
-                      ? "border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50"
-                      : "border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50";
+                    ? "bg-green-500 hover:bg-green-600 text-white border-green-500"
+                    : "border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50";
                   
                   return (
                     <Button
@@ -687,7 +683,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
                       onClick={() => setSelectedPeriod(period.value)}
                     >
                       <div>{period.label}</div>
-                      <div className={isSelected ? "text-white" : orderType === "down" ? "text-red-500" : "text-green-500"}>
+                      <div className={isSelected ? "text-white" : "text-green-500"}>
                         {period.payout}
                       </div>
                     </Button>
@@ -734,17 +730,13 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
 
             {/* Submit Button */}
             <Button
-              className={`w-full h-12 text-white font-medium ${
-                orderType === "up" 
-                  ? "bg-green-500 hover:bg-green-600" 
-                  : "bg-red-500 hover:bg-red-600"
-              }`}
+              className="w-full h-12 text-white font-medium bg-green-500 hover:bg-green-600"
               onClick={handleSubmitOrder}
               disabled={createBettingOrder.isPending || !orderAmount}
             >
               {createBettingOrder.isPending 
                 ? "Submitting..." 
-                : `Submit Order (${orderType.toUpperCase()})`
+                : "Submit Order"
               }
             </Button>
           </div>

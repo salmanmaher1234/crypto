@@ -153,8 +153,8 @@ export function TradingInterface() {
                 variant={selectedDirection === "Buy Down" ? "default" : "outline"}
                 className={`h-12 flex items-center justify-center ${
                   selectedDirection === "Buy Down" 
-                    ? "bg-red-500 hover:bg-red-600 text-white border-red-500" 
-                    : "border-red-500 text-red-500 hover:bg-red-50"
+                    ? "bg-green-500 hover:bg-green-600 text-white border-green-500" 
+                    : "border-green-500 text-green-500 hover:bg-green-50"
                 }`}
               >
                 <TrendingDown className="w-4 h-4 mr-2" />
@@ -169,15 +169,11 @@ export function TradingInterface() {
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {durations.map((d) => {
                 const isSelected = duration === d;
-                const baseColor = selectedDirection === "Buy Down" ? "red" : "green";
+                const baseColor = "green";
                 const colorClasses = selectedDirection
                   ? isSelected
-                    ? selectedDirection === "Buy Down"
-                      ? "bg-red-500 border-red-500 text-white"
-                      : "bg-green-500 border-green-500 text-white"
-                    : selectedDirection === "Buy Down"
-                      ? "border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50"
-                      : "border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50"
+                    ? "bg-green-500 border-green-500 text-white"
+                    : "border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50"
                   : isSelected
                     ? "border-primary bg-blue-50"
                     : "border-gray-300 hover:border-gray-400";
@@ -200,13 +196,9 @@ export function TradingInterface() {
             <Button
               onClick={() => selectedDirection && handleTrade(selectedDirection)}
               disabled={createOrder.isPending || !selectedDirection || !amount || parseFloat(amount) < 1000}
-              className={`w-full h-16 text-lg font-medium ${
-                selectedDirection === "Buy Down"
-                  ? "bg-red-500 hover:bg-red-600 text-white"
-                  : "bg-green-500 hover:bg-green-600 text-white"
-              }`}
+              className="w-full h-16 text-lg font-medium bg-green-500 hover:bg-green-600 text-white"
             >
-              {createOrder.isPending ? "Placing Order..." : `Place ${selectedDirection || "Order"}`}
+              {createOrder.isPending ? "Placing Order..." : "Submit Order"}
             </Button>
           </div>
         </CardContent>

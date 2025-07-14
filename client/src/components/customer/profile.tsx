@@ -972,7 +972,7 @@ export function Profile() {
                                   
                                   toast({
                                     title: "Withdrawal requested",
-                                    description: `${withdrawAmount} USDT withdrawal request submitted successfully via Digital Wallet`,
+                                    description: `${withdrawAmount} withdrawal request submitted successfully via Bank Wallet`,
                                   });
                                   setWithdrawAmount("");
                                   setSelectedBankWallet("bank-wallet");
@@ -1179,7 +1179,8 @@ export function Profile() {
             </DialogHeader>
             <div className="space-y-4 text-center">
               <p className="text-sm text-gray-700 leading-relaxed">
-                Hello, Please contact teacher to get the latest channels for recharging. 
+                Hello, Please contact teacher to get the latest channels for recharging.
+                <br />
                 Thank you for your support and trust. Please return to the previous page.
               </p>
               <Button 
