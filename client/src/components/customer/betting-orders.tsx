@@ -201,7 +201,7 @@ export function CustomerBettingOrders() {
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
             { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}{profit.toFixed(0)}`, isProfit: true },
             { label: "Scale", value: "20%" },
-            { label: "Buy Direction", value: user?.direction === "Actual" ? "Actual" : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
+            { label: "Buy Direction", value: user?.direction === "Actual" ? (selectedOrder.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
             { label: "Order Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
           ].map((item, index) => (
@@ -209,7 +209,11 @@ export function CustomerBettingOrders() {
               <span className="text-gray-600 text-sm">{item.label}</span>
               <span className={`text-sm font-medium ${
                 item.isProfit ? (profit > 0 ? 'text-red-500' : 'text-green-500') :
-                item.isDirection ? (user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500') :
+                item.isDirection ? (
+                  user?.direction === "Actual" ? 
+                    (selectedOrder.direction === "Buy Up" ? 'text-green-500' : 'text-red-500') :
+                    (user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500')
+                ) :
                 item.isActual ? 'text-red-500' :
                 'text-gray-900'
               }`}>
@@ -360,8 +364,12 @@ export function CustomerBettingOrders() {
                             </tr>
                             <tr className="h-8">
                               <td className="text-xs text-gray-500 py-1 pr-4">Buy Direction</td>
-                              <td className={`font-medium text-sm py-1 ${user?.direction === 'Buy Up' ? 'text-green-500' : user?.direction === 'Actual' ? 'text-blue-500' : 'text-red-500'}`}>
-                                {user?.direction === "Actual" ? "Actual" : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down"}
+                              <td className={`font-medium text-sm py-1 ${
+                                user?.direction === "Actual" ? 
+                                  (order.direction === "Buy Up" ? 'text-green-500' : 'text-red-500') :
+                                  (user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500')
+                              }`}>
+                                {user?.direction === "Actual" ? (order.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down"}
                               </td>
                             </tr>
                             <tr className="h-8">

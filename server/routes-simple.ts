@@ -630,16 +630,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields" });
       }
       
-      // Use admin-managed direction from user profile instead of customer's choice
-      const effectiveDirection = user.direction || "Buy Up";
-      console.log(`Using admin-managed direction: ${effectiveDirection} (original customer choice: ${direction})`);
+      // Use customer's clicked direction if backend direction is "Actual", otherwise use admin-managed direction
+      const effectiveDirection = user.direction === "Actual" ? direction : (user.direction || "Buy Up");
+      console.log(`Using direction: ${effectiveDirection} (backend setting: ${user.direction}, customer choice: ${direction})`);
       
       // Prepare complete order data with all required fields
       const orderData = {
         userId: (req as any).userId,
         asset,
         amount: orderAmount,
-        direction: effectiveDirection, // Use backend-managed direction
+        direction: effectiveDirection, // Use effective direction based on backend setting
         duration: parseInt(duration),
         entryPrice,
         orderId,
