@@ -1009,7 +1009,7 @@ export function Profile() {
                                   
                                   toast({
                                     title: "Withdrawal requested",
-                                    description: `${withdrawAmount} USDT withdrawal request submitted successfully via Bank Wallet`,
+                                    description: `${withdrawAmount} withdrawal request submitted successfully via Bank Wallet`,
                                   });
                                   setWithdrawAmount("");
                                   setSelectedBankWallet("bank-wallet");
