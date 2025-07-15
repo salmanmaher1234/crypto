@@ -343,13 +343,12 @@ export function MemberManagement() {
         </CardHeader>
         <CardContent className="p-2">
           <div className="overflow-x-auto">
-            <Table className="min-w-[1780px] table-fixed">
+            <Table className="min-w-[1660px] table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px] text-center">ID</TableHead>
                   <TableHead className="w-[100px]">Username</TableHead>
                   <TableHead className="w-[180px]">Balance</TableHead>
-                  <TableHead className="w-[120px] text-center">VIP Level</TableHead>
                   <TableHead className="w-[80px] text-center">Credit Score</TableHead>
                   <TableHead className="w-[100px] text-center">General Agent</TableHead>
                   <TableHead className="w-[100px] text-center">Invitation Code</TableHead>
@@ -377,19 +376,6 @@ export function MemberManagement() {
                         </div>
                         <div className="text-gray-600">
                           Frozen: {parseFloat(user.frozenBalance || "0").toFixed(2)}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center w-[120px] p-2">
-                      <div className="flex flex-col items-center space-y-1">
-                        <Badge variant="outline" className="text-xs px-1 py-0.5 whitespace-nowrap">
-                          {user.reputation || 100}/100
-                        </Badge>
-                        <div className="w-16 bg-gray-200 rounded-full h-1">
-                          <div 
-                            className="bg-primary h-1 rounded-full transition-all duration-300" 
-                            style={{ width: `${Math.min(100, Math.max(0, (user.reputation || 100)))}%` }}
-                          ></div>
                         </div>
                       </div>
                     </TableCell>
