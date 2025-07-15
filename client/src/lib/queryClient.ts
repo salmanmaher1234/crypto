@@ -12,32 +12,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const sessionId = localStorage.getItem('sessionId');
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  
-  if (sessionId) {
-    headers["X-Session-Id"] = sessionId;
-  }
-
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-
-  await throwIfResNotOk(res);
-  return res;
-}
-
-type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
-  on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
+  try {
     const sessionId = localStorage.getItem('sessionId');
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -47,17 +22,58 @@ export const getQueryFn: <T>(options: {
       headers["X-Session-Id"] = sessionId;
     }
 
-    const res = await fetch(queryKey[0] as string, {
-      credentials: "include",
+    const res = await fetch(url, {
+      method,
       headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
     });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
-    }
-
     await throwIfResNotOk(res);
-    return await res.json();
+    return res;
+  } catch (error) {
+    console.error('API request error:', error);
+    if (error instanceof Error && error.message.includes('Failed to fetch')) {
+      throw new Error('Network connection error. Please check your internet connection and try again.');
+    }
+    throw error;
+  }
+}
+
+type UnauthorizedBehavior = "returnNull" | "throw";
+export const getQueryFn: <T>(options: {
+  on401: UnauthorizedBehavior;
+}) => QueryFunction<T> =
+  ({ on401: unauthorizedBehavior }) =>
+  async ({ queryKey }) => {
+    try {
+      const sessionId = localStorage.getItem('sessionId');
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      
+      if (sessionId) {
+        headers["X-Session-Id"] = sessionId;
+      }
+
+      const res = await fetch(queryKey[0] as string, {
+        credentials: "include",
+        headers,
+      });
+
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    } catch (error) {
+      console.error('Query fetch error:', error);
+      if (error instanceof Error && error.message.includes('Failed to fetch')) {
+        throw new Error('Network connection error. Please check your internet connection and try again.');
+      }
+      throw error;
+    }
   };
 
 export const queryClient = new QueryClient({
