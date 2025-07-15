@@ -26,7 +26,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
   
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [orderType, setOrderType] = useState<"up" | "down">("up");
-  const [selectedPeriod, setSelectedPeriod] = useState("60s");
+  const [selectedPeriod, setSelectedPeriod] = useState("30s");
   const [orderAmount, setOrderAmount] = useState("");
   const [validationError, setValidationError] = useState("");
   const [selectedChartPeriod, setSelectedChartPeriod] = useState("1m");

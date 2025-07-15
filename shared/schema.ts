@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   direction: text("direction").notNull().default("Actual"), // Buy Up, Buy Down, Actual
   isBanned: boolean("is_banned").notNull().default(false),
   withdrawalProhibited: boolean("withdrawal_prohibited").notNull().default(false),
+  tasksBan: text("tasks_ban").notNull().default("Allowed"), // Allowed, Prohibit
   fundPassword: text("fund_password"),
   agentInvitationCode: text("agent_invitation_code"),
   invitationCode: text("invitation_code"),

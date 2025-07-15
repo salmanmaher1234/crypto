@@ -195,6 +195,7 @@ Changelog:
 - July 11, 2025. Successfully migrated SuperCoin project from Replit Agent to standard Replit environment - established PostgreSQL database connectivity with custom Neon database, implemented proper authentication system with session management, seeded database with test users (admin/admin123, sarah/password123, john/password123), verified all login functionality working correctly, maintained security practices and client/server separation
 - July 14, 2025. Fixed comprehensive UI issues - removed USDT from withdrawal notifications, changed all trading popup colors to green, removed (UP)/(DOWN) text from submit buttons showing only "Submit Order", fixed backend direction display to show "Actual" when configured, added proper line breaks to withdraw notice text, fixed duplicate USTD concatenation in customer order screens
 - July 14, 2025. Enhanced direction control system - when backend direction is "Actual", customer's clicked direction (Buy Up/Buy Down) is preserved and displayed in orders; when backend direction is "Buy Up" or "Buy Down", admin's setting overrides customer's choice for all orders
+- July 15, 2025. Fixed customer interface issues - changed default period from 60s 30% to 30s 20% in order popups, added tasks ban option back to member management with full functionality, removed VIP Level column from member management screen, created comprehensive Hostinger deployment guide with all necessary commands
 
 ## User Preferences
 

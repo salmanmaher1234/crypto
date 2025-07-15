@@ -121,7 +121,6 @@ export function MemberManagement() {
               <TableRow>
                 <TableHead>Customer</TableHead>
                 <TableHead>Balance</TableHead>
-                <TableHead>Reputation</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -148,17 +147,7 @@ export function MemberManagement() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium">{user.reputation}</span>
-                      <div className="w-16 h-2 bg-gray-200 rounded-full">
-                        <div
-                          className="h-2 bg-success rounded-full"
-                          style={{ width: `${user.reputation}%` }}
-                        />
-                      </div>
-                    </div>
-                  </TableCell>
+
                   <TableCell>
                     <Badge variant={user.accountStatus === "Active" ? "default" : "destructive"}>
                       {user.accountStatus}
@@ -210,6 +199,7 @@ function CustomerEditForm({
     direction: user.direction,
     accountStatus: user.accountStatus,
     withdrawalStatus: user.withdrawalStatus,
+    tasksBan: user.tasksBan || "Allowed",
   });
 
   const [balanceActions, setBalanceActions] = useState({
@@ -280,6 +270,18 @@ function CustomerEditForm({
           <div>
             <Label htmlFor="withdrawalStatus">Withdrawal Status</Label>
             <Select value={formData.withdrawalStatus} onValueChange={(value) => setFormData({ ...formData, withdrawalStatus: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Allowed">Allowed</SelectItem>
+                <SelectItem value="Prohibit">Prohibit</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="tasksBan">Tasks Ban</Label>
+            <Select value={formData.tasksBan} onValueChange={(value) => setFormData({ ...formData, tasksBan: value })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

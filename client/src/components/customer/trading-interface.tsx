@@ -13,7 +13,7 @@ const durations = [30, 60, 120, 180, 240];
 export function TradingInterface() {
   const [selectedAsset, setSelectedAsset] = useState("BTC/USD");
   const [amount, setAmount] = useState("");
-  const [duration, setDuration] = useState(60);
+  const [duration, setDuration] = useState(30);
   const [selectedDirection, setSelectedDirection] = useState<"Buy Up" | "Buy Down" | null>(null);
   const [validationError, setValidationError] = useState("");
   const { data: prices } = useCryptoPrices();
