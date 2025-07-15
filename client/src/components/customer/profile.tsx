@@ -2325,7 +2325,7 @@ export function Profile() {
                   )}
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mb-3">{message.content}</p>
+              <div className="text-sm text-gray-600 mb-3 whitespace-pre-wrap">{message.content}</div>
               <div className="flex items-center justify-between">
                 <div className="text-xs text-gray-400">
                   {new Date(message.createdAt).toLocaleDateString()}
