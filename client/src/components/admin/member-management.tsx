@@ -147,7 +147,6 @@ export function MemberManagement() {
                       </div>
                     </div>
                   </TableCell>
-
                   <TableCell>
                     <Badge variant={user.accountStatus === "Active" ? "default" : "destructive"}>
                       {user.accountStatus}
