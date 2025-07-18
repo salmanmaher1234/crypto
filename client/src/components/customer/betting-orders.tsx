@@ -46,6 +46,32 @@ export function CustomerBettingOrders() {
     return payoutMap[duration] || "30%"; // Default to 30% if duration not found
   };
 
+  // Function to calculate profit based on order amount and duration
+  const calculateProfit = (order: any) => {
+    const orderAmount = parseFloat(order.amount);
+    const profitPercentageMap: { [key: number]: number } = {
+      30: 0.20,  // 20%
+      60: 0.30,  // 30%
+      120: 0.40, // 40%
+      180: 0.50, // 50%
+      240: 0.60  // 60%
+    };
+    
+    const profitRate = profitPercentageMap[order.duration] || 0.30; // Default to 30%
+    
+    // For active orders, show expected profit
+    if (order.status === "active") {
+      return orderAmount * profitRate;
+    }
+    
+    // For completed orders, show actual profit (should be positive for display)
+    if (order.status === "completed" && order.profit) {
+      return Math.abs(parseFloat(order.profit));
+    }
+    
+    return orderAmount * profitRate;
+  };
+
   // Handle time filter change
   const handleTimeFilterChange = (value: string) => {
     setTimeFilter(value);
@@ -150,21 +176,8 @@ export function CustomerBettingOrders() {
   if (showDetailView && selectedOrder) {
     const orderNumber = selectedOrder.orderId || `${selectedOrder.id}`;
     
-    // Calculate profit using same scale-based logic
-    const getScaleProfitPercentage = (duration: number) => {
-      const profitMap: { [key: number]: number } = {
-        30: 20,   // 20%
-        60: 30,   // 30%
-        120: 40,  // 40%
-        180: 50,  // 50%
-        240: 60   // 60%
-      };
-      return profitMap[duration] || 30; // Default to 30%
-    };
-    
-    const profitPercentage = getScaleProfitPercentage(selectedOrder.duration);
-    // Customer profits are always positive regardless of result
-    const profit = selectedOrder.status === "completed" ? parseFloat(selectedOrder.amount) * (profitPercentage / 100) : 0;
+    // Calculate profit for the selected order
+    const profit = calculateProfit(selectedOrder);
     
     return (
       <div className="p-4 bg-white min-h-screen">
@@ -318,21 +331,8 @@ export function CustomerBettingOrders() {
             {filteredOrders.map((order) => {
               const orderNumber = order.orderId || `${order.id}`;
               
-              // Calculate profit using scale-based percentages
-              const getScaleProfitPercentage = (duration: number) => {
-                const profitMap: { [key: number]: number } = {
-                  30: 20,   // 20%
-                  60: 30,   // 30%
-                  120: 40,  // 40%
-                  180: 50,  // 50%
-                  240: 60   // 60%
-                };
-                return profitMap[duration] || 30; // Default to 30%
-              };
-              
-              const profitPercentage = getScaleProfitPercentage(order.duration);
-              // Customer profits are always positive regardless of result  
-              const profit = order.status === "completed" ? parseFloat(order.amount) * (profitPercentage / 100) : 0;
+              // Calculate profit using our function
+              const profit = calculateProfit(order);
               const isProfit = profit > 0;
               
               return (

@@ -200,6 +200,7 @@ Changelog:
 - July 15, 2025. Fixed "Failed to fetch" network error handling - added comprehensive error handling to queryClient.ts apiRequest and getQueryFn functions, converts network errors into user-friendly messages while maintaining debug logging
 - July 16, 2025. Implemented notification sound system for new betting orders - added Web Audio API-based notification sounds that play when customers place new orders, includes double-beep sound alert, toast notifications, and toggle button for admin control, tracks order count changes to detect new orders in real-time
 - July 18, 2025. Enhanced admin betting orders screen to show all historical records - changed from displaying only active orders to showing all betting orders (active, completed, cancelled) with status column, conditional timer display for active orders only, and profit information for completed orders
+- July 18, 2025. Fixed customer interface issues - reduced Buy Up/Down button sizes from h-16 to h-12 in crypto-trading and h-12 to h-10 in trading-interface for better mobile UX, implemented real-time profit calculation to show expected profit amounts instead of 0 for active orders, standardized all currency pairs to use USDT instead of USD throughout frontend and backend API endpoints
 
 ## User Preferences
 

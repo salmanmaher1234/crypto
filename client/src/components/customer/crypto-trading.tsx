@@ -52,12 +52,12 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     if (!cryptoPrices) return null;
     
     const symbolMap: { [key: string]: string } = {
-      "BTC": "BTC/USD",
-      "ETH": "ETH/USD", 
-      "DOGE": "DOGE/USD",
-      "LTC": "LTC/USD",
-      "CHZ": "CHZ/USD",
-      "BCH": "BCH/USD"
+      "BTC": "BTC/USDT",
+      "ETH": "ETH/USDT", 
+      "DOGE": "DOGE/USDT",
+      "LTC": "LTC/USDT",
+      "CHZ": "CHZ/USDT",
+      "BCH": "BCH/USDT"
     };
     
     const apiSymbol = symbolMap[cryptoKey];
@@ -634,17 +634,17 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
       {/* Trading Buttons */}
       <div className="grid grid-cols-2 gap-4">
         <Button 
-          className="h-16 bg-green-500 hover:bg-green-600 text-white text-lg font-medium"
+          className="h-12 bg-green-500 hover:bg-green-600 text-white text-base font-medium"
           onClick={() => handleBuyOrder("up")}
         >
-          <TrendingUp className="w-5 h-5 mr-2" />
+          <TrendingUp className="w-4 h-4 mr-2" />
           Buy Up
         </Button>
         <Button 
-          className="h-16 bg-red-500 hover:bg-red-600 text-white text-lg font-medium"
+          className="h-12 bg-red-500 hover:bg-red-600 text-white text-base font-medium"
           onClick={() => handleBuyOrder("down")}
         >
-          <TrendingDown className="w-5 h-5 mr-2" />
+          <TrendingDown className="w-4 h-4 mr-2" />
           Buy Down
         </Button>
       </div>

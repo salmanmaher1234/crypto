@@ -11,7 +11,7 @@ import { queryClient } from "@/lib/queryClient";
 const durations = [30, 60, 120, 180, 240];
 
 export function TradingInterface() {
-  const [selectedAsset, setSelectedAsset] = useState("BTC/USD");
+  const [selectedAsset, setSelectedAsset] = useState("BTC/USDT");
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState(30);
   const [selectedDirection, setSelectedDirection] = useState<"Buy Up" | "Buy Down" | null>(null);
@@ -70,7 +70,7 @@ export function TradingInterface() {
     });
   };
 
-  const assets = prices ? Object.keys(prices) : ["BTC/USD", "ETH/USD"];
+  const assets = prices ? Object.keys(prices) : ["BTC/USDT", "ETH/USDT"];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -139,7 +139,7 @@ export function TradingInterface() {
               <Button
                 onClick={() => setSelectedDirection("Buy Up")}
                 variant={selectedDirection === "Buy Up" ? "default" : "outline"}
-                className={`h-12 flex items-center justify-center ${
+                className={`h-10 flex items-center justify-center ${
                   selectedDirection === "Buy Up" 
                     ? "bg-green-500 hover:bg-green-600 text-white border-green-500" 
                     : "border-green-500 text-green-500 hover:bg-green-50"
@@ -151,7 +151,7 @@ export function TradingInterface() {
               <Button
                 onClick={() => setSelectedDirection("Buy Down")}
                 variant={selectedDirection === "Buy Down" ? "default" : "outline"}
-                className={`h-12 flex items-center justify-center ${
+                className={`h-10 flex items-center justify-center ${
                   selectedDirection === "Buy Down" 
                     ? "bg-green-500 hover:bg-green-600 text-white border-green-500" 
                     : "border-green-500 text-green-500 hover:bg-green-50"

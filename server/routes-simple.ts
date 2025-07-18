@@ -1028,27 +1028,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Transform the data to match our format
       const transformedData = {
-        "BTC/USD": {
+        "BTC/USDT": {
           price: data.bitcoin.usd.toFixed(2),
           change: data.bitcoin.usd_24h_change ? `${data.bitcoin.usd_24h_change >= 0 ? '+' : ''}${data.bitcoin.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.bitcoin.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "ETH/USD": {
+        "ETH/USDT": {
           price: data.ethereum.usd.toFixed(2),
           change: data.ethereum.usd_24h_change ? `${data.ethereum.usd_24h_change >= 0 ? '+' : ''}${data.ethereum.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.ethereum.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "DOGE/USD": {
+        "DOGE/USDT": {
           price: data.dogecoin.usd.toFixed(5),
           change: data.dogecoin.usd_24h_change ? `${data.dogecoin.usd_24h_change >= 0 ? '+' : ''}${data.dogecoin.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.dogecoin.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "CHZ/USD": {
+        "CHZ/USDT": {
           price: data.chiliz.usd.toFixed(5),
           change: data.chiliz.usd_24h_change ? `${data.chiliz.usd_24h_change >= 0 ? '+' : ''}${data.chiliz.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.chiliz.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "BCH/USD": {
+        "BCH/USDT": {
           price: data['bitcoin-cash'].usd.toFixed(2),
           change: data['bitcoin-cash'].usd_24h_change ? `${data['bitcoin-cash'].usd_24h_change >= 0 ? '+' : ''}${data['bitcoin-cash'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['bitcoin-cash'].usd_24h_change >= 0 ? "positive" : "negative"
@@ -1068,7 +1068,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           change: data['atletico-madrid'].usd_24h_change ? `${data['atletico-madrid'].usd_24h_change >= 0 ? '+' : ''}${data['atletico-madrid'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['atletico-madrid'].usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "LTC/USD": {
+        "LTC/USDT": {
           price: data.litecoin.usd.toFixed(2),
           change: data.litecoin.usd_24h_change ? `${data.litecoin.usd_24h_change >= 0 ? '+' : ''}${data.litecoin.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.litecoin.usd_24h_change >= 0 ? "positive" : "negative"
@@ -1100,27 +1100,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error fetching crypto prices:', error);
       // Fallback to static data if API fails
       res.json({
-        "BTC/USD": {
+        "BTC/USDT": {
           price: "42150.00",
           change: "+2.4%",
           changeType: "positive"
         },
-        "ETH/USD": {
+        "ETH/USDT": {
           price: "2850.00",
           change: "-1.2%",
           changeType: "negative"
         },
-        "DOGE/USD": {
+        "DOGE/USDT": {
           price: "0.16147",
           change: "-1.87%",
           changeType: "negative"
         },
-        "CHZ/USD": {
+        "CHZ/USDT": {
           price: "0.03457",
           change: "-2.59%",
           changeType: "negative"
         },
-        "BCH/USD": {
+        "BCH/USDT": {
           price: "502.8",
           change: "0.50%",
           changeType: "positive"
