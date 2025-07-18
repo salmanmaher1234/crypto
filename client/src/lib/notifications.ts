@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 // Notification sound utility
 export class NotificationSound {
   private static audioContext: AudioContext | null = null;
@@ -12,11 +14,21 @@ export class NotificationSound {
   }
 
   // Create a beep sound using Web Audio API
-  static playNotificationSound(frequency = 800, duration = 200, volume = 0.3) {
-    if (!this.isEnabled) return;
+  static playNotificationSound(frequency = 800, duration = 200, volume = 0.5) {
+    console.log("Attempting to play sound - enabled:", this.isEnabled, "frequency:", frequency);
+    
+    if (!this.isEnabled) {
+      console.log("Sound disabled, not playing");
+      return;
+    }
 
     try {
       const audioContext = this.getAudioContext();
+      
+      // Resume audio context if suspended (required for some browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
       
       // Create oscillator for tone
       const oscillator = audioContext.createOscillator();
@@ -38,6 +50,8 @@ export class NotificationSound {
       // Play sound
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + duration / 1000);
+      
+      console.log("Sound played successfully");
     } catch (error) {
       console.warn('Failed to play notification sound:', error);
     }
@@ -64,21 +78,30 @@ export class NotificationSound {
 
 // Hook for managing notification preferences
 export const useNotificationSound = () => {
+  const [isEnabled, setIsEnabled] = useState(NotificationSound.isNotificationEnabled());
+
   const playNewOrderSound = () => {
+    console.log("Playing new order sound, enabled:", isEnabled);
     NotificationSound.playNewOrderNotification();
   };
 
   const toggleNotifications = () => {
-    const currentState = NotificationSound.isNotificationEnabled();
-    NotificationSound.setEnabled(!currentState);
-    return !currentState;
+    const newState = !isEnabled;
+    console.log("Toggling notifications from", isEnabled, "to", newState);
+    NotificationSound.setEnabled(newState);
+    setIsEnabled(newState);
+    return newState;
   };
 
-  const isEnabled = NotificationSound.isNotificationEnabled();
+  const testSound = () => {
+    console.log("Testing notification sound");
+    NotificationSound.playNewOrderNotification();
+  };
 
   return {
     playNewOrderSound,
     toggleNotifications,
+    testSound,
     isEnabled
   };
 };

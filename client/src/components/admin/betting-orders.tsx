@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { X, TrendingUp, TrendingDown, Volume2, VolumeX } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNotificationSound } from "@/lib/notifications";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const durations = [30, 60, 120, 180, 240];
 
@@ -16,16 +16,18 @@ export function BettingOrders() {
   const { data: orders, isLoading } = useActiveBettingOrders();
   const updateOrder = useUpdateBettingOrder();
   const { toast } = useToast();
-  const { playNewOrderSound, toggleNotifications, isEnabled } = useNotificationSound();
+  const { playNewOrderSound, toggleNotifications, testSound, isEnabled } = useNotificationSound();
   const previousOrderCountRef = useRef<number>(0);
 
   // Track new orders and play notification sound
   useEffect(() => {
-    if (orders && orders.length > 0) {
+    if (orders && Array.isArray(orders)) {
       const currentOrderCount = orders.length;
+      console.log("Orders count changed:", previousOrderCountRef.current, "->", currentOrderCount);
       
       // Only play sound if we have more orders than before (new orders added)
       if (previousOrderCountRef.current > 0 && currentOrderCount > previousOrderCountRef.current) {
+        console.log("New orders detected, playing sound");
         playNewOrderSound();
         toast({
           title: "New Betting Order",
@@ -36,6 +38,12 @@ export function BettingOrders() {
       previousOrderCountRef.current = currentOrderCount;
     }
   }, [orders, playNewOrderSound, toast]);
+
+  // Add test sound function for debugging
+  const handleTestSound = () => {
+    console.log("Testing sound manually");
+    testSound();
+  };
 
   const handleUpdateDuration = (orderId: number, newDuration: number) => {
     const newExpiresAt = new Date(Date.now() + newDuration * 1000);
@@ -132,15 +140,25 @@ export function BettingOrders() {
         <CardHeader className="p-2">
           <div className="flex justify-between items-center mb-2">
             <CardTitle>Active Betting Orders</CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleNotifications}
-              className="flex items-center gap-2"
-            >
-              {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-              {isEnabled ? "Sound On" : "Sound Off"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleNotifications}
+                className="flex items-center gap-2"
+              >
+                {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                {isEnabled ? "Sound On" : "Sound Off"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleTestSound}
+                className="flex items-center gap-2"
+              >
+                Test Sound
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="default" size="sm">All Orders</Button>
