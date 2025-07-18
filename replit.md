@@ -199,6 +199,7 @@ Changelog:
 - July 15, 2025. Fixed message formatting system - customer messages now preserve exact formatting from admin "Send a letter" input using whitespace-pre-wrap CSS, maintains line breaks and spacing as admin typed them
 - July 15, 2025. Fixed "Failed to fetch" network error handling - added comprehensive error handling to queryClient.ts apiRequest and getQueryFn functions, converts network errors into user-friendly messages while maintaining debug logging
 - July 16, 2025. Implemented notification sound system for new betting orders - added Web Audio API-based notification sounds that play when customers place new orders, includes double-beep sound alert, toast notifications, and toggle button for admin control, tracks order count changes to detect new orders in real-time
+- July 18, 2025. Enhanced admin betting orders screen to show all historical records - changed from displaying only active orders to showing all betting orders (active, completed, cancelled) with status column, conditional timer display for active orders only, and profit information for completed orders
 
 ## User Preferences
 

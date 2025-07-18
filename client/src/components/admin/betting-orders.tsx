@@ -1,4 +1,4 @@
-import { useActiveBettingOrders, useUpdateBettingOrder } from "@/lib/api";
+import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,29 +13,30 @@ import { useEffect, useRef, useState } from "react";
 const durations = [30, 60, 120, 180, 240];
 
 export function BettingOrders() {
-  const { data: orders, isLoading } = useActiveBettingOrders();
+  const { data: orders, isLoading } = useBettingOrders();
   const updateOrder = useUpdateBettingOrder();
   const { toast } = useToast();
   const { playNewOrderSound, toggleNotifications, testSound, isEnabled } = useNotificationSound();
   const previousOrderCountRef = useRef<number>(0);
 
-  // Track new orders and play notification sound
+  // Track new active orders and play notification sound
   useEffect(() => {
     if (orders && Array.isArray(orders)) {
-      const currentOrderCount = orders.length;
-      console.log("Orders count changed:", previousOrderCountRef.current, "->", currentOrderCount);
+      const activeOrders = orders.filter(order => order.status === "active");
+      const currentActiveOrderCount = activeOrders.length;
+      console.log("Active orders count changed:", previousOrderCountRef.current, "->", currentActiveOrderCount);
       
-      // Only play sound if we have more orders than before (new orders added)
-      if (previousOrderCountRef.current > 0 && currentOrderCount > previousOrderCountRef.current) {
-        console.log("New orders detected, playing sound");
+      // Only play sound if we have more active orders than before (new orders added)
+      if (previousOrderCountRef.current > 0 && currentActiveOrderCount > previousOrderCountRef.current) {
+        console.log("New active orders detected, playing sound");
         playNewOrderSound();
         toast({
           title: "New Betting Order",
-          description: `${currentOrderCount - previousOrderCountRef.current} new order(s) received`,
+          description: `${currentActiveOrderCount - previousOrderCountRef.current} new order(s) received`,
         });
       }
       
-      previousOrderCountRef.current = currentOrderCount;
+      previousOrderCountRef.current = currentActiveOrderCount;
     }
   }, [orders, playNewOrderSound, toast]);
 
@@ -105,7 +106,7 @@ export function BettingOrders() {
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Active Betting Orders</CardTitle>
+              <CardTitle>All Betting Orders</CardTitle>
               <Button
                 variant="outline"
                 size="sm"
@@ -139,7 +140,7 @@ export function BettingOrders() {
       <Card className="h-full">
         <CardHeader className="p-2">
           <div className="flex justify-between items-center mb-2">
-            <CardTitle>Active Betting Orders</CardTitle>
+            <CardTitle>All Betting Orders</CardTitle>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -173,7 +174,7 @@ export function BettingOrders() {
           {!orders || orders.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>No active orders</p>
+              <p>No betting orders</p>
             </div>
           ) : (
             <Table>
@@ -184,6 +185,7 @@ export function BettingOrders() {
                   <TableHead>Asset</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Direction</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Timer</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -218,43 +220,67 @@ export function BettingOrders() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div>
-                          <div className="text-sm font-medium text-warning">
-                            {remainingTime}s
-                          </div>
-                          <div className="w-20 bg-gray-200 rounded-full h-1 mt-1">
-                            <div 
-                              className="bg-warning h-1 rounded-full transition-all duration-1000"
-                              style={{ width: `${progressPercent}%` }}
-                            />
-                          </div>
-                        </div>
+                        <Badge 
+                          variant={order.status === "active" ? "default" : 
+                                   order.status === "completed" ? "secondary" : "destructive"}
+                        >
+                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex space-x-2">
-                          <Select 
-                            value={order.duration.toString()} 
-                            onValueChange={(value) => handleUpdateDuration(order.id, parseInt(value))}
-                          >
-                            <SelectTrigger className="w-20">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {durations.map((duration) => (
-                                <SelectItem key={duration} value={duration.toString()}>
-                                  {duration}s
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleCancelOrder(order.id)}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
+                        {order.status === "active" ? (
+                          <div>
+                            <div className="text-sm font-medium text-warning">
+                              {remainingTime}s
+                            </div>
+                            <div className="w-20 bg-gray-200 rounded-full h-1 mt-1">
+                              <div 
+                                className="bg-warning h-1 rounded-full transition-all duration-1000"
+                                style={{ width: `${progressPercent}%` }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-500">
+                            {order.status === "completed" ? "Completed" : "Cancelled"}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {order.status === "active" ? (
+                          <div className="flex space-x-2">
+                            <Select 
+                              value={order.duration.toString()} 
+                              onValueChange={(value) => handleUpdateDuration(order.id, parseInt(value))}
+                            >
+                              <SelectTrigger className="w-20">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {durations.map((duration) => (
+                                  <SelectItem key={duration} value={duration.toString()}>
+                                    {duration}s
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleCancelOrder(order.id)}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-500">
+                            {order.status === "completed" && order.profit && (
+                              <div>
+                                Profit: {parseFloat(order.profit).toFixed(2)}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
