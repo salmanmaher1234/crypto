@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { X, TrendingUp, TrendingDown } from "lucide-react";
+import { X, TrendingUp, TrendingDown, Volume2, VolumeX } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNotificationSound } from "@/lib/notifications";
+import { useEffect, useRef } from "react";
 
 const durations = [30, 60, 120, 180, 240];
 
@@ -14,6 +16,26 @@ export function BettingOrders() {
   const { data: orders, isLoading } = useActiveBettingOrders();
   const updateOrder = useUpdateBettingOrder();
   const { toast } = useToast();
+  const { playNewOrderSound, toggleNotifications, isEnabled } = useNotificationSound();
+  const previousOrderCountRef = useRef<number>(0);
+
+  // Track new orders and play notification sound
+  useEffect(() => {
+    if (orders && orders.length > 0) {
+      const currentOrderCount = orders.length;
+      
+      // Only play sound if we have more orders than before (new orders added)
+      if (previousOrderCountRef.current > 0 && currentOrderCount > previousOrderCountRef.current) {
+        playNewOrderSound();
+        toast({
+          title: "New Betting Order",
+          description: `${currentOrderCount - previousOrderCountRef.current} new order(s) received`,
+        });
+      }
+      
+      previousOrderCountRef.current = currentOrderCount;
+    }
+  }, [orders, playNewOrderSound, toast]);
 
   const handleUpdateDuration = (orderId: number, newDuration: number) => {
     const newExpiresAt = new Date(Date.now() + newDuration * 1000);
@@ -74,7 +96,18 @@ export function BettingOrders() {
       <div className="p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Active Betting Orders</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle>Active Betting Orders</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleNotifications}
+                className="flex items-center gap-2"
+              >
+                {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                {isEnabled ? "Sound On" : "Sound Off"}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -97,7 +130,18 @@ export function BettingOrders() {
     <div className="p-1 h-full">
       <Card className="h-full">
         <CardHeader className="p-2">
-          <CardTitle>Active Betting Orders</CardTitle>
+          <div className="flex justify-between items-center mb-2">
+            <CardTitle>Active Betting Orders</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleNotifications}
+              className="flex items-center gap-2"
+            >
+              {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {isEnabled ? "Sound On" : "Sound Off"}
+            </Button>
+          </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="default" size="sm">All Orders</Button>
             {durations.map((duration) => (

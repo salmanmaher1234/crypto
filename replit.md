@@ -198,6 +198,7 @@ Changelog:
 - July 15, 2025. Fixed customer interface issues - changed default period from 60s 30% to 30s 20% in order popups, added tasks ban option back to member management with full functionality, removed VIP Level column from member management screen, created comprehensive Hostinger deployment guide with all necessary commands
 - July 15, 2025. Fixed message formatting system - customer messages now preserve exact formatting from admin "Send a letter" input using whitespace-pre-wrap CSS, maintains line breaks and spacing as admin typed them
 - July 15, 2025. Fixed "Failed to fetch" network error handling - added comprehensive error handling to queryClient.ts apiRequest and getQueryFn functions, converts network errors into user-friendly messages while maintaining debug logging
+- July 16, 2025. Implemented notification sound system for new betting orders - added Web Audio API-based notification sounds that play when customers place new orders, includes double-beep sound alert, toast notifications, and toggle button for admin control, tracks order count changes to detect new orders in real-time
 
 ## User Preferences
 
