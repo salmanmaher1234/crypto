@@ -61,7 +61,7 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     };
     
     const apiSymbol = symbolMap[cryptoKey];
-    return apiSymbol && cryptoPrices[apiSymbol] ? cryptoPrices[apiSymbol] : null;
+    return apiSymbol && (cryptoPrices as any)[apiSymbol] ? (cryptoPrices as any)[apiSymbol] : null;
   };
 
   const cryptoData: { [key: string]: any } = {
@@ -226,7 +226,8 @@ export function CryptoTrading({ currency, onBack, onOrderPlaced }: CryptoTrading
     createBettingOrder.mutate({
       asset: currency,
       amount: orderAmount,
-      direction: orderType === "up" ? "Buy Up" : "Buy Down",
+      direction: "Actual", // Always send "Actual" for this interface
+      actualDirection: orderType === "up" ? "Buy Up" : "Buy Down", // Pass the actual clicked direction
       duration: parseInt(selectedPeriod.replace('s', '')),
       entryPrice: currentCrypto.price,
     }, {

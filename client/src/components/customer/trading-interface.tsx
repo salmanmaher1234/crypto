@@ -39,12 +39,14 @@ export function TradingInterface() {
     // Clear validation error if amount is valid
     setValidationError("");
 
-    const entryPrice = prices?.[selectedAsset]?.price || "0";
+    const entryPrice = (prices as any)?.[selectedAsset]?.price || "0";
     
+    // For "Actual" direction, always use the clicked direction (not admin override)
     createOrder.mutate({
       asset: selectedAsset,
       amount,
-      direction,
+      direction: "Actual", // Always send "Actual" for this interface
+      actualDirection: direction, // Pass the actual clicked direction
       duration,
       entryPrice,
     }, {
@@ -84,7 +86,7 @@ export function TradingInterface() {
             <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Select Asset</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {assets.map((asset) => {
-                const priceData = prices?.[asset];
+                const priceData = (prices as any)?.[asset];
                 const isSelected = selectedAsset === asset;
                 return (
                   <button

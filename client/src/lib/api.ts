@@ -137,7 +137,7 @@ export function useCreateBettingOrder() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (order: { asset: string; amount: string; direction: string; duration: number; entryPrice: string }) => {
+    mutationFn: async (order: { asset: string; amount: string; direction: string; duration: number; entryPrice: string; actualDirection?: string }) => {
       const response = await apiRequest("POST", "/api/betting-orders", order);
       return response.json();
     },

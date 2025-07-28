@@ -13,7 +13,9 @@ import { Eye, EyeOff, User, Lock, Share2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  username: z.string()
+    .min(3, "Username must be at least 3 characters")
+    .refine((val) => !val.includes(" "), "Username cannot contain spaces"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Please confirm your password"),
   fundPassword: z.string().min(6, "Fund password must be at least 6 characters"),
@@ -42,6 +44,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showFundPassword, setShowFundPassword] = useState(false);
   const [showConfirmFundPassword, setShowConfirmFundPassword] = useState(false);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -55,8 +58,42 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
     },
   });
 
+  // Check for duplicate username
+  const checkUsernameAvailability = async (username: string) => {
+    if (!username.trim()) return true;
+    
+    setIsCheckingUsername(true);
+    try {
+      const response = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to check username");
+      }
+      
+      const result = await response.json();
+      return result.available;
+    } catch (error) {
+      console.error("Username check error:", error);
+      return true; // Allow registration if check fails
+    } finally {
+      setIsCheckingUsername(false);
+    }
+  };
+
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterForm) => {
+      // Check username availability before proceeding
+      const isAvailable = await checkUsernameAvailability(data.username);
+      if (!isAvailable) {
+        throw new Error("Username already exists");
+      }
+
       const registerData = {
         username: data.username,
         password: data.password,
@@ -124,7 +161,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Input
                         {...field}
-                        placeholder="Amitkumar"
+                        placeholder="username"
                         className="pl-12 h-12 bg-blue-50 border-blue-100"
                       />
                     </div>
@@ -146,7 +183,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                       <Input
                         {...field}
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="Enter Password"
                         className="pl-12 pr-12 h-12 bg-gray-50 border-gray-200"
                       />
                       <button

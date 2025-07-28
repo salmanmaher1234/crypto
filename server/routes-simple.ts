@@ -79,6 +79,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Auth routes
+  // Check username availability endpoint
+  app.get("/api/auth/check-username", async (req, res) => {
+    try {
+      const { username } = req.query;
+      
+      if (!username || typeof username !== 'string') {
+        return res.status(400).json({ message: "Username is required" });
+      }
+
+      // Check if username already exists
+      const existingUser = memStorage.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      
+      res.json({ 
+        available: !existingUser,
+        message: existingUser ? "Username already exists" : "Username is available"
+      });
+    } catch (error) {
+      console.error("Username check error:", error);
+      res.status(500).json({ message: "Failed to check username availability" });
+    }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
