@@ -10,25 +10,43 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
 export function MemberManagement() {
-  const { data: users, isLoading } = useUsers();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const limit = 25;
+  
+  const { data: response, isLoading } = useUsers(currentPage, limit, searchTerm);
   const updateUser = useUpdateUser();
   const createTransaction = useCreateTransaction();
   const { toast } = useToast();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredUsers = users?.filter(user =>
-    user.role === "customer" &&
-    ((user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-     (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-     (user.username || '').toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  const users = response?.users || [];
+  const pagination = response?.pagination || {
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  };
+
+  const filteredUsers = users.filter((user: any) => user.role === "customer");
+
+  // Handle search term changes
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleUpdateUser = (updates: Partial<User>) => {
     if (!selectedUser) return;
@@ -110,7 +128,7 @@ export function MemberManagement() {
             <Input
               placeholder="Search customers..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="max-w-sm"
             />
           </div>
@@ -126,7 +144,7 @@ export function MemberManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map((user) => (
+              {filteredUsers.map((user: any) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center space-x-3">
@@ -148,8 +166,8 @@ export function MemberManagement() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.accountStatus === "Active" ? "default" : "destructive"}>
-                      {user.accountStatus}
+                    <Badge variant={user.isBanned ? "destructive" : "default"}>
+                      {user.isBanned ? "Banned" : "Active"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -177,6 +195,58 @@ export function MemberManagement() {
               ))}
             </TableBody>
           </Table>
+          
+          {/* Pagination */}
+          <div className="flex items-center justify-between pt-4">
+            <div className="text-sm text-gray-500">
+              Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, pagination.totalCount)} of {pagination.totalCount} customers
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={!pagination.hasPrevPage}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  const pageNum = currentPage <= 3 
+                    ? i + 1 
+                    : currentPage >= pagination.totalPages - 2
+                    ? pagination.totalPages - 4 + i
+                    : currentPage - 2 + i;
+                  
+                  if (pageNum > pagination.totalPages || pageNum < 1) return null;
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={pageNum === currentPage ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={!pagination.hasNextPage}
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -196,8 +266,8 @@ function CustomerEditForm({
     reputation: user.reputation,
     winLoseSetting: user.winLoseSetting,
     direction: user.direction,
-    accountStatus: user.accountStatus,
-    withdrawalStatus: user.withdrawalStatus,
+    isBanned: user.isBanned,
+    withdrawalProhibited: user.withdrawalProhibited,
     tasksBan: user.tasksBan || "Allowed",
   });
 
@@ -256,25 +326,25 @@ function CustomerEditForm({
           </div>
           <div>
             <Label htmlFor="accountStatus">Account Status</Label>
-            <Select value={formData.accountStatus} onValueChange={(value) => setFormData({ ...formData, accountStatus: value })}>
+            <Select value={formData.isBanned ? "Banned" : "Active"} onValueChange={(value) => setFormData({ ...formData, isBanned: value === "Banned" })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Prohibit">Prohibit</SelectItem>
+                <SelectItem value="Banned">Banned</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
             <Label htmlFor="withdrawalStatus">Withdrawal Status</Label>
-            <Select value={formData.withdrawalStatus} onValueChange={(value) => setFormData({ ...formData, withdrawalStatus: value })}>
+            <Select value={formData.withdrawalProhibited ? "Prohibited" : "Allowed"} onValueChange={(value) => setFormData({ ...formData, withdrawalProhibited: value === "Prohibited" })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Allowed">Allowed</SelectItem>
-                <SelectItem value="Prohibit">Prohibit</SelectItem>
+                <SelectItem value="Prohibited">Prohibited</SelectItem>
               </SelectContent>
             </Select>
           </div>

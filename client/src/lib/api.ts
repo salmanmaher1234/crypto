@@ -3,9 +3,18 @@ import { apiRequest } from "@/lib/queryClient";
 import type { User, Transaction, BettingOrder, WithdrawalRequest, Announcement, BankAccount, Message } from "@shared/schema";
 
 // Users API
-export function useUsers() {
-  return useQuery<User[]>({
-    queryKey: ["/api/users"],
+export function useUsers(page = 1, limit = 25, search = '') {
+  return useQuery({
+    queryKey: ["/api/users", page, limit, search],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(search && { search })
+      });
+      const response = await apiRequest("GET", `/api/users?${params}`);
+      return response.json();
+    },
   });
 }
 
