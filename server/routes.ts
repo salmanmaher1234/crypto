@@ -223,8 +223,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("User ID from session:", req.session.userId);
       console.log("Order data:", req.body);
       
+      // Get user to check their backend direction setting
+      const user = await storage.getUser(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Determine the final direction to store in the order
+      let finalDirection = req.body.direction;
+      
+      if (user.direction === "Actual") {
+        // When admin sets direction to "Actual", use customer's actual choice
+        finalDirection = req.body.actualDirection || req.body.direction;
+        console.log(`Using direction: ${finalDirection} (backend setting: ${user.direction}, customer choice: ${req.body.actualDirection})`);
+      } else {
+        // When admin sets a specific direction, override customer's choice
+        finalDirection = user.direction;
+        console.log(`Using direction: ${finalDirection} (backend override: ${user.direction})`);
+      }
+      
       const dataToValidate = {
         ...req.body,
+        direction: finalDirection, // Use the determined direction
         userId: req.session.userId,
       };
       
@@ -247,19 +267,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const commissionAmount = orderAmount * commissionRate;
       
       console.log(`Commission calculation: ${orderAmount} × ${commissionRate} = ${commissionAmount}`);
+      console.log("Order data:", validatedData);
       
       const order = await storage.createBettingOrder(validatedData);
       console.log("Created order:", order);
       
       // Deduct amount from available balance and add commission
-      const user = await storage.getUser(req.session.userId);
-      console.log("Current user before balance update:", user);
+      const userForBalance = await storage.getUser(req.session.userId);
+      console.log("Current user before balance update:", userForBalance);
       
-      if (user) {
-        const currentBalance = parseFloat(user.availableBalance);
-        const newBalance = currentBalance - orderAmount + commissionAmount;
+      if (userForBalance) {
+        const currentBalance = parseFloat(userForBalance.availableBalance);
+        const newBalance = currentBalance - orderAmount;
         
-        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} + ${commissionAmount} = ${newBalance}`);
+        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} = ${newBalance}`);
         
         const updatedUser = await storage.updateUser(req.session.userId, {
           availableBalance: newBalance.toFixed(2),
