@@ -232,15 +232,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Determine the final direction to store in the order
       let finalDirection = req.body.direction;
       
+      console.log(`Backend direction logic - User direction: ${user.direction}, Request direction: ${req.body.direction}, Actual direction: ${req.body.actualDirection}`);
+      
       if (user.direction === "Actual") {
         // When admin sets direction to "Actual", use customer's actual choice
         finalDirection = req.body.actualDirection || req.body.direction;
-        console.log(`Using direction: ${finalDirection} (backend setting: ${user.direction}, customer choice: ${req.body.actualDirection})`);
+        console.log(`Using ACTUAL direction: ${finalDirection} (backend setting: ${user.direction}, customer choice: ${req.body.actualDirection})`);
       } else {
         // When admin sets a specific direction, override customer's choice
         finalDirection = user.direction;
-        console.log(`Using direction: ${finalDirection} (backend override: ${user.direction})`);
+        console.log(`Using OVERRIDE direction: ${finalDirection} (backend override: ${user.direction})`);
       }
+      
+      console.log(`FINAL DIRECTION TO STORE: ${finalDirection}`);
       
       const dataToValidate = {
         ...req.body,

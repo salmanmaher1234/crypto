@@ -204,6 +204,7 @@ Changelog:
 - July 28, 2025. Enhanced direction control system - updated trading interfaces to pass "Actual" direction with customer's clicked choice, allowing proper direction handling when admin sets backend direction to "Actual", updated register form placeholders from "AmitKumar" to "username" and password placeholder to "Enter Password", implemented comprehensive username validation with no spaces allowed and duplicate checking via new /api/auth/check-username endpoint
 - July 28, 2025. Added pagination to Member Management screen - displays 25 customers per page with Previous/Next navigation, numbered page buttons (up to 5 visible), and record count display showing current page range with search functionality that resets to first page
 - July 28, 2025. Updated database schema.sql with complete current structure - includes all latest fields (win_lose_setting, tasks_ban, credit_score, signature_data, order_id, processed_at), sample data with test users and bank accounts, performance indexes, and MySQL compatibility settings for Hostinger deployment
+- July 29, 2025. Fixed direction display system for "Actual" setting - when admin sets member direction to "Actual" in member management, backend now properly processes customer's actualDirection parameter and stores their real choice (Buy Up/Buy Down) instead of "Actual", ensuring order screens display customer's actual selection
 
 ## User Preferences
 
