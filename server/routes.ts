@@ -246,8 +246,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`FINAL DIRECTION TO STORE: ${finalDirection}`);
       
+      // Remove actualDirection from validation data since it's not part of the schema
+      const { actualDirection, ...bodyWithoutActual } = req.body;
+      
       const dataToValidate = {
-        ...req.body,
+        ...bodyWithoutActual,
         direction: finalDirection, // Use the determined direction
         userId: req.session.userId,
       };
