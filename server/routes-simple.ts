@@ -647,14 +647,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orderId = `ORD${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
       
       // Manually validate required fields
-      const { asset, amount: orderAmount, direction, duration, entryPrice } = req.body;
+      const { asset, amount: orderAmount, direction, actualDirection, duration, entryPrice } = req.body;
       if (!asset || !orderAmount || !direction || !duration || !entryPrice) {
         return res.status(400).json({ message: "Missing required fields" });
       }
       
       // Use customer's clicked direction if backend direction is "Actual", otherwise use admin-managed direction
-      const effectiveDirection = user.direction === "Actual" ? direction : (user.direction || "Buy Up");
-      console.log(`Using direction: ${effectiveDirection} (backend setting: ${user.direction}, customer choice: ${direction})`);
+      const effectiveDirection = user.direction === "Actual" ? (actualDirection || direction) : (user.direction || "Buy Up");
+      console.log(`Direction: ${effectiveDirection} (backend: ${user.direction}, customer: ${actualDirection || direction})`);
       
       // Prepare complete order data with all required fields
       const orderData = {

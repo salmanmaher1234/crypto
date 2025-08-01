@@ -242,10 +242,18 @@ export class DatabaseStorage implements IStorage {
       let balanceImpact = baseProfitAmount; // This affects actual balance calculation
       
       if (user.direction === "Actual") {
-        // Actual = No profit/loss, only return original amount
-        finalProfitAmount = 0;
-        balanceImpact = 0;
-        result = "win";
+        // When user direction is "Actual", use the order's stored direction (customer's actual choice)
+        if (order.direction === "Buy Up") {
+          balanceImpact = baseProfitAmount;
+          result = "win";
+        } else if (order.direction === "Buy Down") {
+          balanceImpact = -baseProfitAmount;
+          result = "loss";
+        } else {
+          // Fallback
+          balanceImpact = baseProfitAmount;
+          result = "win";
+        }
       } else if (user.direction === "Buy Up") {
         // Buy Up = Profit is added to balance (positive impact)
         balanceImpact = baseProfitAmount;
