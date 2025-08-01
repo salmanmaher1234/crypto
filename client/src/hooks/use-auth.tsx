@@ -31,6 +31,18 @@ export function useAuth() {
     }
   }, [queryClient]);
 
+  // Auto-refresh balance every 10 seconds when user is logged in
+  useEffect(() => {
+    const sessionId = localStorage.getItem('sessionId');
+    if (!sessionId) return;
+    
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    }, 10000); // Refresh every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [queryClient]);
+
   const { data: authData, isLoading } = useQuery<AuthResponse | null>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
