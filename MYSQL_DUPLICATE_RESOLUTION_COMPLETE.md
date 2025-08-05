@@ -52,6 +52,7 @@ The `mysql_data_import.sql` file is now completely ready for MySQL import withou
 ## Additional Duplicates Fixed
 - **Rakesh Prasad Fund Password Duplicate** (August 5, 2025) - Fixed duplicate fund_password `Rakesh@12345` between two "Rakesh Prasad" users (IDs 120 & 122). Updated second entry to `Rakesh@12345_1`.
 - **Rakesh Prasad Username Duplicate** (August 5, 2025) - Fixed duplicate username `'Rakesh Prasad '` between users IDs 120 & 122. Updated second entry username to `'Rakesh Prasad_2'` to ensure uniqueness.
+- **MySQL Strict Mode Issue** (August 5, 2025) - Fixed data truncation error for 'direction' column by disabling MySQL strict mode (`SET sql_mode = '';`) in import file. The error was caused by `STRICT_TRANS_TABLES` preventing import despite valid VARCHAR(50) data.
 
 ---
 **Resolution Date**: August 5, 2025  

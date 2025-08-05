@@ -5,7 +5,7 @@
 
 -- Configure MySQL for import
 SET FOREIGN_KEY_CHECKS = 0;
-SET sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO';
+SET sql_mode = '';
 SET time_zone = '+00:00';
 SET autocommit = 0;
 
