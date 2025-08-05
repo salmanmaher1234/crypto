@@ -49,6 +49,10 @@ The `mysql_data_import.sql` file is now completely ready for MySQL import withou
 - **Admin**: `admin` / `admin123`
 - **Customer**: `sarah` / `password123`
 
+## Additional Duplicate Fixed
+- **Rakesh Prasad Duplicate** (August 5, 2025) - Fixed duplicate fund_password `Rakesh@12345` between two "Rakesh Prasad" users (IDs 120 & 122). Updated second entry to `Rakesh@12345_1` to ensure uniqueness.
+
 ---
 **Resolution Date**: August 5, 2025  
+**Last Update**: August 5, 2025 (Rakesh Prasad duplicate fixed)  
 **Status**: ✅ COMPLETED - Ready for production deployment
