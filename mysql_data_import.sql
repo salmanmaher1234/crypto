@@ -1247,53 +1247,14 @@ INSERT INTO withdrawal_requests (id, user_id, bank_account_id, amount, status, n
 INSERT INTO withdrawal_requests (id, user_id, bank_account_id, amount, status, note, created_at, processed_at) VALUES (93, 252, 45, 68000.00, 'rejected', 'Wrong entry Your withdraw has been banned due to illegal entry', '2025-08-05 06:32:07.595153', '2025-08-05 06:34:09.354');
 
 
---
--- Name: announcements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('announcements_id_seq', 1, 0);
-
-
---
--- Name: bank_accounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('bank_accounts_id_seq', 45, 1);
-
-
---
--- Name: betting_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('betting_orders_id_seq', 587, 1);
-
-
---
--- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('messages_id_seq', 14, 1);
-
-
---
--- Name: transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('transactions_id_seq', 94, 1);
-
-
---
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('users_id_seq', 265, 1);
-
-
---
--- Name: withdrawal_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: neondb_owner
---
-
-SELECT pg_catalog.setval('withdrawal_requests_id_seq', 93, 1);
+-- Set MySQL AUTO_INCREMENT values for proper sequence continuation
+ALTER TABLE announcements AUTO_INCREMENT = 2;
+ALTER TABLE bank_accounts AUTO_INCREMENT = 46;
+ALTER TABLE betting_orders AUTO_INCREMENT = 588;
+ALTER TABLE messages AUTO_INCREMENT = 15;
+ALTER TABLE transactions AUTO_INCREMENT = 95;
+ALTER TABLE users AUTO_INCREMENT = 266;
+ALTER TABLE withdrawal_requests AUTO_INCREMENT = 94;
 
 
 --
