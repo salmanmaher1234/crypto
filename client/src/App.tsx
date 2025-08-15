@@ -1,29 +1,49 @@
-import React, { useState, useEffect } from "react";
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/use-auth";
+import { LoginModal } from "@/components/auth/login-modal";
+import AdminDashboard from "@/pages/admin-dashboard";
+import CustomerApp from "@/pages/customer-app";
+import { RechargeDetail } from "@/components/customer/recharge-detail";
+import NotFound from "@/pages/not-found";
 
-function App() {
-  const [health, setHealth] = useState<string>("Checking...");
+function AppContent() {
+  const { user, isLoading } = useAuth();
 
-  useEffect(() => {
-    fetch("/api/health")
-      .then(res => res.json())
-      .then(data => setHealth(data.message))
-      .catch(() => setHealth("Error connecting to server"));
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginModal />;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Crypto Trading App
-        </h1>
-        <p className="text-lg text-gray-600 mb-4">
-          Server Status: {health}
-        </p>
-        <div className="text-green-600">
-          ✅ Application is running successfully!
-        </div>
-      </div>
-    </div>
+    <Switch>
+      <Route path="/" component={user.role === "admin" ? AdminDashboard : CustomerApp} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/customer" component={CustomerApp} />
+      <Route path="/recharge-detail/:id" component={RechargeDetail} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <AppContent />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 

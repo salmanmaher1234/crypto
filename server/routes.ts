@@ -1,0 +1,509 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertUserSchema, insertBankAccountSchema, insertTransactionSchema, insertBettingOrderSchema, insertWithdrawalRequestSchema, insertAnnouncementSchema } from "@shared/schema";
+import { z } from "zod";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication middleware
+  const authenticateUser = (req: any, res: any, next: any) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+  };
+
+  const requireAdmin = async (req: any, res: any, next: any) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const user = await storage.getUser(req.session.userId);
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    next();
+  };
+
+  // Auth routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      if (req.session) {
+        req.session.userId = user.id;
+      }
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error) {
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    if (req.session?.destroy) {
+      req.session.destroy(() => {
+        res.json({ message: "Logged out successfully" });
+      });
+    } else {
+      res.json({ message: "Logged out successfully" });
+    }
+  });
+
+  app.get("/api/auth/me", authenticateUser, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get user" });
+    }
+  });
+
+  // User management routes
+  app.get("/api/users", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const usersWithoutPasswords = users.map(({ password, ...user }) => user);
+      res.json(usersWithoutPasswords);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get users" });
+    }
+  });
+
+  app.patch("/api/users/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedUser = await storage.updateUser(id, updates);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password: _, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  // Bank account routes
+  app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
+    try {
+      const bankAccounts = await storage.getBankAccountsByUserId(req.session.userId);
+      res.json(bankAccounts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get bank accounts" });
+    }
+  });
+
+  app.post("/api/bank-accounts", authenticateUser, async (req, res) => {
+    try {
+      const validatedData = insertBankAccountSchema.parse({
+        ...req.body,
+        userId: req.session.userId,
+      });
+      
+      const bankAccount = await storage.createBankAccount(validatedData);
+      res.json(bankAccount);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid bank account data" });
+    }
+  });
+
+  // Transaction routes
+  app.get("/api/transactions", authenticateUser, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId);
+      let transactions;
+      
+      if (user?.role === "admin") {
+        transactions = await storage.getAllTransactions();
+      } else {
+        transactions = await storage.getTransactionsByUserId(req.session.userId);
+      }
+      
+      res.json(transactions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get transactions" });
+    }
+  });
+
+  app.post("/api/transactions", authenticateUser, async (req, res) => {
+    try {
+      const validatedData = insertTransactionSchema.parse(req.body);
+      const transaction = await storage.createTransaction(validatedData);
+      
+      // Update user balance based on transaction type
+      const user = await storage.getUser(validatedData.userId);
+      if (user) {
+        const amount = parseFloat(validatedData.amount);
+        let balanceUpdate = {};
+        
+        switch (validatedData.type) {
+          case "deposit":
+            balanceUpdate = {
+              balance: (parseFloat(user.balance) + amount).toFixed(2),
+              availableBalance: (parseFloat(user.availableBalance) + amount).toFixed(2),
+            };
+            break;
+          case "withdrawal":
+            balanceUpdate = {
+              balance: (parseFloat(user.balance) - amount).toFixed(2),
+              availableBalance: (parseFloat(user.availableBalance) - amount).toFixed(2),
+            };
+            break;
+          case "freeze":
+            balanceUpdate = {
+              availableBalance: (parseFloat(user.availableBalance) - amount).toFixed(2),
+              frozenBalance: (parseFloat(user.frozenBalance) + amount).toFixed(2),
+            };
+            break;
+          case "unfreeze":
+            balanceUpdate = {
+              availableBalance: (parseFloat(user.availableBalance) + amount).toFixed(2),
+              frozenBalance: (parseFloat(user.frozenBalance) - amount).toFixed(2),
+            };
+            break;
+        }
+        
+        await storage.updateUser(validatedData.userId, balanceUpdate);
+      }
+      
+      res.json(transaction);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid transaction data" });
+    }
+  });
+
+  // Betting order routes
+  app.get("/api/betting-orders", authenticateUser, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId);
+      let orders;
+      
+      if (user?.role === "admin") {
+        orders = await storage.getAllBettingOrders();
+      } else {
+        orders = await storage.getBettingOrdersByUserId(req.session.userId);
+      }
+      
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get betting orders" });
+    }
+  });
+
+  app.get("/api/betting-orders/active", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const orders = await storage.getActiveBettingOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get active orders" });
+    }
+  });
+
+  app.post("/api/betting-orders", authenticateUser, async (req, res) => {
+    try {
+      console.log("==== BETTING ORDER START ====");
+      console.log("User ID from session:", req.session.userId);
+      console.log("Order data:", req.body);
+      
+      // Get user to check their backend direction setting
+      const user = await storage.getUser(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Determine the final direction to store in the order
+      let finalDirection = req.body.direction;
+      
+      console.log(`Backend direction logic - User direction: ${user.direction}, Request direction: ${req.body.direction}, Actual direction: ${req.body.actualDirection}`);
+      
+      if (user.direction === "Actual") {
+        // When admin sets direction to "Actual", use customer's actual choice
+        finalDirection = req.body.actualDirection || req.body.direction;
+        console.log(`Using ACTUAL direction: ${finalDirection} (backend setting: ${user.direction}, customer choice: ${req.body.actualDirection})`);
+      } else {
+        // When admin sets a specific direction, override customer's choice
+        finalDirection = user.direction;
+        console.log(`Using OVERRIDE direction: ${finalDirection} (backend override: ${user.direction})`);
+      }
+      
+      console.log(`FINAL DIRECTION TO STORE: ${finalDirection}`);
+      
+      // Remove actualDirection from validation data since it's not part of the schema
+      const { actualDirection, ...bodyWithoutActual } = req.body;
+      
+      const dataToValidate = {
+        ...bodyWithoutActual,
+        direction: finalDirection, // Use the determined direction
+        userId: req.session.userId,
+      };
+      
+      const validatedData = insertBettingOrderSchema.parse(dataToValidate);
+      
+      // Calculate commission based on duration
+      const getCommissionRate = (duration: number): number => {
+        switch (duration) {
+          case 30: return 0.20; // 20%
+          case 60: return 0.30; // 30%
+          case 120: return 0.40; // 40%
+          case 180: return 0.50; // 50%
+          case 240: return 0.60; // 60%
+          default: return 0.20; // Default to 20%
+        }
+      };
+      
+      const orderAmount = parseFloat(validatedData.amount);
+      const commissionRate = getCommissionRate(validatedData.duration);
+      const commissionAmount = orderAmount * commissionRate;
+      
+      console.log(`Commission calculation: ${orderAmount} × ${commissionRate} = ${commissionAmount}`);
+      console.log("Order data:", validatedData);
+      
+      const order = await storage.createBettingOrder(validatedData);
+      console.log("Created order:", order);
+      
+      // Deduct amount from available balance and add commission
+      const userForBalance = await storage.getUser(req.session.userId);
+      console.log("Current user before balance update:", userForBalance);
+      
+      if (userForBalance) {
+        const currentBalance = parseFloat(userForBalance.availableBalance);
+        const newBalance = currentBalance - orderAmount;
+        
+        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} = ${newBalance}`);
+        
+        const updatedUser = await storage.updateUser(req.session.userId, {
+          availableBalance: newBalance.toFixed(2),
+        });
+        console.log("Updated user:", updatedUser);
+      }
+      
+      console.log("==== BETTING ORDER END ====");
+      res.json(order);
+    } catch (error) {
+      console.error("Betting order error:", error);
+      res.status(400).json({ message: "Invalid betting order data", error: error.message });
+    }
+  });
+
+  app.patch("/api/betting-orders/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedOrder = await storage.updateBettingOrder(id, updates);
+      if (!updatedOrder) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      res.json(updatedOrder);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update order" });
+    }
+  });
+
+  // Withdrawal request routes
+  app.get("/api/withdrawal-requests", authenticateUser, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId);
+      let requests;
+      
+      if (user?.role === "admin") {
+        requests = await storage.getPendingWithdrawalRequests();
+      } else {
+        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId);
+      }
+      
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get withdrawal requests" });
+    }
+  });
+
+  app.post("/api/withdrawal-requests", authenticateUser, async (req, res) => {
+    try {
+      const validatedData = insertWithdrawalRequestSchema.parse({
+        ...req.body,
+        userId: req.session.userId,
+      });
+      
+      const request = await storage.createWithdrawalRequest(validatedData);
+      res.json(request);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid withdrawal request data" });
+    }
+  });
+
+  app.patch("/api/withdrawal-requests/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status, note } = req.body;
+      
+      const updateData: any = {
+        status,
+        processedAt: new Date(),
+      };
+      
+      if (note) {
+        updateData.note = note;
+      }
+      
+      const updatedRequest = await storage.updateWithdrawalRequest(id, updateData);
+      
+      if (!updatedRequest) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+      
+      // If approved, create withdrawal transaction
+      if (status === "approved") {
+        await storage.createTransaction({
+          userId: updatedRequest.userId,
+          type: "withdrawal",
+          amount: updatedRequest.amount,
+          status: "completed",
+          description: "Withdrawal approved",
+        });
+      }
+      
+      res.json(updatedRequest);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update withdrawal request" });
+    }
+  });
+
+  // Announcement routes
+  app.get("/api/announcements", async (req, res) => {
+    try {
+      const announcements = await storage.getActiveAnnouncements();
+      res.json(announcements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get announcements" });
+    }
+  });
+
+  app.get("/api/announcements/all", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const announcements = await storage.getAllAnnouncements();
+      res.json(announcements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get all announcements" });
+    }
+  });
+
+  app.post("/api/announcements", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertAnnouncementSchema.parse(req.body);
+      const announcement = await storage.createAnnouncement(validatedData);
+      res.json(announcement);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid announcement data" });
+    }
+  });
+
+  app.patch("/api/announcements/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedAnnouncement = await storage.updateAnnouncement(id, updates);
+      if (!updatedAnnouncement) {
+        return res.status(404).json({ message: "Announcement not found" });
+      }
+      
+      res.json(updatedAnnouncement);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update announcement" });
+    }
+  });
+
+  // Static crypto prices endpoint
+  app.get("/api/crypto-prices", (req, res) => {
+    res.json({
+      "BTC/USD": {
+        price: "107314.24",
+        change: "-0.41%",
+        changeType: "negative"
+      },
+      "ETH/USD": {
+        price: "2449.91",
+        change: "-1.44%",
+        changeType: "negative"
+      },
+      "DOGE/USD": {
+        price: "0.16147",
+        change: "-1.87%",
+        changeType: "negative"
+      },
+      "CHZ/USD": {
+        price: "0.03457",
+        change: "-2.59%",
+        changeType: "negative"
+      },
+      "BCH/USD": {
+        price: "502.8",
+        change: "0.50%",
+        changeType: "positive"
+      },
+      "PSG/USD": {
+        price: "1.417",
+        change: "-2.01%",
+        changeType: "negative"
+      },
+      "JUV/USD": {
+        price: "0.901",
+        change: "-1.42%",
+        changeType: "negative"
+      },
+      "ATM/USD": {
+        price: "0.999",
+        change: "-1.87%",
+        changeType: "negative"
+      },
+      "LTC/USD": {
+        price: "85.13",
+        change: "-0.28%",
+        changeType: "negative"
+      },
+      "EOS/USD": {
+        price: "0",
+        change: "0.00%",
+        changeType: "positive"
+      },
+      "TRX/USD": {
+        price: "0.2712",
+        change: "0.15%",
+        changeType: "positive"
+      },
+      "ETC/USD": {
+        price: "16.19",
+        change: "-2.00%",
+        changeType: "negative"
+      },
+      "BTS/USD": {
+        price: "502.8",
+        change: "0.50%",
+        changeType: "positive"
+      }
+    });
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
