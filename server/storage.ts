@@ -3,9 +3,9 @@ import type {
   BettingOrder, InsertBettingOrder,
   Transaction, InsertTransaction,
   BankAccount, InsertBankAccount
-} from "@shared/schema";
-import { db } from "./db";
-import { users, bettingOrders, transactions, bankAccounts } from "@shared/schema";
+} from "../shared/schema.js";
+import { db } from "./db.js";
+import { users, bettingOrders, transactions, bankAccounts } from "../shared/schema.js";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {

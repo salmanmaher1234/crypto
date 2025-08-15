@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { DatabaseStorage } from "./storage";
-import { insertUserSchema, insertBettingOrderSchema, insertTransactionSchema, insertBankAccountSchema } from "@shared/schema";
+import { DatabaseStorage } from "./storage.js";
+import { insertUserSchema, insertBettingOrderSchema, insertTransactionSchema, insertBankAccountSchema } from "../shared/schema.js";
 import bcrypt from "bcrypt";
 
 const router = Router();
