@@ -1,174 +1,79 @@
 <?php
-// SuperCoin PHP Application Entry Point
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/config/routes.php';
+session_start();
 
-// Set content type
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Session-ID');
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['user_id']);
+$userRole = $_SESSION['user_role'] ?? null;
 
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: /');
     exit;
 }
 
-// Start session
-session_start();
-
-// Get request method and path
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Remove leading slash
-$path = ltrim($path, '/');
-
-// Handle API routes
-if (strpos($path, 'api/') === 0) {
-    $apiPath = substr($path, 4); // Remove 'api/' prefix
-    handleApiRoute($method, $apiPath);
-} else {
-    // Serve frontend for non-API routes
-    serveFrontend($path);
-}
-
-function handleApiRoute($method, $path) {
-    global $routes;
-    
-    $routeKey = $method . ' ' . $path;
-    
-    // Check for exact match first
-    if (isset($routes[$routeKey])) {
-        $handler = $routes[$routeKey];
-        call_user_func($handler);
-        return;
-    }
-    
-    // Check for parameterized routes
-    foreach ($routes as $route => $handler) {
-        if (strpos($route, $method . ' ') === 0) {
-            $routePath = substr($route, strlen($method) + 1);
-            if (preg_match('#^' . str_replace('{id}', '(\d+)', $routePath) . '$#', $path, $matches)) {
-                if (isset($matches[1])) {
-                    $_GET['id'] = $matches[1];
-                }
-                call_user_func($handler);
-                return;
-            }
-        }
-    }
-    
-    // Route not found
-    http_response_code(404);
-    echo json_encode(['message' => 'Route not found']);
-}
-
-function serveFrontend($path) {
-    // Serve the React frontend (built files)
-    if (empty($path) || $path === 'index.html') {
-        // Serve main HTML file
-        $htmlContent = file_get_contents(__DIR__ . '/public/index.html');
-        if ($htmlContent === false) {
-            // Fallback HTML if build doesn't exist
-            $htmlContent = getDefaultHtml();
-        }
-        header('Content-Type: text/html');
-        echo $htmlContent;
+// Redirect based on user role if logged in
+if ($isLoggedIn) {
+    if ($userRole === 'admin') {
+        header('Location: /admin.php');
     } else {
-        // Serve static assets
-        $filePath = __DIR__ . '/public/' . $path;
-        if (file_exists($filePath)) {
-            $mimeType = getMimeType($filePath);
-            header('Content-Type: ' . $mimeType);
-            readfile($filePath);
-        } else {
-            // Fallback to index.html for SPA routing
-            serveFrontend('');
-        }
+        header('Location: /customer.php');
     }
+    exit;
 }
-
-function getMimeType($filePath) {
-    $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-    $mimeTypes = [
-        'html' => 'text/html',
-        'css' => 'text/css',
-        'js' => 'application/javascript',
-        'json' => 'application/json',
-        'png' => 'image/png',
-        'jpg' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'svg' => 'image/svg+xml'
-    ];
-    
-    return $mimeTypes[$extension] ?? 'application/octet-stream';
-}
-
-function getDefaultHtml() {
-    return '<!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperCoin - Investment Platform</title>
+    <title>SuperCoin - Cryptocurrency Investment Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 400px; margin: 0 auto; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; margin-bottom: 10px; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background: #0056b3; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>SuperCoin Login</h1>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+<body class="bg-gray-100 min-h-screen">
+    <div class="gradient-bg min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">SuperCoin</h1>
+                <p class="text-gray-600">Cryptocurrency Investment Platform</p>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-        <div id="message"></div>
-    </div>
-    
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
             
-            try {
-                const response = await fetch("/api/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
-                });
+            <form action="php/api/auth/login.php" method="POST" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" name="username" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
                 
-                const data = await response.json();
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="password" name="password" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
                 
-                if (response.ok) {
-                    document.getElementById("message").innerHTML = "<p style=\"color: green;\">Login successful! Welcome " + data.user.name + "</p>";
-                    // Store session and redirect logic here
-                } else {
-                    document.getElementById("message").innerHTML = "<p style=\"color: red;\">" + data.message + "</p>";
-                }
-            } catch (error) {
-                document.getElementById("message").innerHTML = "<p style=\"color: red;\">Connection error</p>";
-            }
-        });
-    </script>
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Sign In
+                </button>
+            </form>
+            
+            <?php if (isset($_GET['error'])): ?>
+                <div class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <?php echo htmlspecialchars($_GET['error']); ?>
+                </div>
+            <?php endif; ?>
+            
+            <div class="mt-6 text-center text-sm text-gray-600">
+                <p>Demo Accounts:</p>
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>Customer:</strong> sarah / password123</p>
+            </div>
+        </div>
+    </div>
 </body>
-</html>';
-}
-?>
+</html>
