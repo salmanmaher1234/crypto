@@ -1,35 +1,38 @@
 <?php
 // SuperCoin PHP Application Entry Point
-session_start();
+require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/routes.php';
 
-// Set headers for API routes only
-if (strpos($_SERVER['REQUEST_URI'], '/api/') !== false) {
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Session-ID');
-    
-    // Handle preflight requests
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        http_response_code(200);
-        exit;
-    }
+// Set content type
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Session-ID');
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
 }
+
+// Start session
+session_start();
 
 // Get request method and path
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Remove leading slash
 $path = ltrim($path, '/');
 
 // Handle API routes
 if (strpos($path, 'api/') === 0) {
-    $apiPath = substr($path, 4);
+    $apiPath = substr($path, 4); // Remove 'api/' prefix
     handleApiRoute($method, $apiPath);
 } else {
-    // Serve PHP frontend pages
-    servePhpFrontend($path);
+    // Serve frontend for non-API routes
+    serveFrontend($path);
 }
 
 function handleApiRoute($method, $path) {
@@ -63,58 +66,28 @@ function handleApiRoute($method, $path) {
     echo json_encode(['message' => 'Route not found']);
 }
 
-function servePhpFrontend($path) {
-    // Route to PHP frontend pages
-    switch ($path) {
-        case '':
-        case 'login':
-            require_once __DIR__ . '/views/login.php';
-            break;
-        case 'register':
-            require_once __DIR__ . '/views/register.php';
-            break;
-        case 'dashboard':
-            require_once __DIR__ . '/views/dashboard.php';
-            break;
-        case 'trading':
-            require_once __DIR__ . '/views/trading.php';
-            break;
-        case 'profile':
-            require_once __DIR__ . '/views/profile.php';
-            break;
-        case 'admin':
-            require_once __DIR__ . '/views/admin.php';
-            break;
-        case 'admin/members':
-            require_once __DIR__ . '/views/admin/members.php';
-            break;
-        case 'admin/orders':
-            require_once __DIR__ . '/views/admin/orders.php';
-            break;
-        case 'admin/transactions':
-            require_once __DIR__ . '/views/admin/transactions.php';
-            break;
-        case 'assets/style.css':
-            header('Content-Type: text/css');
-            require_once __DIR__ . '/assets/style.css';
-            break;
-        case 'assets/app.js':
-            header('Content-Type: application/javascript');
-            require_once __DIR__ . '/assets/app.js';
-            break;
-        default:
-            // Check if it's a static asset
-            $filePath = __DIR__ . '/assets/' . $path;
-            if (file_exists($filePath)) {
-                $mimeType = getMimeType($filePath);
-                header('Content-Type: ' . $mimeType);
-                readfile($filePath);
-            } else {
-                // 404 page
-                http_response_code(404);
-                require_once __DIR__ . '/views/404.php';
-            }
-            break;
+function serveFrontend($path) {
+    // Serve the React frontend (built files)
+    if (empty($path) || $path === 'index.html') {
+        // Serve main HTML file
+        $htmlContent = file_get_contents(__DIR__ . '/public/index.html');
+        if ($htmlContent === false) {
+            // Fallback HTML if build doesn't exist
+            $htmlContent = getDefaultHtml();
+        }
+        header('Content-Type: text/html');
+        echo $htmlContent;
+    } else {
+        // Serve static assets
+        $filePath = __DIR__ . '/public/' . $path;
+        if (file_exists($filePath)) {
+            $mimeType = getMimeType($filePath);
+            header('Content-Type: ' . $mimeType);
+            readfile($filePath);
+        } else {
+            // Fallback to index.html for SPA routing
+            serveFrontend('');
+        }
     }
 }
 
@@ -135,20 +108,67 @@ function getMimeType($filePath) {
     return $mimeTypes[$extension] ?? 'application/octet-stream';
 }
 
-// Authentication helper function
-function requireAuth() {
-    if (!isset($_SESSION['user_id'])) {
-        header('Location: /login');
-        exit;
-    }
-}
-
-// Check if user is admin
-function requireAdmin() {
-    requireAuth();
-    if ($_SESSION['user_role'] !== 'admin') {
-        header('Location: /dashboard');
-        exit;
-    }
+function getDefaultHtml() {
+    return '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperCoin - Investment Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SuperCoin Login</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div id="message"></div>
+    </div>
+    
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            try {
+                const response = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById("message").innerHTML = "<p style=\"color: green;\">Login successful! Welcome " + data.user.name + "</p>";
+                    // Store session and redirect logic here
+                } else {
+                    document.getElementById("message").innerHTML = "<p style=\"color: red;\">" + data.message + "</p>";
+                }
+            } catch (error) {
+                document.getElementById("message").innerHTML = "<p style=\"color: red;\">Connection error</p>";
+            }
+        });
+    </script>
+</body>
+</html>';
 }
 ?>
