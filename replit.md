@@ -1,24 +1,25 @@
 # SuperCoin - Investment Platform
 
 ## Overview
-SuperCoin is a pure PHP cryptocurrency investment platform designed to facilitate trading, user management, and financial transactions. It provides both customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. The platform has been completely converted from React/Node.js to vanilla PHP for maximum compatibility with shared hosting.
+SuperCoin is a full-stack cryptocurrency investment platform designed to facilitate trading, user management, and financial transactions. It provides both customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. The platform aims to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 ### Frontend
-- **Framework**: Pure PHP with HTML/CSS
-- **Styling**: Tailwind CSS (CDN)
-- **JavaScript**: Vanilla JS for client-side interactions
-- **Routing**: PHP file-based routing with .htaccess
-- **UI/UX Decisions**: Clean responsive design, professional trading interface, card-based layouts for personal information, tab-based navigation.
+- **Framework**: React with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui
+- **State Management**: TanStack Query
+- **Routing**: Wouter
+- **Build Tool**: Vite
+- **UI/UX Decisions**: Comprehensive shadcn/ui component system, professional Binance-style trading charts with dark theme, responsive design adapting to various screen sizes, dynamic image scaling for banners and sliders, no currency symbols in display, privacy toggles for sensitive information, card-based layouts for personal information.
 
 ### Backend
-- **Framework**: Pure PHP 
-- **Database**: MySQL with PDO
-- **Authentication**: Session-based authentication with role-based access control (customer/admin)
-- **API Design**: Form-based requests with PHP responses
+- **Framework**: Express.js with TypeScript
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Simple session-based authentication with role-based access control (customer/admin)
+- **API Design**: RESTful API with JSON responses
 - **Key Features**:
     - **User Management**: Roles (customer/admin), balances, trading preferences, VIP levels/reputation (default 100), ban/unban, withdrawal prohibition, credit score management.
     - **Trading**: Real-time balance tracking, Buy Up/Buy Down options, commission logic (20-60% based on duration), real-time price integration (CoinGecko API), server-side order completion, direction override from admin.

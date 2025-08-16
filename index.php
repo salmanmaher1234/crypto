@@ -1,101 +1,154 @@
 <?php
+// SuperCoin PHP Application Entry Point
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/routes.php';
 
-// Handle logout
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header('Location: /');
-    exit;
-}
-
-// Handle login form submission
-if (isset($_POST['username']) && isset($_POST['password'])) {
-    // Mock login for testing without database
-    if ($_POST['username'] === 'admin' && $_POST['password'] === 'admin123') {
-        $_SESSION['user_id'] = 1;
-        $_SESSION['username'] = 'admin';
-        $_SESSION['user_role'] = 'admin';
-        header('Location: /admin.php');
+// Set headers for API routes only
+if (strpos($_SERVER['REQUEST_URI'], '/api/') !== false) {
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Session-ID');
+    
+    // Handle preflight requests
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
         exit;
-    } elseif ($_POST['username'] === 'sarah' && $_POST['password'] === 'password123') {
-        $_SESSION['user_id'] = 2;
-        $_SESSION['username'] = 'sarah';
-        $_SESSION['user_role'] = 'customer';
-        header('Location: /customer.php');
-        exit;
-    } else {
-        $error = 'Invalid credentials';
     }
 }
 
-// Check if user is logged in
-$isLoggedIn = isset($_SESSION['user_id']);
-$userRole = $_SESSION['user_role'] ?? null;
+// Get request method and path
+$method = $_SERVER['REQUEST_METHOD'];
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = ltrim($path, '/');
 
-// Redirect based on user role if logged in
-if ($isLoggedIn) {
-    if ($userRole === 'admin') {
-        header('Location: /admin.php');
-    } else {
-        header('Location: /customer.php');
+// Handle API routes
+if (strpos($path, 'api/') === 0) {
+    $apiPath = substr($path, 4);
+    handleApiRoute($method, $apiPath);
+} else {
+    // Serve PHP frontend pages
+    servePhpFrontend($path);
+}
+
+function handleApiRoute($method, $path) {
+    global $routes;
+    
+    $routeKey = $method . ' ' . $path;
+    
+    // Check for exact match first
+    if (isset($routes[$routeKey])) {
+        $handler = $routes[$routeKey];
+        call_user_func($handler);
+        return;
     }
-    exit;
+    
+    // Check for parameterized routes
+    foreach ($routes as $route => $handler) {
+        if (strpos($route, $method . ' ') === 0) {
+            $routePath = substr($route, strlen($method) + 1);
+            if (preg_match('#^' . str_replace('{id}', '(\d+)', $routePath) . '$#', $path, $matches)) {
+                if (isset($matches[1])) {
+                    $_GET['id'] = $matches[1];
+                }
+                call_user_func($handler);
+                return;
+            }
+        }
+    }
+    
+    // Route not found
+    http_response_code(404);
+    echo json_encode(['message' => 'Route not found']);
+}
+
+function servePhpFrontend($path) {
+    // Route to PHP frontend pages
+    switch ($path) {
+        case '':
+        case 'login':
+            require_once __DIR__ . '/views/login.php';
+            break;
+        case 'register':
+            require_once __DIR__ . '/views/register.php';
+            break;
+        case 'dashboard':
+            require_once __DIR__ . '/views/dashboard.php';
+            break;
+        case 'trading':
+            require_once __DIR__ . '/views/trading.php';
+            break;
+        case 'profile':
+            require_once __DIR__ . '/views/profile.php';
+            break;
+        case 'admin':
+            require_once __DIR__ . '/views/admin.php';
+            break;
+        case 'admin/members':
+            require_once __DIR__ . '/views/admin/members.php';
+            break;
+        case 'admin/orders':
+            require_once __DIR__ . '/views/admin/orders.php';
+            break;
+        case 'admin/transactions':
+            require_once __DIR__ . '/views/admin/transactions.php';
+            break;
+        case 'assets/style.css':
+            header('Content-Type: text/css');
+            require_once __DIR__ . '/assets/style.css';
+            break;
+        case 'assets/app.js':
+            header('Content-Type: application/javascript');
+            require_once __DIR__ . '/assets/app.js';
+            break;
+        default:
+            // Check if it's a static asset
+            $filePath = __DIR__ . '/assets/' . $path;
+            if (file_exists($filePath)) {
+                $mimeType = getMimeType($filePath);
+                header('Content-Type: ' . $mimeType);
+                readfile($filePath);
+            } else {
+                // 404 page
+                http_response_code(404);
+                require_once __DIR__ . '/views/404.php';
+            }
+            break;
+    }
+}
+
+function getMimeType($filePath) {
+    $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+    $mimeTypes = [
+        'html' => 'text/html',
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'json' => 'application/json',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml'
+    ];
+    
+    return $mimeTypes[$extension] ?? 'application/octet-stream';
+}
+
+// Authentication helper function
+function requireAuth() {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: /login');
+        exit;
+    }
+}
+
+// Check if user is admin
+function requireAdmin() {
+    requireAuth();
+    if ($_SESSION['user_role'] !== 'admin') {
+        header('Location: /dashboard');
+        exit;
+    }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperCoin - Cryptocurrency Investment Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="gradient-bg min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">SuperCoin</h1>
-                <p class="text-gray-600">Cryptocurrency Investment Platform</p>
-            </div>
-            
-            <form method="POST" class="space-y-6">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                    <input type="text" id="username" name="username" required 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="password" name="password" required 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                
-                <button type="submit" 
-                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Sign In
-                </button>
-            </form>
-            
-            <?php if (isset($error)): ?>
-                <div class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                    <?php echo htmlspecialchars($error); ?>
-                </div>
-            <?php endif; ?>
-            
-            <div class="mt-6 text-center text-sm text-gray-600">
-                <p>Demo Accounts:</p>
-                <p><strong>Admin:</strong> admin / admin123</p>
-                <p><strong>Customer:</strong> sarah / password123</p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>

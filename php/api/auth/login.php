@@ -1,14 +1,18 @@
 <?php
-session_start();
 require_once '../../config/database.php';
+require_once '../../includes/session.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /?error=Method not allowed');
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
     exit();
 }
 
-if (!isset($_POST['username']) || !isset($_POST['password'])) {
-    header('Location: /?error=Username and password required');
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!isset($input['username']) || !isset($input['password'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Username and password required']);
     exit();
 }
 
@@ -18,32 +22,35 @@ $db = $database->getConnection();
 // Get user by username
 $query = "SELECT * FROM users WHERE username = :username";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':username', $_POST['username']);
+$stmt->bindParam(':username', $input['username']);
 $stmt->execute();
 
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// For now, use plain text password comparison (will update to hash later)
-if (!$user || $user['password'] !== $_POST['password']) {
-    header('Location: /?error=Invalid credentials');
+if (!$user || !password_verify($input['password'], $user['password_hash'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Invalid credentials']);
     exit();
 }
 
 // Check if user is banned
 if ($user['is_banned']) {
-    header('Location: /?error=Account has been suspended');
+    http_response_code(403);
+    echo json_encode(['error' => 'Account has been suspended']);
     exit();
 }
 
 // Set session
 $_SESSION['user_id'] = $user['id'];
 $_SESSION['username'] = $user['username'];
-$_SESSION['user_role'] = $user['role'];
+$_SESSION['role'] = $user['role'];
 
-// Redirect based on role
-if ($user['role'] === 'admin') {
-    header('Location: /admin.php');
-} else {
-    header('Location: /customer.php');
-}
+// Return user data (without password)
+unset($user['password_hash']);
+unset($user['fund_password_hash']);
+
+echo json_encode([
+    'user' => $user,
+    'message' => 'Login successful'
+]);
 ?>
