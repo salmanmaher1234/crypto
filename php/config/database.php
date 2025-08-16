@@ -2,9 +2,9 @@
 // Database configuration for Hostinger shared hosting
 class Database {
     private $host = 'localhost';
-    private $db_name = 'your_database_name';
-    private $username = 'your_username';
-    private $password = 'your_password';
+    private $db_name = 'supercoin_db';
+    private $username = 'root';
+    private $password = '';
     private $conn;
 
     public function getConnection() {

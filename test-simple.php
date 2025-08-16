@@ -1,18 +1,8 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
-// Handle logout
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header('Location: /');
-    exit;
-}
-
-// Handle login form submission
+// Mock login for testing without database
 if (isset($_POST['username']) && isset($_POST['password'])) {
-    // Mock login for testing without database
     if ($_POST['username'] === 'admin' && $_POST['password'] === 'admin123') {
         $_SESSION['user_id'] = 1;
         $_SESSION['username'] = 'admin';
@@ -30,13 +20,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     }
 }
 
-// Check if user is logged in
-$isLoggedIn = isset($_SESSION['user_id']);
-$userRole = $_SESSION['user_role'] ?? null;
-
-// Redirect based on user role if logged in
-if ($isLoggedIn) {
-    if ($userRole === 'admin') {
+// Check if already logged in
+if (isset($_SESSION['user_id'])) {
+    if ($_SESSION['user_role'] === 'admin') {
         header('Location: /admin.php');
     } else {
         header('Location: /customer.php');

@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once 'php/config/database.php';
 
 // Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
@@ -8,26 +7,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-$db = new Database();
-$conn = $db->getConnection();
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: /');
+    exit;
+}
 
-// Get user info
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+// Mock user data for testing
+$user = [
+    'id' => $_SESSION['user_id'],
+    'name' => 'Administrator',
+    'username' => $_SESSION['username'],
+    'role' => $_SESSION['user_role']
+];
 
-// Get summary stats
-$stmt = $conn->prepare("SELECT COUNT(*) as total_users FROM users WHERE role = 'customer'");
-$stmt->execute();
-$total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total_users'];
-
-$stmt = $conn->prepare("SELECT COUNT(*) as total_orders FROM betting_orders");
-$stmt->execute();
-$total_orders = $stmt->fetch(PDO::FETCH_ASSOC)['total_orders'];
-
-$stmt = $conn->prepare("SELECT SUM(amount) as total_volume FROM betting_orders WHERE status = 'completed'");
-$stmt->execute();
-$total_volume = $stmt->fetch(PDO::FETCH_ASSOC)['total_volume'] ?? 0;
+// Mock summary stats for testing
+$total_users = 246;
+$total_orders = 578;
+$total_volume = 1254386.50;
 ?>
 <!DOCTYPE html>
 <html lang="en">

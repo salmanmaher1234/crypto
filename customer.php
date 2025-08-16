@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once 'php/config/database.php';
 
 // Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'customer') {
@@ -8,18 +7,55 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'customer') {
     exit;
 }
 
-$db = new Database();
-$conn = $db->getConnection();
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: /');
+    exit;
+}
 
-// Get user info
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+// Mock user data for testing
+$user = [
+    'id' => $_SESSION['user_id'],
+    'name' => 'Sarah Johnson',
+    'username' => $_SESSION['username'],
+    'role' => $_SESSION['user_role'],
+    'balance' => 306450.00,
+    'available_balance' => 312950.00,
+    'frozen_balance' => 500.00,
+    'reputation' => 5,
+    'credit_score' => 100,
+    'email' => 'sarah@email.com',
+    'registration_time' => '2025-07-08 12:06:01.842'
+];
 
-// Get recent orders
-$stmt = $conn->prepare("SELECT * FROM betting_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
-$stmt->execute([$_SESSION['user_id']]);
-$recent_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Mock recent orders for testing
+$recent_orders = [
+    [
+        'id' => 1,
+        'asset' => 'BTC/USDT',
+        'amount' => 1000.00,
+        'direction' => 'Buy Up',
+        'status' => 'completed',
+        'result' => 'win'
+    ],
+    [
+        'id' => 2,
+        'asset' => 'ETH/USDT',
+        'amount' => 2500.00,
+        'direction' => 'Buy Down',
+        'status' => 'completed',
+        'result' => 'loss'
+    ],
+    [
+        'id' => 3,
+        'asset' => 'BNB/USDT',
+        'amount' => 500.00,
+        'direction' => 'Buy Up',
+        'status' => 'active',
+        'result' => null
+    ]
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
