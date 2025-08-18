@@ -106,7 +106,7 @@ export function SpotOrders() {
     }
   });
 
-  // Canvas chart drawing
+  // Enhanced Canvas chart drawing with better grid and professional styling
   useEffect(() => {
     if (!chartRef.current) return;
 
@@ -123,75 +123,160 @@ export function SpotOrders() {
     canvas.style.width = rect.width + "px";
     canvas.style.height = rect.height + "px";
 
-    // Clear canvas
-    ctx.fillStyle = "#1a1a1a";
+    // Clear canvas with dark background
+    ctx.fillStyle = "#0a0e27";
     ctx.fillRect(0, 0, rect.width, rect.height);
 
-    // Draw grid lines
-    ctx.strokeStyle = "#2a2a2a";
-    ctx.lineWidth = 1;
+    // Draw enhanced grid lines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 0.5;
     
-    // Vertical grid lines
-    for (let i = 0; i <= 10; i++) {
-      const x = (rect.width / 10) * i;
+    // Major vertical grid lines
+    const majorVerticalLines = 8;
+    for (let i = 0; i <= majorVerticalLines; i++) {
+      const x = (rect.width / majorVerticalLines) * i;
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, rect.height);
+      ctx.lineTo(x, rect.height * 0.8); // Don't draw through volume area
       ctx.stroke();
     }
 
-    // Horizontal grid lines
-    for (let i = 0; i <= 6; i++) {
-      const y = (rect.height / 6) * i;
+    // Major horizontal grid lines
+    const majorHorizontalLines = 8;
+    for (let i = 0; i <= majorHorizontalLines; i++) {
+      const y = (rect.height * 0.8 / majorHorizontalLines) * i;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(rect.width, y);
       ctx.stroke();
     }
 
-    // Generate sample candlestick data
-    const candleWidth = rect.width / 50;
-    const basePrice = parseFloat(currentPrice);
+    // Minor grid lines for better precision
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+    ctx.lineWidth = 0.3;
     
-    for (let i = 0; i < 50; i++) {
+    // Minor vertical lines
+    for (let i = 0; i <= majorVerticalLines * 2; i++) {
+      const x = (rect.width / (majorVerticalLines * 2)) * i;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, rect.height * 0.8);
+      ctx.stroke();
+    }
+
+    // Minor horizontal lines
+    for (let i = 0; i <= majorHorizontalLines * 2; i++) {
+      const y = (rect.height * 0.8 / (majorHorizontalLines * 2)) * i;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(rect.width, y);
+      ctx.stroke();
+    }
+
+    // Generate realistic candlestick data
+    const candleCount = 80;
+    const candleWidth = rect.width / candleCount;
+    const basePrice = parseFloat(currentPrice);
+    const chartHeight = rect.height * 0.8;
+    const priceRange = 4000; // Price range for the chart
+    
+    let lastClose = basePrice;
+    
+    for (let i = 0; i < candleCount; i++) {
       const x = i * candleWidth;
-      const variation = (Math.random() - 0.5) * 2000;
-      const high = basePrice + Math.abs(variation) + Math.random() * 500;
-      const low = basePrice - Math.abs(variation) - Math.random() * 500;
-      const open = low + Math.random() * (high - low);
-      const close = low + Math.random() * (high - low);
+      
+      // Create more realistic price movement
+      const trend = Math.sin(i * 0.1) * 200; // Overall trend
+      const volatility = (Math.random() - 0.5) * 400; // Random volatility
+      const open = lastClose + (Math.random() - 0.5) * 50;
+      const close = open + trend + volatility;
+      const high = Math.max(open, close) + Math.random() * 200;
+      const low = Math.min(open, close) - Math.random() * 200;
+      
+      lastClose = close;
       
       const isGreen = close > open;
-      const highY = rect.height - ((high - (basePrice - 3000)) / 6000) * rect.height;
-      const lowY = rect.height - ((low - (basePrice - 3000)) / 6000) * rect.height;
-      const openY = rect.height - ((open - (basePrice - 3000)) / 6000) * rect.height;
-      const closeY = rect.height - ((close - (basePrice - 3000)) / 6000) * rect.height;
+      
+      // Convert prices to Y coordinates
+      const highY = chartHeight - ((high - (basePrice - priceRange/2)) / priceRange) * chartHeight;
+      const lowY = chartHeight - ((low - (basePrice - priceRange/2)) / priceRange) * chartHeight;
+      const openY = chartHeight - ((open - (basePrice - priceRange/2)) / priceRange) * chartHeight;
+      const closeY = chartHeight - ((close - (basePrice - priceRange/2)) / priceRange) * chartHeight;
 
-      // Draw wicks
-      ctx.strokeStyle = isGreen ? "#00ff88" : "#ff4757";
+      // Draw wick/shadow
+      ctx.strokeStyle = isGreen ? "#26a69a" : "#ef5350";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(x + candleWidth/2, highY);
       ctx.lineTo(x + candleWidth/2, lowY);
       ctx.stroke();
 
-      // Draw body
-      ctx.fillStyle = isGreen ? "#00ff88" : "#ff4757";
+      // Draw candle body
+      ctx.fillStyle = isGreen ? "#26a69a" : "#ef5350";
       const bodyHeight = Math.abs(closeY - openY);
       const bodyY = Math.min(openY, closeY);
-      ctx.fillRect(x + 1, bodyY, candleWidth - 2, bodyHeight || 1);
+      
+      if (bodyHeight < 1) {
+        // Doji candle - draw thin line
+        ctx.fillRect(x + 1, bodyY, candleWidth - 2, 1);
+      } else {
+        ctx.fillRect(x + 1, bodyY, candleWidth - 2, bodyHeight);
+      }
     }
 
-    // Draw volume bars at bottom
-    const volumeAreaHeight = rect.height * 0.2;
-    for (let i = 0; i < 50; i++) {
+    // Draw volume bars with better styling
+    const volumeAreaHeight = rect.height * 0.15;
+    const volumeStartY = rect.height * 0.85;
+    
+    for (let i = 0; i < candleCount; i++) {
       const x = i * candleWidth;
       const volumeHeight = Math.random() * volumeAreaHeight;
-      const y = rect.height - volumeHeight;
+      const y = volumeStartY + (volumeAreaHeight - volumeHeight);
       
-      ctx.fillStyle = `rgba(0, 255, 136, ${0.3 + Math.random() * 0.4})`;
+      // Color volume bars based on price movement
+      const isGreenVolume = Math.random() > 0.5;
+      ctx.fillStyle = isGreenVolume 
+        ? "rgba(38, 166, 154, 0.6)" 
+        : "rgba(239, 83, 80, 0.6)";
       ctx.fillRect(x + 1, y, candleWidth - 2, volumeHeight);
     }
+
+    // Draw price scale on the right
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+    ctx.font = "10px monospace";
+    ctx.textAlign = "left";
+    
+    for (let i = 0; i <= 8; i++) {
+      const y = (chartHeight / 8) * i;
+      const price = basePrice + (priceRange/2) - (i * priceRange / 8);
+      ctx.fillText(price.toFixed(0), rect.width - 60, y + 3);
+    }
+
+    // Draw time labels at bottom
+    ctx.textAlign = "center";
+    const timeLabels = ["22:30", "23:30", "00:30", "01:30", "02:30", "03:30", "04:30", "05:30"];
+    for (let i = 0; i < timeLabels.length; i++) {
+      const x = (rect.width / (timeLabels.length - 1)) * i;
+      ctx.fillText(timeLabels[i], x, rect.height - 5);
+    }
+
+    // Current price line
+    const currentPriceY = chartHeight - ((basePrice - (basePrice - priceRange/2)) / priceRange) * chartHeight;
+    ctx.strokeStyle = "#ffeb3b";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, currentPriceY);
+    ctx.lineTo(rect.width - 70, currentPriceY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Current price label
+    ctx.fillStyle = "#ffeb3b";
+    ctx.fillRect(rect.width - 70, currentPriceY - 10, 65, 20);
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "center";
+    ctx.fillText(basePrice.toFixed(2), rect.width - 37, currentPriceY + 3);
 
   }, [currentPrice, selectedTimeframe]);
 
@@ -313,20 +398,20 @@ export function SpotOrders() {
           </div>
 
           <div className="flex-1 flex flex-col lg:flex-row">
-            {/* Chart Section */}
+            {/* Chart Section with Professional Grid */}
             <div className="flex-1 p-4">
-              {/* Timeframe Buttons */}
-              <div className="flex space-x-2 mb-4">
+              {/* Enhanced Timeframe Buttons */}
+              <div className="flex space-x-1 bg-gray-800 rounded-lg p-1 w-fit mb-4">
                 {timeframes.map((tf) => (
                   <Button
                     key={tf}
-                    variant={selectedTimeframe === tf ? "default" : "ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={() => setSelectedTimeframe(tf)}
-                    className={`${
+                    className={`px-4 py-2 rounded-md transition-all duration-200 ${
                       selectedTimeframe === tf 
-                        ? 'bg-blue-600 text-white' 
-                        : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                        ? 'bg-blue-600 text-white shadow-lg' 
+                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
                     }`}
                   >
                     {tf}
@@ -334,21 +419,56 @@ export function SpotOrders() {
                 ))}
               </div>
 
-              {/* Chart Canvas */}
-              <div className="relative bg-gray-900 rounded-lg border border-gray-800 mb-4" style={{ height: '400px' }}>
+              {/* Professional Chart Canvas with Grid Layout */}
+              <div className="relative rounded-lg border border-gray-700 mb-4 overflow-hidden" 
+                   style={{ 
+                     height: '450px',
+                     background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)'
+                   }}>
                 <canvas 
                   ref={chartRef}
-                  className="w-full h-full rounded-lg"
+                  className="w-full h-full"
                   style={{ width: '100%', height: '100%' }}
                 />
-                <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-                  Chart by TradingView
+                
+                {/* Chart branding and info overlay */}
+                <div className="absolute bottom-3 left-3 flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs text-blue-400 font-medium">Chart by TradingView</span>
+                  </div>
+                </div>
+                
+                {/* Price info overlay */}
+                <div className="absolute top-3 left-3 flex items-center space-x-6 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-400">O</span>
+                    <span className="text-white font-mono">{(parseFloat(currentPrice) * 0.999).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-400">H</span>
+                    <span className="text-white font-mono">{(parseFloat(currentPrice) * 1.002).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-400">L</span>
+                    <span className="text-white font-mono">{(parseFloat(currentPrice) * 0.998).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-400">C</span>
+                    <span className="text-white font-mono">{currentPrice}</span>
+                  </div>
+                </div>
+                
+                {/* Volume indicator */}
+                <div className="absolute top-3 right-3 text-xs text-gray-400">
+                  <div>24H Volume: 143.25M</div>
+                  <div className="text-right">24H Turnover: 1.56K</div>
                 </div>
               </div>
 
-              {/* Trade History Table */}
-              <div className="bg-gray-900 rounded-lg border border-gray-800">
-                <div className="grid grid-cols-4 gap-4 p-3 border-b border-gray-800 text-sm text-gray-400">
+              {/* Enhanced Trade History Table with Better Layout */}
+              <div className="bg-gray-900 rounded-lg border border-gray-700 shadow-xl">
+                <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-700 text-sm text-gray-300 font-medium bg-gray-800">
                   <div>Time</div>
                   <div>Direction</div>
                   <div>Price</div>
@@ -356,33 +476,33 @@ export function SpotOrders() {
                 </div>
                 <div className="max-h-64 overflow-y-auto">
                   {tradeHistory.map((trade, index) => (
-                    <div key={index} className="grid grid-cols-4 gap-4 p-3 border-b border-gray-800 text-sm">
-                      <div className="text-gray-400">{trade.time}</div>
-                      <div className={trade.direction === 'Buy' ? 'text-green-400' : 'text-red-400'}>
+                    <div key={index} className="grid grid-cols-4 gap-4 p-3 border-b border-gray-800 text-sm hover:bg-gray-800 transition-colors">
+                      <div className="text-gray-400 font-mono">{trade.time}</div>
+                      <div className={`font-medium ${trade.direction === 'Buy' ? 'text-green-400' : 'text-red-400'}`}>
                         {trade.direction}
                       </div>
-                      <div className="font-mono">{trade.price}</div>
-                      <div className="text-gray-400">{trade.quantity}</div>
+                      <div className="font-mono text-white">{trade.price}</div>
+                      <div className="text-gray-300 font-mono">{trade.quantity}</div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Right Sidebar - Order Book */}
-            <div className="w-full lg:w-80 p-4 border-l border-gray-800">
-              <div className="bg-gray-900 rounded-lg border border-gray-800 mb-4">
-                <div className="grid grid-cols-2 gap-4 p-3 border-b border-gray-800 text-sm text-gray-400">
+            {/* Enhanced Right Sidebar - Order Book */}
+            <div className="w-full lg:w-80 p-4 border-l border-gray-700">
+              <div className="bg-gray-900 rounded-lg border border-gray-700 shadow-xl mb-4">
+                <div className="grid grid-cols-2 gap-4 p-4 border-b border-gray-700 text-sm text-gray-300 font-medium bg-gray-800">
                   <div>Price</div>
                   <div>Quantity</div>
                 </div>
                 <div className="max-h-64 overflow-y-auto">
                   {orderBook.map((order, index) => (
-                    <div key={index} className="grid grid-cols-2 gap-4 p-2 text-sm">
+                    <div key={index} className="grid grid-cols-2 gap-4 p-3 hover:bg-gray-800 transition-colors text-sm">
                       <div className={`font-mono ${order.type === 'buy' ? 'text-green-400' : 'text-red-400'}`}>
                         {order.price}
                       </div>
-                      <div className="text-gray-400">{order.quantity}</div>
+                      <div className="text-gray-300 font-mono">{order.quantity}</div>
                     </div>
                   ))}
                 </div>
