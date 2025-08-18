@@ -31,14 +31,18 @@ export function useAuth() {
     }
   }, [queryClient]);
 
-  // Auto-refresh balance every 10 seconds when user is logged in
+  // Auto-refresh balance every 30 seconds when user is logged in (reduced frequency)
   useEffect(() => {
     const sessionId = localStorage.getItem('sessionId');
     if (!sessionId) return;
     
     const interval = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-    }, 10000); // Refresh every 10 seconds
+      // Only invalidate if the user is currently authenticated
+      const currentAuth = queryClient.getQueryData(["/api/auth/me"]);
+      if (currentAuth) {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      }
+    }, 30000); // Refresh every 30 seconds instead of 10
     
     return () => clearInterval(interval);
   }, [queryClient]);
@@ -61,10 +65,11 @@ export function useAuth() {
       });
 
       if (response.status === 401) {
-        // Session is invalid or expired - clear it
+        // Session is invalid or expired - clear it but don't be too aggressive
         console.log("Session unauthorized, clearing localStorage");
         localStorage.removeItem('sessionId');
         queryClient.setQueryDefaults(["/api/auth/me"], { enabled: false });
+        queryClient.setQueryData(["/api/auth/me"], null);
         return null;
       }
 

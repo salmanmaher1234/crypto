@@ -46,8 +46,12 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       setAmount("");
       setDirection(null);
       setShowOrderForm(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      // Only invalidate betting orders, let auth refresh on its own schedule
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+      // Delay auth refresh slightly to avoid conflicts
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      }, 1000);
     },
     onError: (error: any) => {
       toast({
