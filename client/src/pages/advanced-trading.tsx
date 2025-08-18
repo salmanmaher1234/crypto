@@ -9,6 +9,23 @@ import { useToast } from "@/hooks/use-toast";
 
 const timeframes = ["1M", "5M", "30M", "1H", "4H", "1D"];
 
+interface CryptoPriceData {
+  price: string;
+  change: string;
+}
+
+interface CryptoPrices {
+  [key: string]: CryptoPriceData;
+}
+
+interface Candle {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
 export default function AdvancedTrading() {
   const [, setLocation] = useLocation();
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
@@ -31,7 +48,7 @@ export default function AdvancedTrading() {
   const queryClient = useQueryClient();
 
   // Get real-time crypto prices
-  const { data: cryptoPrices = {} } = useQuery({
+  const { data: cryptoPrices = {} } = useQuery<CryptoPrices>({
     queryKey: ["/api/crypto-prices"],
     refetchInterval: 5000,
   });
@@ -126,7 +143,7 @@ export default function AdvancedTrading() {
     }
 
     // Generate realistic candlestick data
-    const candles = [];
+    const candles: Candle[] = [];
     const numCandles = 50;
     let price = basePrice;
     
@@ -242,7 +259,7 @@ export default function AdvancedTrading() {
             onClick={() => setLocation('/spot-orders')}
             className="text-white hover:bg-gray-700 text-sm"
           >
-            Spot Orders >
+            Spot Orders &gt;
           </Button>
         </div>
       </div>
