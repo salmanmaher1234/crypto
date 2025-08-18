@@ -13,19 +13,80 @@ import {
   Home,
   Key,
   Globe,
-  Eye
+  Eye,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import type { BankAccount } from "@shared/schema";
 
 export function Profile() {
   const { user, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage' | 'capitalCode'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage' | 'capitalCode' | 'addBank'>('main');
   const [fundsPassword, setFundsPassword] = useState<string[]>(Array(6).fill(''));
+  const [bankForm, setBankForm] = useState({
+    accountHolderName: '',
+    accountNumber: '',
+    bankName: '',
+    ifscCode: ''
+  });
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   if (!user) return null;
 
   const handleLogout = () => {
     logout();
+  };
+
+  // Fetch user's bank accounts
+  const { data: bankAccounts = [], isLoading: bankAccountsLoading } = useQuery<BankAccount[]>({
+    queryKey: ["/api/bank-accounts"],
+    enabled: currentView === 'collection'
+  });
+
+  // Create bank account mutation
+  const createBankAccount = useMutation({
+    mutationFn: async (data: typeof bankForm) => {
+      const res = await apiRequest('POST', '/api/bank-accounts', data);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Bank Account Added",
+        description: "Your bank account has been added successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
+      setCurrentView('collection');
+      setBankForm({
+        accountHolderName: '',
+        accountNumber: '',
+        bankName: '',
+        ifscCode: ''
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add bank account",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleCreateBankAccount = () => {
+    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName || !bankForm.ifscCode) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    createBankAccount.mutate(bankForm);
   };
 
   // Collection Information Page
@@ -49,25 +110,141 @@ export function Profile() {
         </div>
 
         {/* Content */}
-        <div className="p-4">
-          <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-600">City Bank PLC</div>
-              <div className="text-sm text-gray-600">2204***1001</div>
+        <div className="p-4 pb-24">
+          {bankAccountsLoading ? (
+            <div className="text-center text-gray-500 py-8">
+              <div className="text-sm">Loading bank accounts...</div>
             </div>
-          </div>
+          ) : bankAccounts.length > 0 ? (
+            <div className="space-y-3">
+              {bankAccounts.map((account) => (
+                <div key={account.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{account.bankName}</div>
+                      <div className="text-sm text-gray-600 mt-1">{account.accountHolderName}</div>
+                      <div className="text-sm text-gray-500">
+                        ***{account.accountNumber.slice(-4)}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-gray-500">{account.ifscCode}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              <div className="text-sm">No bank accounts added yet</div>
+              <div className="text-xs mt-1">Add your bank account information below</div>
+            </div>
+          )}
         </div>
 
         {/* Add Collection Information Button */}
         <div className="p-4 fixed bottom-4 left-4 right-4">
           <Button
+            onClick={() => setCurrentView('addBank')}
             className="w-full h-12 text-white font-medium rounded-2xl"
             style={{
               background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
             }}
           >
-            Add Collection Information
+            <Plus className="w-5 h-5 mr-2" />
+            Add Bank Account
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Add Bank Account Page
+  if (currentView === 'addBank') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('collection')}
+              className="p-1 mr-2"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Add Bank Account</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Form */}
+        <div className="p-4 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Account Holder Name *
+            </label>
+            <Input
+              type="text"
+              value={bankForm.accountHolderName}
+              onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
+              placeholder="Enter account holder name"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bank Name *
+            </label>
+            <Input
+              type="text"
+              value={bankForm.bankName}
+              onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
+              placeholder="Enter bank name"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Account Number *
+            </label>
+            <Input
+              type="text"
+              value={bankForm.accountNumber}
+              onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
+              placeholder="Enter account number"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              IFSC Code *
+            </label>
+            <Input
+              type="text"
+              value={bankForm.ifscCode}
+              onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
+              placeholder="Enter IFSC code"
+              className="w-full"
+            />
+          </div>
+
+          <div className="pt-6">
+            <Button
+              onClick={handleCreateBankAccount}
+              disabled={createBankAccount.isPending}
+              className="w-full h-12 text-white font-medium rounded-2xl"
+              style={{
+                background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+              }}
+            >
+              {createBankAccount.isPending ? "Adding..." : "Add Bank Account"}
+            </Button>
+          </div>
         </div>
       </div>
     );
