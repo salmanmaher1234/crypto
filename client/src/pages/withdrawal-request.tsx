@@ -3,11 +3,33 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function WithdrawalRequest() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [withdrawalAmount, setWithdrawalAmount] = useState("0");
+  const queryClient = useQueryClient();
+
+  // Create withdrawal mutation
+  const createWithdrawal = useMutation({
+    mutationFn: async (data: { amount: number; currency: string }) => {
+      return apiRequest('/api/withdrawal-requests', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/withdrawal-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      
+      // Navigate to withdrawal record page
+      setLocation('/withdrawal-record');
+    }
+  });
 
   const handleBack = () => {
     setLocation('/withdrawal');
@@ -25,25 +47,11 @@ export default function WithdrawalRequest() {
   const handleDetermineWithdrawal = () => {
     if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) return;
     
-    // Create withdrawal record (in real app this would be an API call)
-    const newRecord = {
-      id: Date.now(),
-      currency: "BDT",
-      quantityOfWithdrawal: parseFloat(withdrawalAmount),
-      actualQuantity: parseFloat(withdrawalAmount),
-      status: "Under review" as const,
-      createdAt: new Date().toLocaleString('en-GB', {
-        year: 'numeric',
-        month: '2-digit', 
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      }).replace(',', '')
-    };
-    
-    // Navigate to withdrawal record page
-    setLocation('/withdrawal-record');
+    // Submit withdrawal request
+    createWithdrawal.mutate({
+      amount: parseFloat(withdrawalAmount),
+      currency: "BDT"
+    });
   };
 
   const availableBalance = parseFloat(user?.availableBalance || user?.balance || "669522.6");
@@ -95,11 +103,11 @@ export default function WithdrawalRequest() {
           >
             <div className="flex justify-between items-start">
               <div className="text-white space-y-1">
-                <div className="text-sm">Ismail Ali</div>
-                <div className="text-sm">Ismail Ali</div>
-                <div className="text-sm">Ismail Ali</div>
-                <div className="text-sm">Ismail Ali</div>
-                <div className="text-sm">Ismail Ali</div>
+                <div className="text-sm">Account Holder</div>
+                <div className="text-sm">Bank Name</div>
+                <div className="text-sm">Branch Name</div>
+                <div className="text-sm">Account Number</div>
+                <div className="text-sm">Routing Number</div>
               </div>
               <div className="text-white text-right space-y-1">
                 <div className="text-sm">220453981001</div>
@@ -139,12 +147,13 @@ export default function WithdrawalRequest() {
         <div className="pt-8">
           <Button
             onClick={handleDetermineWithdrawal}
-            className="w-full h-12 text-white font-medium rounded-full text-base"
+            disabled={createWithdrawal.isPending || !withdrawalAmount || parseFloat(withdrawalAmount) <= 0}
+            className="w-full h-12 text-white font-medium rounded-full text-base disabled:opacity-50"
             style={{
               background: "linear-gradient(90deg, #F59E0B 0%, #F97316 100%)"
             }}
           >
-            Determine Withdrawal
+            {createWithdrawal.isPending ? 'Processing...' : 'Determine Withdrawal'}
           </Button>
         </div>
       </div>

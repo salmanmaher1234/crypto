@@ -27,19 +27,24 @@ export default function WithdrawalRecord() {
     select: (data: any) => (Array.isArray(data) ? data : [])
   });
 
-  // Sample data for demonstration (replace with actual data)
-  const sampleRecords: WithdrawalRecord[] = [
-    {
-      id: 1,
-      currency: "BDT",
-      quantityOfWithdrawal: 10.00,
-      actualQuantity: 10.00,
-      status: "Under review",
-      createdAt: "2025-08-18 16:41:46"
-    }
-  ];
+  // Map API data to match the expected format
+  const mapToWithdrawalRecord = (apiRecord: any): WithdrawalRecord => ({
+    id: apiRecord.id,
+    currency: "BDT",
+    quantityOfWithdrawal: parseFloat(apiRecord.amount),
+    actualQuantity: parseFloat(apiRecord.amount),
+    status: apiRecord.status as 'Under review' | 'Success' | 'Failed',
+    createdAt: new Date(apiRecord.createdAt || apiRecord.created_at).toLocaleString('en-GB', {
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }).replace(',', '')
+  });
 
-  const records = withdrawalRecords.length > 0 ? withdrawalRecords : sampleRecords;
+  const records: WithdrawalRecord[] = withdrawalRecords.map(mapToWithdrawalRecord);
 
   const getStatusBadge = (status: string) => {
     switch (status) {

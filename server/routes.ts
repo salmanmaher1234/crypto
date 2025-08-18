@@ -213,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertWithdrawalRequestSchema.parse({
         ...req.body,
         userId: req.session.userId,
-        status: "pending",
+        status: "Under review",
       });
       
       // Check if user has sufficient balance
@@ -229,9 +229,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Insufficient balance" });
       }
       
+      // Create withdrawal request
       const request = await storage.createWithdrawalRequest(validatedData);
+      
+      // Update user balance (deduct withdrawal amount)
+      const newBalance = (availableBalance - withdrawalAmount).toString();
+      await storage.updateUser(req.session.userId, { 
+        availableBalance: newBalance,
+        balance: newBalance
+      });
+      
       res.json(request);
     } catch (error) {
+      console.error('Withdrawal request error:', error);
       res.status(400).json({ message: "Invalid withdrawal request data" });
     }
   });
