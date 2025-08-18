@@ -10,9 +10,9 @@ export default function WithdrawalPage() {
   };
 
   const handleWithdrawalRecord = () => {
-    // Navigate to withdrawal record page
+    // Navigate to withdrawal record tab
     console.log('Navigate to withdrawal record');
-    window.location.href = '/withdrawal-record';
+    setLocation('/top-up-records?tab=withdrawal');
   };
 
   return (

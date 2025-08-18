@@ -30,9 +30,9 @@ export default function WithdrawalRequest() {
       queryClient.invalidateQueries({ queryKey: ['/api/withdrawal-requests'] });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       
-      // Navigate to withdrawal record page after delay
+      // Navigate to withdrawal record tab after delay
       setTimeout(() => {
-        setLocation('/withdrawal-record');
+        setLocation('/top-up-records?tab=withdrawal');
       }, 1000);
     },
     onError: (error: any) => {
@@ -49,7 +49,7 @@ export default function WithdrawalRequest() {
   };
 
   const handleWithdrawalRecord = () => {
-    setLocation('/withdrawal-record');
+    setLocation('/top-up-records?tab=withdrawal');
   };
 
   const handleMaxAmount = () => {

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 
 const tabs = [
@@ -10,7 +10,19 @@ const tabs = [
 ];
 
 export default function TopUpRecordsPage() {
-  const [activeTab, setActiveTab] = useState("withdrawal");
+  const [location] = useLocation();
+  const [activeTab, setActiveTab] = useState("top-up");
+
+  // Check for URL parameters to set default tab
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab === 'withdrawal') {
+      setActiveTab('withdrawal');
+    } else {
+      setActiveTab('top-up');
+    }
+  }, [location]);
 
   // Get transactions for top-up records
   const { data: transactions = [] } = useQuery({
@@ -40,13 +52,12 @@ export default function TopUpRecordsPage() {
     switch (status.toLowerCase()) {
       case 'completed':
       case 'approved':
-        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Success</span>;
+        return <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">Success</span>;
       case 'rejected':
-        return <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Failure</span>;
+        return <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium">Failure</span>;
       case 'pending':
-        return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Under Review</span>;
       default:
-        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">{status}</span>;
+        return <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">Under review</span>;
     }
   };
 
