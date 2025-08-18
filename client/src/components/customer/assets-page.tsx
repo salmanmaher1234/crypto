@@ -28,7 +28,7 @@ export function AssetsPage() {
     return amount.toFixed(2);
   };
 
-  const getCurrencySymbol = () => selectedCurrency === "USD" ? "$" : "৳";
+  const getCurrencySymbol = () => ""; // Remove currency symbols
 
   // Handle clicks outside dropdown
   useEffect(() => {
@@ -156,14 +156,17 @@ export function AssetsPage() {
 
       {/* Content Section */}
       <div className="bg-gray-50 px-4 py-6">
-        {/* BDT Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        {/* BDT Section - Clickable */}
+        <div 
+          className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setLocation('/funding-information')}
+        >
           <div className="flex justify-between items-start">
             <div>
               <div className="text-lg font-medium text-gray-900 mb-2">{selectedCurrency}</div>
               <div className="space-y-1">
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">{getCurrencySymbol()}{convertAmount(availableBalance)}</div>
+                  <div className="text-2xl font-bold text-blue-600">{convertAmount(availableBalance)}</div>
                   <div className="text-xs text-gray-500">Available Balance</div>
                 </div>
               </div>
@@ -171,14 +174,14 @@ export function AssetsPage() {
             
             <div className="text-center">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{getCurrencySymbol()}{convertAmount(frozenBalance)}</div>
+                <div className="text-2xl font-bold text-blue-600">{convertAmount(frozenBalance)}</div>
                 <div className="text-xs text-gray-500">Frozen</div>
               </div>
             </div>
             
             <div className="text-right">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{getCurrencySymbol()}{convertAmount(totalBalance)}</div>
+                <div className="text-2xl font-bold text-blue-600">{convertAmount(totalBalance)}</div>
                 <div className="text-xs text-gray-500">Balance</div>
               </div>
             </div>

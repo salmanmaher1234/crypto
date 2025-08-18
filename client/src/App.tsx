@@ -12,6 +12,7 @@ import RechargePage from "@/pages/recharge-page";
 import TopUpRecordsPage from "@/pages/top-up-records";
 import WithdrawalPage from "@/pages/withdrawal-page";
 import CustomerServicePage from "@/pages/customer-service";
+import FundingInformation from "@/pages/funding-information";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -39,6 +40,7 @@ function AppContent() {
       <Route path="/withdrawal" component={WithdrawalPage} />
 
       <Route path="/customer-service" component={CustomerServicePage} />
+      <Route path="/funding-information" component={FundingInformation} />
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />
     </Switch>
