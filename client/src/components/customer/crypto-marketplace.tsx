@@ -140,11 +140,15 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Top crypto prices header */}
+      {/* Top crypto prices header - clickable */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex justify-between space-x-4">
           {topCryptos.map((crypto) => (
-            <div key={crypto.symbol} className="text-center flex-1">
+            <div 
+              key={crypto.symbol} 
+              className="text-center flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+              onClick={() => onSelectCurrency(crypto.symbol)}
+            >
               <div className="text-xs font-medium text-gray-900">{crypto.symbol}</div>
               <div className="text-sm font-bold text-red-600">{formatPrice(crypto.price)}</div>
               <div className="text-xs text-red-600">{formatChange(crypto.change)}</div>
@@ -153,26 +157,26 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
         </div>
       </div>
 
-      {/* Action buttons - without padding to match design */}
+      {/* Action buttons with cryptocurrency icons */}
       <div className="bg-white border-b border-gray-200">
         <div className="flex justify-between">
           <Link href="/recharge" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
-              <RotateCcw className="w-6 h-6 text-gray-600" />
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none hover:bg-gray-50">
+              <img src="/api/placeholder/24/24" alt="Recharge" className="w-6 h-6 rounded-full" />
               <span className="text-xs text-gray-600">Recharge</span>
             </Button>
           </Link>
           
           <Link href="/withdrawal" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
-              <CreditCard className="w-6 h-6 text-gray-600" />
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none hover:bg-gray-50">
+              <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">₿</div>
               <span className="text-xs text-gray-600">Withdrawal</span>
             </Button>
           </Link>
           
           <Link href="/customer-service" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
-              <Headphones className="w-6 h-6 text-gray-600" />
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none hover:bg-gray-50">
+              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">Ξ</div>
               <span className="text-xs text-gray-600">Customer Service</span>
             </Button>
           </Link>
