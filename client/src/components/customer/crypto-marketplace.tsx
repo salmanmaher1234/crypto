@@ -157,32 +157,26 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
         </div>
       </div>
 
-      {/* Action buttons with proper icons */}
+      {/* Action buttons - without padding to match design */}
       <div className="bg-white border-b border-gray-200">
         <div className="flex justify-between">
           <Link href="/recharge" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none hover:bg-gray-50">
-              <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center">
-                <div className="w-6 h-4 bg-blue-500 rounded-sm"></div>
-              </div>
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
+              <RotateCcw className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Recharge</span>
             </Button>
           </Link>
           
           <Link href="/withdrawal" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none hover:bg-gray-50">
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold">₿</div>
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
+              <CreditCard className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Withdrawal</span>
             </Button>
           </Link>
           
           <Link href="/customer-service" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none hover:bg-gray-50">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-white rounded-full relative">
-                  <div className="absolute inset-1 bg-white rounded-full"></div>
-                </div>
-              </div>
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
+              <Headphones className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Customer Service</span>
             </Button>
           </Link>

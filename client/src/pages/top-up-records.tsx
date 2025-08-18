@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 
 const tabs = [
+  { id: "top-up", label: "Top-up Records" },
   { id: "withdrawal", label: "Withdrawal Record" }
 ];
 
@@ -61,7 +62,7 @@ export default function TopUpRecordsPage() {
               </Button>
             </Link>
             <h1 className="text-lg font-medium text-gray-900">
-              Withdrawal Record
+              {activeTab === "top-up" ? "Top-up Records" : "Withdrawal Record"}
             </h1>
           </div>
         </div>
@@ -89,44 +90,89 @@ export default function TopUpRecordsPage() {
       </div>
 
       {/* Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-4">
-          {withdrawalRequests.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                <div className="w-8 h-8 bg-gray-300 rounded"></div>
-              </div>
-              <div className="text-gray-400 text-sm">No More</div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {withdrawalRequests.map((request: any) => (
-                <div key={request.id} className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="text-sm font-medium">BDT</div>
-                    <div className="text-xs text-gray-500">
-                      {formatDate(request.createdAt)}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Quantity of Withdrawal</span>
-                      <span className="text-sm font-medium">{parseFloat(request.amount).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Actual quantity</span>
-                      <span className="text-sm font-medium">{parseFloat(request.amount).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Withdrawal Status</span>
-                      {getStatusBadge(request.status)}
-                    </div>
-                  </div>
+      <main className="flex-1 overflow-auto bg-gray-100">
+        {activeTab === "top-up" ? (
+          <div className="p-4">
+            {(transactions as any[]).length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                  <div className="w-8 h-8 bg-gray-300 rounded"></div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="text-gray-400 text-sm">No More</div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(transactions as any[])
+                  .filter((t: any) => t.type === 'deposit')
+                  .map((transaction: any) => (
+                    <div key={transaction.id} className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="text-sm font-medium">BDT</div>
+                        <div className="text-xs text-gray-500">
+                          {formatDate(transaction.createdAt)}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Quantity of Top-up</span>
+                          <span className="text-sm font-medium">{parseFloat(transaction.amount).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Actual quantity</span>
+                          <span className="text-sm font-medium">{parseFloat(transaction.amount).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Top-up Status</span>
+                          {getStatusBadge(transaction.status)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-0">
+            {(withdrawalRequests as any[]).length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                  <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                </div>
+                <div className="text-gray-400 text-sm">No More</div>
+              </div>
+            ) : (
+              <div className="space-y-0">
+                {(withdrawalRequests as any[]).map((request: any, index: number) => (
+                  <div key={request.id} className="bg-white border-b border-gray-100 p-4">
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="text-sm font-medium text-black">BDT</div>
+                      <div className="text-xs text-gray-500">
+                        {formatDate(request.createdAt)}
+                      </div>
+                    </div>
+                    <div className="space-y-0">
+                      <div className="flex justify-between py-1">
+                        <span className="text-sm text-black">Quantity of Withdrawal</span>
+                        <span className="text-sm font-bold text-black">{parseFloat(request.amount).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-sm text-black">Actual quantity</span>
+                        <span className="text-sm font-bold text-black">{parseFloat(request.amount).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between py-1 items-center">
+                        <span className="text-sm text-black">Withdrawal Status</span>
+                        {getStatusBadge(request.status)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="bg-white p-4 text-center">
+                  <div className="text-gray-400 text-sm">No More</div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );
