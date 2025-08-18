@@ -332,12 +332,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove actualDirection from validation data since it's not part of the schema
       const { actualDirection, ...bodyWithoutActual } = req.body;
       
+      // Get current crypto price for entryPrice
+      let entryPrice = "115000.00"; // Default fallback
+      try {
+        const cryptoPrices = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+          .then(res => res.json());
+        if (cryptoPrices?.bitcoin?.usd) {
+          entryPrice = cryptoPrices.bitcoin.usd.toString();
+        }
+      } catch (error) {
+        console.log("Failed to fetch live price, using fallback");
+      }
+      
+      // Generate unique order ID
+      const orderId = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+      
+      // Calculate expiration time
+      const expiresAt = new Date(Date.now() + (bodyWithoutActual.duration * 1000));
+      
       const dataToValidate = {
         ...bodyWithoutActual,
-        direction: finalDirection, // Use the determined direction
         userId: req.session.userId,
+        orderId: orderId,
+        asset: "BTC/USDT", // Default asset
+        direction: finalDirection, // Use the determined direction
+        entryPrice: entryPrice,
+        expiresAt: expiresAt,
       };
       
+      console.log("Data to validate:", dataToValidate);
       const validatedData = insertBettingOrderSchema.parse(dataToValidate);
       
       // Calculate commission based on duration
