@@ -17,13 +17,177 @@ import {
 
 export function Profile() {
   const { user, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<'main' | 'settings'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter'>('main');
 
   if (!user) return null;
 
   const handleLogout = () => {
     logout();
   };
+
+  // Collection Information Page
+  if (currentView === 'collection') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('main')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Collection Information</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600">City Bank PLC</div>
+              <div className="text-sm text-gray-600">2204***1001</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Add Collection Information Button */}
+        <div className="p-4 fixed bottom-4 left-4 right-4">
+          <Button
+            className="w-full h-12 text-white font-medium rounded-2xl"
+            style={{
+              background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+            }}
+          >
+            Add Collection Information
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Authentication Page
+  if (currentView === 'authentication') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('main')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Authentication</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 space-y-6">
+          {/* Basic Authentication */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-medium text-gray-900">Basic Authentication</h3>
+              <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Completed</span>
+            </div>
+            <p className="text-xs text-gray-500">
+              Complete basic email or mobile phone authentication, therefore, the fund transaction will be automatically notified by e-mail or mobile phone, and the market dynamics will be immediately tracked
+            </p>
+          </div>
+
+          {/* Identity Authentication */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-medium text-gray-900">Identity Authentication</h3>
+              <span className="text-xs text-gray-500">Not authenticated</span>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              Authentication of True Identity Information. We will arrange a 7*24 hour dedicated VIP customer service manager to analysis for you
+            </p>
+            
+            <Button
+              className="w-full h-12 text-white font-medium rounded-2xl"
+              style={{
+                background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+              }}
+            >
+              Start Authentication
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // User Message Page (Empty)
+  if (currentView === 'userMessage') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('main')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">User Message</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Empty Content */}
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="text-center text-gray-500">
+            <div className="text-lg mb-2">No Messages</div>
+            <div className="text-sm">You have no messages at this time.</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Help Center Page (Empty)
+  if (currentView === 'helpCenter') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('main')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Help Center</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Empty Content */}
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="text-center text-gray-500">
+            <div className="text-lg mb-2">Help Center</div>
+            <div className="text-sm">Contact support for assistance.</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Settings Page
   if (currentView === 'settings') {
@@ -133,6 +297,7 @@ export function Profile() {
           <Button 
             variant="ghost" 
             className="w-full justify-start h-14 px-4"
+            onClick={() => setCurrentView('collection')}
           >
             <div className="flex items-center space-x-3">
               <CreditCard className="w-5 h-5 text-gray-600" />
@@ -146,6 +311,7 @@ export function Profile() {
           <Button 
             variant="ghost" 
             className="w-full justify-start h-14 px-4"
+            onClick={() => setCurrentView('authentication')}
           >
             <div className="flex items-center space-x-3">
               <Shield className="w-5 h-5 text-gray-600" />
@@ -159,6 +325,7 @@ export function Profile() {
           <Button 
             variant="ghost" 
             className="w-full justify-start h-14 px-4"
+            onClick={() => setCurrentView('userMessage')}
           >
             <div className="flex items-center space-x-3">
               <MessageSquare className="w-5 h-5 text-gray-600" />
@@ -172,6 +339,7 @@ export function Profile() {
           <Button 
             variant="ghost" 
             className="w-full justify-start h-14 px-4"
+            onClick={() => setCurrentView('helpCenter')}
           >
             <div className="flex items-center space-x-3">
               <HelpCircle className="w-5 h-5 text-gray-600" />
