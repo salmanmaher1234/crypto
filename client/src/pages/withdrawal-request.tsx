@@ -14,8 +14,7 @@ export default function WithdrawalRequest() {
   };
 
   const handleWithdrawalRecord = () => {
-    // Navigate to withdrawal record page
-    console.log('Navigate to withdrawal record');
+    setLocation('/withdrawal-record');
   };
 
   const handleMaxAmount = () => {
@@ -24,8 +23,27 @@ export default function WithdrawalRequest() {
   };
 
   const handleDetermineWithdrawal = () => {
-    // Handle withdrawal submission
-    console.log('Determine withdrawal for amount:', withdrawalAmount);
+    if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) return;
+    
+    // Create withdrawal record (in real app this would be an API call)
+    const newRecord = {
+      id: Date.now(),
+      currency: "BDT",
+      quantityOfWithdrawal: parseFloat(withdrawalAmount),
+      actualQuantity: parseFloat(withdrawalAmount),
+      status: "Under review" as const,
+      createdAt: new Date().toLocaleString('en-GB', {
+        year: 'numeric',
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }).replace(',', '')
+    };
+    
+    // Navigate to withdrawal record page
+    setLocation('/withdrawal-record');
   };
 
   const availableBalance = parseFloat(user?.availableBalance || user?.balance || "669522.6");
