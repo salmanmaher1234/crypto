@@ -13,6 +13,7 @@ import TopUpRecordsPage from "@/pages/top-up-records";
 import WithdrawalPage from "@/pages/withdrawal-page";
 import CustomerServicePage from "@/pages/customer-service";
 import FundingInformation from "@/pages/funding-information";
+import WithdrawalRequest from "@/pages/withdrawal-request";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -41,6 +42,7 @@ function AppContent() {
 
       <Route path="/customer-service" component={CustomerServicePage} />
       <Route path="/funding-information" component={FundingInformation} />
+      <Route path="/withdrawal-request" component={WithdrawalRequest} />
       <Route path="/spot-orders" component={() => import("./components/customer/spot-orders").then(m => m.SpotOrders)} />
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />

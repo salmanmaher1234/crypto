@@ -43,8 +43,11 @@ export default function WithdrawalPage() {
 
       {/* Content */}
       <div className="p-4">
-        {/* BDT Currency Label */}
-        <div className="mb-6">
+        {/* BDT Currency Label - Clickable */}
+        <div 
+          className="mb-6 cursor-pointer hover:bg-gray-100 p-2 rounded transition-colors"
+          onClick={() => setLocation('/withdrawal-request')}
+        >
           <div className="text-gray-600 text-sm font-medium">BDT</div>
         </div>
 
