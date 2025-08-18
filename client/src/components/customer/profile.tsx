@@ -19,7 +19,8 @@ import { Input } from "@/components/ui/input";
 
 export function Profile() {
   const { user, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage' | 'capitalCode'>('main');
+  const [fundsPassword, setFundsPassword] = useState<string[]>(Array(6).fill(''));
 
   if (!user) return null;
 
@@ -283,6 +284,82 @@ export function Profile() {
     );
   }
 
+  // Capital Code Page
+  if (currentView === 'capitalCode') {
+    const handlePasswordChange = (index: number, value: string) => {
+      if (value.length <= 1 && /^\d*$/.test(value)) {
+        const newPassword = [...fundsPassword];
+        newPassword[index] = value;
+        setFundsPassword(newPassword);
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('settings')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Capital Code</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          {/* Set Funds Password Section */}
+          <div className="text-center mb-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-8">Set Funds Password</h2>
+            
+            {/* Password Input Circles */}
+            <div className="flex justify-center space-x-4 mb-12">
+              {fundsPassword.map((digit, index) => (
+                <div key={index} className="relative">
+                  <input
+                    type="password"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handlePasswordChange(index, e.target.value)}
+                    className="w-12 h-12 rounded-full border-2 border-yellow-400 bg-yellow-100 text-center text-lg font-bold text-gray-900 focus:outline-none focus:border-yellow-500"
+                    style={{
+                      background: index === 0 ? "linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)" : "#FEF3C7"
+                    }}
+                  />
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-gray-700">
+                    {index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Submit Settings Button */}
+          <div className="pt-6">
+            <Button
+              className="w-full h-12 text-white font-medium rounded-2xl"
+              style={{
+                background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+              }}
+              onClick={() => {
+                // Handle form submission
+                console.log('Funds Password:', fundsPassword.join(''));
+              }}
+            >
+              Submit Settings
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Switch Language Page
   if (currentView === 'switchLanguage') {
     const languages = [
@@ -379,6 +456,7 @@ export function Profile() {
             <Button 
               variant="ghost" 
               className="w-full justify-start h-14 px-4"
+              onClick={() => setCurrentView('capitalCode')}
             >
               <div className="flex items-center space-x-3">
                 <Shield className="w-5 h-5 text-gray-600" />
