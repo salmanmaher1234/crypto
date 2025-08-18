@@ -357,11 +357,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         asset: "BTC/USDT", // Default asset
         direction: finalDirection, // Use the determined direction
         entryPrice: entryPrice,
-        expiresAt: expiresAt,
       };
       
       console.log("Data to validate:", dataToValidate);
       const validatedData = insertBettingOrderSchema.parse(dataToValidate);
+      
+      // Add the expiresAt field after validation since it's handled automatically
+      const orderData = {
+        ...validatedData,
+        expiresAt: expiresAt,
+      };
       
       // Calculate commission based on duration
       const getCommissionRate = (duration: number): number => {
@@ -380,9 +385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const commissionAmount = orderAmount * commissionRate;
       
       console.log(`Commission calculation: ${orderAmount} × ${commissionRate} = ${commissionAmount}`);
-      console.log("Order data:", validatedData);
+      console.log("Order data:", orderData);
       
-      const order = await storage.createBettingOrder(validatedData);
+      const order = await storage.createBettingOrder(orderData);
       console.log("Created order:", order);
       
       // Deduct amount from available balance and add commission

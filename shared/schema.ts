@@ -133,6 +133,7 @@ export const insertBettingOrderSchema = createInsertSchema(bettingOrders).omit({
   status: true,
   result: true,
   createdAt: true,
+  expiresAt: true,
 });
 
 export const insertWithdrawalRequestSchema = createInsertSchema(withdrawalRequests).omit({
