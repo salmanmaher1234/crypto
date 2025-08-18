@@ -170,24 +170,24 @@ export function BettingOrders() {
             ))}
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-gray-800">
           {!orders || orders.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-400">
               <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>No betting orders</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Customer Name</TableHead>
-                  <TableHead>Asset</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Direction</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Timer</TableHead>
-                  <TableHead>Actions</TableHead>
+                <TableRow className="border-gray-700">
+                  <TableHead className="text-gray-300">Order ID</TableHead>
+                  <TableHead className="text-gray-300">Customer Name</TableHead>
+                  <TableHead className="text-gray-300">Asset</TableHead>
+                  <TableHead className="text-gray-300">Amount</TableHead>
+                  <TableHead className="text-gray-300">Direction</TableHead>
+                  <TableHead className="text-gray-300">Status</TableHead>
+                  <TableHead className="text-gray-300">Timer</TableHead>
+                  <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -196,16 +196,16 @@ export function BettingOrders() {
                   const progressPercent = Math.max(0, (remainingTime / order.duration) * 100);
                   
                   return (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}-{(order as any).username || `User${order.userId}`}</TableCell>
-                      <TableCell className="font-medium">{(order as any).username || `User${order.userId}`}</TableCell>
+                    <TableRow key={order.id} className="border-gray-700 hover:bg-gray-750">
+                      <TableCell className="font-medium text-gray-200">{order.id}-{(order as any).username || `User${order.userId}`}</TableCell>
+                      <TableCell className="font-medium text-gray-200">{(order as any).username || `User${order.userId}`}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{order.asset}</div>
-                          <div className="text-sm text-gray-500">{parseFloat(order.entryPrice).toFixed(2)}</div>
+                          <div className="font-medium text-gray-200">{order.asset}</div>
+                          <div className="text-sm text-gray-400">{parseFloat(order.entryPrice).toFixed(2)}</div>
                         </div>
                       </TableCell>
-                      <TableCell>{parseFloat(order.amount).toFixed(2)}</TableCell>
+                      <TableCell className="text-gray-200">{parseFloat(order.amount).toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge 
                           variant={order.direction === "Buy Up" ? "default" : "destructive"}
@@ -230,18 +230,18 @@ export function BettingOrders() {
                       <TableCell>
                         {order.status === "active" ? (
                           <div>
-                            <div className="text-sm font-medium text-warning">
+                            <div className="text-sm font-medium text-yellow-400">
                               {remainingTime}s
                             </div>
-                            <div className="w-20 bg-gray-200 rounded-full h-1 mt-1">
+                            <div className="w-20 bg-gray-600 rounded-full h-1 mt-1">
                               <div 
-                                className="bg-warning h-1 rounded-full transition-all duration-1000"
+                                className="bg-yellow-400 h-1 rounded-full transition-all duration-1000"
                                 style={{ width: `${progressPercent}%` }}
                               />
                             </div>
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-400">
                             {order.status === "completed" ? "Completed" : "Cancelled"}
                           </div>
                         )}
@@ -273,7 +273,7 @@ export function BettingOrders() {
                             </Button>
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-400">
                             {order.status === "completed" && order.profit && (
                               <div>
                                 Profit: {parseFloat(order.profit).toFixed(2)}
