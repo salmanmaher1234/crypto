@@ -233,16 +233,20 @@ export default function AdvancedTrading() {
         </div>
       </div>
 
-      {/* Price Info */}
-      <div className="bg-gray-800 px-4 py-2 border-b border-gray-700">
+      {/* Current Price Display */}
+      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
         <div className="flex justify-between items-center">
           <div>
-            <div className="text-red-400 text-sm">24H High: 116200.3000</div>
-            <div className="text-green-400 text-sm">24H Low: 114964.2603</div>
+            <div className="text-2xl font-bold text-red-400 font-mono">{parseFloat(btcPrice).toFixed(4)}</div>
+            <div className="text-sm text-red-400">{btcChange}%</div>
           </div>
-          <div className="text-right">
-            <div className="text-white text-sm">24H Volume: 187.09M</div>
-            <div className="text-white text-sm">24H Turnover: 1.57K</div>
+          <div className="text-right text-xs text-gray-400">
+            <div>24H High: 116200.3000</div>
+            <div>24H Low: 114964.2603</div>
+          </div>
+          <div className="text-right text-xs text-gray-400">
+            <div>24H Volume: 182.69M</div>
+            <div>24H Turnover: 1.57K</div>
           </div>
         </div>
       </div>
@@ -303,20 +307,34 @@ export default function AdvancedTrading() {
 
         {/* Buy/Sell Buttons */}
         <div className="flex p-4 space-x-4">
-          <Button
-            onClick={() => handleTrade("Buy Up")}
-            disabled={placeTrade.isPending}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg"
-          >
-            Buy Up
-          </Button>
-          <Button
-            onClick={() => handleTrade("Buy Down")}
-            disabled={placeTrade.isPending}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg"
-          >
-            Buy Down
-          </Button>
+          <div className="flex-1">
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              placeholder="Quantity"
+              className="w-full mb-2 px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 outline-none text-center"
+            />
+            <Button
+              onClick={() => handleTrade("Buy Up")}
+              disabled={placeTrade.isPending}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg"
+            >
+              Buy Up
+            </Button>
+          </div>
+          <div className="flex-1">
+            <div className="mb-2 px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 text-center font-mono">
+              {parseFloat(btcPrice).toFixed(4)}
+            </div>
+            <Button
+              onClick={() => handleTrade("Buy Down")}
+              disabled={placeTrade.isPending}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg"
+            >
+              Buy Down
+            </Button>
+          </div>
         </div>
       </div>
     </div>

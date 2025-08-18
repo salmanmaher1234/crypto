@@ -147,7 +147,7 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
             <div 
               key={crypto.symbol} 
               className="text-center flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
-              onClick={() => onSelectCurrency(crypto.symbol)}
+              onClick={() => window.location.href = '/advanced-trading'}
             >
               <div className="text-xs font-medium text-gray-900">{crypto.symbol}</div>
               <div className="text-sm font-bold text-red-600">{formatPrice(crypto.price)}</div>
@@ -188,7 +188,7 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
         {cryptoData.map((crypto, index) => (
           <div
             key={crypto.symbol}
-            onClick={() => onSelectCurrency(crypto.symbol)}
+            onClick={() => window.location.href = '/advanced-trading'}
             className="flex items-center justify-between px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
           >
             <div className="flex items-center space-x-3">
