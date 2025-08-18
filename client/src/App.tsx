@@ -16,6 +16,7 @@ import CustomerServicePage from "@/pages/customer-service";
 import FundingInformation from "@/pages/funding-information";
 import WithdrawalRequest from "@/pages/withdrawal-request";
 import WithdrawalRecord from "@/pages/withdrawal-record";
+import OrderRecord from "@/pages/order-record";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -46,6 +47,7 @@ function AppContent() {
       <Route path="/funding-information" component={FundingInformation} />
       <Route path="/withdrawal-request" component={WithdrawalRequest} />
       <Route path="/withdrawal-record" component={WithdrawalRecord} />
+      <Route path="/order-record" component={OrderRecord} />
       <Route path="/spot-orders">
         {() => {
           const SpotOrdersComponent = React.lazy(() => 

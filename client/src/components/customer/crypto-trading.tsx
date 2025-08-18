@@ -167,7 +167,15 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         <div className="text-center">
           <h1 className="text-lg font-medium">{currency}</h1>
         </div>
-        <div className="text-right">
+        <div className="text-right flex items-center gap-3">
+          <Button
+            onClick={() => window.location.href = '/order-record'}
+            variant="ghost"
+            size="sm"
+            className="text-blue-400 hover:bg-blue-400/10 px-3 py-1.5 text-sm border border-blue-400/30 rounded-md"
+          >
+            Order
+          </Button>
           <div className="text-sm text-gray-400">Spot Orders →</div>
         </div>
       </div>

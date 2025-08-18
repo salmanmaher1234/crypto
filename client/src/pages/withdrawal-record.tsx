@@ -22,7 +22,7 @@ export default function WithdrawalRecord() {
   };
 
   // Fetch withdrawal records
-  const { data: withdrawalRecords = [] } = useQuery<WithdrawalRecord[]>({
+  const { data: withdrawalRecords = [] } = useQuery<any[]>({
     queryKey: ['/api/withdrawal-requests'],
     select: (data: any) => (Array.isArray(data) ? data : [])
   });
