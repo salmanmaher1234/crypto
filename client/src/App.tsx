@@ -48,6 +48,14 @@ function AppContent() {
       <Route path="/withdrawal-request" component={WithdrawalRequest} />
       <Route path="/withdrawal-record" component={WithdrawalRecord} />
       <Route path="/order-record" component={OrderRecord} />
+      <Route path="/advanced-trading" component={() => {
+        const AdvancedTradingComponent = React.lazy(() => import("./pages/advanced-trading"));
+        return (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <AdvancedTradingComponent />
+          </React.Suspense>
+        );
+      }} />
       <Route path="/spot-orders">
         {() => {
           const SpotOrdersComponent = React.lazy(() => 
