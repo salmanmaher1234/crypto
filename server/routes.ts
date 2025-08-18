@@ -306,31 +306,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("User ID from session:", req.session.userId);
       console.log("Order data:", req.body);
       
+      // Basic validation with detailed logging
+      console.log("Request body fields:", {
+        amount: req.body.amount,
+        direction: req.body.direction,
+        duration: req.body.duration,
+        hasAmount: !!req.body.amount,
+        hasDirection: !!req.body.direction,
+        hasDuration: !!req.body.duration
+      });
+      
+      if (!req.body.amount || !req.body.direction || !req.body.duration) {
+        console.log("VALIDATION FAILED - Missing basic fields:", { 
+          amount: req.body.amount, 
+          direction: req.body.direction, 
+          duration: req.body.duration,
+          amountType: typeof req.body.amount,
+          directionType: typeof req.body.direction,
+          durationType: typeof req.body.duration
+        });
+        return res.status(400).json({ message: "Missing required fields: amount, direction, duration" });
+      }
+      
       // Get user to check their backend direction setting
       const user = await storage.getUser(req.session.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check if user has sufficient balance
+      const orderAmount = parseFloat(req.body.amount);
+      const availableBalance = parseFloat(user.availableBalance);
+      
+      if (orderAmount > availableBalance) {
+        return res.status(400).json({ message: "Insufficient balance" });
+      }
+      
       // Determine the final direction to store in the order
       let finalDirection = req.body.direction;
       
-      console.log(`Backend direction logic - User direction: ${user.direction}, Request direction: ${req.body.direction}, Actual direction: ${req.body.actualDirection}`);
+      console.log(`Backend direction logic - User direction: ${user.direction}, Request direction: ${req.body.direction}`);
       
-      if (user.direction === "Actual") {
-        // When admin sets direction to "Actual", use customer's actual choice
-        finalDirection = req.body.actualDirection || req.body.direction;
-        console.log(`Using ACTUAL direction: ${finalDirection} (backend setting: ${user.direction}, customer choice: ${req.body.actualDirection})`);
-      } else {
+      if (user.direction !== "Actual") {
         // When admin sets a specific direction, override customer's choice
         finalDirection = user.direction;
         console.log(`Using OVERRIDE direction: ${finalDirection} (backend override: ${user.direction})`);
+      } else {
+        console.log(`Using ACTUAL direction: ${finalDirection} (backend setting: ${user.direction})`);
       }
       
       console.log(`FINAL DIRECTION TO STORE: ${finalDirection}`);
-      
-      // Remove actualDirection from validation data since it's not part of the schema
-      const { actualDirection, ...bodyWithoutActual } = req.body;
       
       // Get current crypto price for entryPrice
       let entryPrice = "115000.00"; // Default fallback
@@ -344,73 +369,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Failed to fetch live price, using fallback");
       }
       
-      // Generate unique order ID
-      const orderId = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
-      
-      // Calculate expiration time
-      const expiresAt = new Date(Date.now() + (bodyWithoutActual.duration * 1000));
-      
-      const dataToValidate = {
-        ...bodyWithoutActual,
-        userId: req.session.userId,
-        orderId: orderId,
-        asset: "BTC/USDT", // Default asset
-        direction: finalDirection, // Use the determined direction
-        entryPrice: entryPrice,
-      };
-      
-      console.log("Data to validate:", dataToValidate);
-      const validatedData = insertBettingOrderSchema.parse(dataToValidate);
-      
-      // Add the expiresAt field after validation since it's handled automatically
+      // Create order data that matches storage expectations
       const orderData = {
-        ...validatedData,
-        expiresAt: expiresAt,
+        userId: req.session.userId,
+        asset: "BTC/USDT",
+        amount: orderAmount.toString(),
+        direction: finalDirection,
+        duration: parseInt(req.body.duration),
+        entryPrice: entryPrice
       };
       
-      // Calculate commission based on duration
-      const getCommissionRate = (duration: number): number => {
-        switch (duration) {
-          case 30: return 0.20; // 20%
-          case 60: return 0.30; // 30%
-          case 120: return 0.40; // 40%
-          case 180: return 0.50; // 50%
-          case 240: return 0.60; // 60%
-          default: return 0.20; // Default to 20%
-        }
-      };
-      
-      const orderAmount = parseFloat(validatedData.amount);
-      const commissionRate = getCommissionRate(validatedData.duration);
-      const commissionAmount = orderAmount * commissionRate;
-      
-      console.log(`Commission calculation: ${orderAmount} × ${commissionRate} = ${commissionAmount}`);
-      console.log("Order data:", orderData);
+      console.log("Final order data:", orderData);
       
       const order = await storage.createBettingOrder(orderData);
       console.log("Created order:", order);
       
-      // Deduct amount from available balance and add commission
-      const userForBalance = await storage.getUser(req.session.userId);
-      console.log("Current user before balance update:", userForBalance);
+      // Deduct amount from available balance
+      const newBalance = availableBalance - orderAmount;
+      console.log(`BALANCE UPDATE: ${availableBalance} - ${orderAmount} = ${newBalance}`);
       
-      if (userForBalance) {
-        const currentBalance = parseFloat(userForBalance.availableBalance);
-        const newBalance = currentBalance - orderAmount;
-        
-        console.log(`BALANCE UPDATE: ${currentBalance} - ${orderAmount} = ${newBalance}`);
-        
-        const updatedUser = await storage.updateUser(req.session.userId, {
-          availableBalance: newBalance.toFixed(2),
-        });
-        console.log("Updated user:", updatedUser);
-      }
+      await storage.updateUser(req.session.userId, {
+        availableBalance: newBalance.toFixed(2),
+      });
       
       console.log("==== BETTING ORDER END ====");
       res.json(order);
     } catch (error) {
       console.error("Betting order error:", error);
-      res.status(400).json({ message: "Invalid betting order data", error: error.message });
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+      res.status(500).json({ message: "Failed to create betting order", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
