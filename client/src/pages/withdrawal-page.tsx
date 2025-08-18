@@ -91,125 +91,36 @@ export default function WithdrawalPage() {
   const defaultBankAccount = bankAccounts[0];
 
   return (
-    <div className="h-screen w-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="w-full px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Link href="/customer">
-                <Button variant="ghost" size="sm" className="mr-2">
-                  <ArrowLeft className="w-4 h-4" />
-                </Button>
-              </Link>
-              <h1 className="text-lg font-medium text-gray-900">Request for Withdrawal</h1>
-            </div>
-            <Link href="/top-up-records">
-              <Button variant="ghost" size="sm" className="text-blue-600">
-                Withdrawal Record
+    <div className="min-h-screen bg-white">
+      {/* Header - Clean design matching the image */}
+      <div className="bg-white px-4 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Link href="/customer">
+              <Button variant="ghost" size="sm" className="p-1">
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Button>
             </Link>
+            <h1 className="ml-3 text-lg font-medium text-gray-900">Request for Withdrawal</h1>
           </div>
+          <Link href="/top-up-records">
+            <div className="text-sm text-gray-600">Withdrawal Record</div>
+          </Link>
         </div>
-      </header>
+      </div>
 
-      {/* Content */}
-      <main className="flex-1 overflow-auto p-4">
-        <div className="space-y-6">
-          {/* Currency Selection */}
-          <div>
-            <div className="text-sm text-gray-600 mb-2">Currency withdrawal ( Currency Account)</div>
-            <div className="flex space-x-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Collection Information - Only show for BDT */}
-          {activeTab === "bdt" && (
-            <div>
-              <div className="text-sm text-gray-600 mb-3">Collection Information</div>
-              {defaultBankAccount ? (
-                <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Account Holder:</span>
-                      <span className="text-sm font-medium text-right">{defaultBankAccount.accountHolderName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Account Number:</span>
-                      <span className="text-sm font-medium text-right">{defaultBankAccount.accountNumber}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Bank Name:</span>
-                      <span className="text-sm font-medium text-right">{defaultBankAccount.bankName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">IFSC Code:</span>
-                      <span className="text-sm font-medium text-right">{defaultBankAccount.ifscCode}</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-red-100 border border-red-300 rounded-lg p-4">
-                  <div className="text-sm text-red-600">
-                    No bank account found. Please add a bank account to proceed with withdrawal.
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Withdrawal Amount */}
-          <div>
-            <div className="text-sm text-gray-600 mb-3">Quantity of Withdrawal</div>
-            <div className="space-y-4">
-              <div className="relative">
-                <Input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0"
-                  className="text-lg h-12"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-600"
-                  onClick={() => setAmount(userData?.availableBalance || "0")}
-                >
-                  All
-                </Button>
-              </div>
-              <div className="text-sm text-gray-500">
-                Available Balance: {parseFloat(userData?.availableBalance || "0").toFixed(2)}
-              </div>
-            </div>
-          </div>
-
-          {/* Withdrawal Button */}
-          <div className="pt-4">
-            <Button
-              onClick={handleWithdrawal}
-              disabled={createWithdrawalMutation.isPending || !amount}
-              className="w-full h-12 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-medium"
-            >
-              {createWithdrawalMutation.isPending ? "Processing..." : "Determine Withdrawal"}
-            </Button>
-          </div>
+      {/* Content - Simple clean layout like the image */}
+      <div className="p-4">
+        {/* BDT Currency Label */}
+        <div className="mb-6">
+          <div className="text-sm font-medium text-gray-700">BDT</div>
         </div>
-      </main>
+
+        {/* Main Content Area - Empty like in the image */}
+        <div className="min-h-96">
+          {/* This area is intentionally minimal to match the clean design in your image */}
+        </div>
+      </div>
     </div>
   );
 }

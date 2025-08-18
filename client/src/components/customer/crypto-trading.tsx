@@ -30,15 +30,12 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
     { label: "180S", value: "180S", rate: "Scale:50.00%" }
   ];
 
-  const currentPrice = cryptoPrices?.[currency]?.price || "115365.9629";
-  const priceChange = cryptoPrices?.[currency]?.change || "-2.43";
+  const currentPrice = (cryptoPrices as any)?.[currency]?.price || "115365.9629";
+  const priceChange = (cryptoPrices as any)?.[currency]?.change || "-2.43";
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/betting-orders", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("/api/betting-orders", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -213,48 +210,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         ></div>
       </div>
 
-      {/* Trading Tables */}
-      <div className="bg-gray-900 flex-1">
-        {/* First Table */}
-        <div className="px-4 py-3 border-b border-gray-800">
-          <div className="grid grid-cols-4 text-xs text-gray-400 mb-3 pb-2 border-b border-gray-700">
-            <div>Time</div>
-            <div>Direction</div>
-            <div className="text-right">Price</div>
-            <div className="text-right">Quantity</div>
-          </div>
-          <div className="space-y-2">
-            {tradingData.map((item, index) => (
-              <div key={index} className="grid grid-cols-4 text-xs">
-                <div className="text-gray-300">{item.time}</div>
-                <div className="text-green-400">{item.direction}</div>
-                <div className="text-right text-gray-300">{item.price}</div>
-                <div className="text-right text-gray-300">{item.quantity}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Second Table */}
-        <div className="px-4 py-3">
-          <div className="grid grid-cols-4 text-xs text-gray-400 mb-3 pb-2 border-b border-gray-700">
-            <div>Time</div>
-            <div>Direction</div>
-            <div className="text-right">Price</div>
-            <div className="text-right">Quantity</div>
-          </div>
-          <div className="space-y-2 mb-20">
-            {moreData.map((item, index) => (
-              <div key={index} className="grid grid-cols-4 text-xs">
-                <div className="text-gray-300">{item.time}</div>
-                <div className={item.direction === "Sell" ? "text-red-400" : "text-green-400"}>{item.direction}</div>
-                <div className="text-right text-gray-300">{item.price}</div>
-                <div className="text-right text-gray-300">{item.quantity}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Spacer for bottom buttons */}
+      <div className="flex-1 bg-gray-900"></div>
 
       {/* Bottom Buttons - Fixed position exactly like in the image */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 flex space-x-4 border-t border-gray-800">
