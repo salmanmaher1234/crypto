@@ -646,10 +646,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique order ID
       const orderId = `ORD${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
       
-      // Manually validate required fields
-      const { asset, amount: orderAmount, direction, actualDirection, duration, entryPrice } = req.body;
-      if (!asset || !orderAmount || !direction || !duration || !entryPrice) {
-        return res.status(400).json({ message: "Missing required fields" });
+      // Manually validate required fields (only check what frontend actually sends)
+      const { amount: orderAmount, direction, actualDirection, duration } = req.body;
+      if (!orderAmount || !direction || !duration) {
+        console.log("Missing required fields:", { amount: orderAmount, direction, duration });
+        return res.status(400).json({ message: "Missing required fields: amount, direction, duration" });
+      }
+      
+      // Set default values for fields not sent by frontend
+      const asset = "BTC/USDT";
+      let entryPrice = "115000.00"; // Default fallback
+      
+      // Get current crypto price for entryPrice
+      try {
+        const cryptoPrices = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+          .then(res => res.json());
+        if (cryptoPrices?.bitcoin?.usd) {
+          entryPrice = cryptoPrices.bitcoin.usd.toString();
+        }
+      } catch (error) {
+        console.log("Failed to fetch live price, using fallback");
+      }
+      
+      // Check if user has sufficient balance
+      const orderAmountNumber = parseFloat(orderAmount);
+      const availableBalance = parseFloat(user.availableBalance);
+      
+      if (orderAmountNumber > availableBalance) {
+        console.log(`Insufficient balance: ${orderAmountNumber} > ${availableBalance}`);
+        return res.status(400).json({ message: "Insufficient balance" });
       }
       
       // Use customer's clicked direction if backend direction is "Actual", otherwise use admin-managed direction
@@ -660,7 +685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orderData = {
         userId: (req as any).userId,
         asset,
-        amount: orderAmount,
+        amount: orderAmountNumber.toString(),
         direction: effectiveDirection, // Use effective direction based on backend setting
         duration: parseInt(duration),
         entryPrice,
@@ -674,20 +699,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Created order:", order);
       
       // Deduct amount from available balance
-      console.log("Current user before balance update:", user);
+      const newBalance = availableBalance - orderAmountNumber;
+      console.log(`BALANCE UPDATE: ${availableBalance} - ${orderAmountNumber} = ${newBalance}`);
       
-      if (user) {
-        const amountNumber = parseFloat(orderAmount);
-        const currentBalance = parseFloat(user.availableBalance);
-        const newBalance = currentBalance - amountNumber;
-        
-        console.log(`BALANCE UPDATE: ${currentBalance} - ${amountNumber} = ${newBalance}`);
-        
-        const updatedUser = await storage.updateUser((req as any).userId, {
-          availableBalance: newBalance.toFixed(2),
-        });
-        console.log("Updated user:", updatedUser);
-      }
+      await storage.updateUser((req as any).userId, {
+        availableBalance: newBalance.toFixed(2),
+      });
+      console.log("Balance updated successfully");
       
       console.log("==== BETTING ORDER END ====");
       res.json(order);
