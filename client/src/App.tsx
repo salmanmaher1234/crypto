@@ -1,3 +1,4 @@
+import React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -45,7 +46,18 @@ function AppContent() {
       <Route path="/funding-information" component={FundingInformation} />
       <Route path="/withdrawal-request" component={WithdrawalRequest} />
       <Route path="/withdrawal-record" component={WithdrawalRecord} />
-      <Route path="/spot-orders" component={() => import("./components/customer/spot-orders").then(m => m.SpotOrders)} />
+      <Route path="/spot-orders">
+        {() => {
+          const SpotOrdersComponent = React.lazy(() => 
+            import("./components/customer/spot-orders").then(m => ({ default: m.SpotOrders }))
+          );
+          return (
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <SpotOrdersComponent />
+            </React.Suspense>
+          );
+        }}
+      </Route>
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />
     </Switch>
