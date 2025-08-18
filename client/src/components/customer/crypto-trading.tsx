@@ -210,8 +210,80 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         ></div>
       </div>
 
+      {/* Trading Data Table */}
+      <div className="bg-gray-800 border-t border-gray-700">
+        <div className="grid grid-cols-4 text-xs text-gray-400 px-4 py-3 border-b border-gray-700">
+          <div>Time</div>
+          <div>Direction</div>
+          <div className="text-right">Price</div>
+          <div className="text-right">Quantity</div>
+        </div>
+        <div className="px-4 py-2 space-y-1 max-h-64 overflow-y-auto">
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:41</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115074.4300</div>
+            <div className="text-right">0.0002</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:16</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115060.0100</div>
+            <div className="text-right">0.0001</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:41</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115069.2000</div>
+            <div className="text-right">0.0075</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:41</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115072.00</div>
+            <div className="text-right">0.0001</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:41</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115078.7800</div>
+            <div className="text-right">0.0041</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:41</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115066.00</div>
+            <div className="text-right">0.0001</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:31</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115042.9700</div>
+            <div className="text-right">0.0002</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:31</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115048.00</div>
+            <div className="text-right">0.0003</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:35</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115069.00</div>
+            <div className="text-right">0.0001</div>
+          </div>
+          <div className="grid grid-cols-4 text-xs text-white">
+            <div>14:47:41</div>
+            <div className="text-green-400">Buy</div>
+            <div className="text-right">115060.00</div>
+            <div className="text-right">0.0002</div>
+          </div>
+        </div>
+      </div>
+
       {/* Spacer for bottom buttons */}
-      <div className="flex-1 bg-gray-900"></div>
+      <div className="flex-1 bg-gray-900 pb-24"></div>
 
       {/* Bottom Buttons - Fixed position exactly like in the image */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 flex space-x-4 border-t border-gray-800">

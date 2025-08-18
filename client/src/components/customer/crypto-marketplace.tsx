@@ -201,8 +201,10 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
               <div className="text-sm font-medium text-gray-900">{crypto.symbol}</div>
             </div>
             
-            <div className="text-right">
+            <div className="text-center flex-1">
               <div className="text-sm font-medium text-red-600">{formatPrice(crypto.price)}</div>
+            </div>
+            <div className="text-right">
               <div className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
                 {formatChange(crypto.change)}
               </div>

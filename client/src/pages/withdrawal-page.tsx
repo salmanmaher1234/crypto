@@ -92,7 +92,7 @@ export default function WithdrawalPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Clean design matching the image */}
+      {/* Header */}
       <div className="bg-white px-4 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -109,16 +109,68 @@ export default function WithdrawalPage() {
         </div>
       </div>
 
-      {/* Content - Simple clean layout like the image */}
-      <div className="p-4">
-        {/* BDT Currency Label */}
-        <div className="mb-6">
-          <div className="text-sm font-medium text-gray-700">BDT</div>
+      {/* Content */}
+      <div className="p-4 space-y-6">
+        {/* Currency Selection */}
+        <div>
+          <div className="text-sm text-gray-600 mb-3">Currency withdrawal ( Currency Account)</div>
+          <div className="text-sm font-medium text-gray-900">BDT</div>
         </div>
 
-        {/* Main Content Area - Empty like in the image */}
-        <div className="min-h-96">
-          {/* This area is intentionally minimal to match the clean design in your image */}
+        {/* Collection Information */}
+        <div>
+          <div className="text-sm text-gray-600 mb-3">Collection Information</div>
+          <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-y-2 text-sm">
+              <div className="text-gray-600">Holder Name:</div>
+              <div className="text-right font-medium">220453968100T</div>
+              <div className="text-gray-600">Mobile No:</div>
+              <div className="text-right font-medium">Ismail Ali</div>
+              <div className="text-gray-600">Bank Name:</div>
+              <div className="text-right font-medium">City Bank PLC</div>
+              <div className="text-gray-600">Branch Name:</div>
+              <div className="text-right font-medium">HEAD OFFICE</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quantity of Withdrawal */}
+        <div>
+          <div className="text-sm text-gray-600 mb-3">Quantity of Withdrawal</div>
+          <div className="relative mb-2">
+            <Input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0"
+              className="text-lg h-12 pr-12"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-600"
+              onClick={() => setAmount(userData?.availableBalance || "0")}
+            >
+              All
+            </Button>
+          </div>
+          <div className="text-sm text-gray-500">
+            Available Balance:{parseFloat(userData?.availableBalance || "669522.6").toFixed(1)}
+          </div>
+        </div>
+
+        {/* Withdrawal Button */}
+        <div className="pt-4">
+          <Button
+            onClick={handleWithdrawal}
+            disabled={createWithdrawalMutation.isPending || !amount}
+            className="w-full h-12 text-white font-medium rounded-2xl"
+            style={{
+              background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+            }}
+          >
+            {createWithdrawalMutation.isPending ? "Processing..." : "Determine Withdrawal"}
+          </Button>
         </div>
       </div>
     </div>
