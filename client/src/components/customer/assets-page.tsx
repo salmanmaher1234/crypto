@@ -162,28 +162,23 @@ export function AssetsPage() {
           onClick={() => setLocation('/funding-information')}
         >
           <div className="flex justify-between items-start">
-            <div>
+            {/* Left Section - Currency and Available Balance */}
+            <div className="flex-1">
               <div className="text-lg font-medium text-gray-900 mb-2">{selectedCurrency}</div>
-              <div className="space-y-1">
-                <div>
-                  <div className="text-2xl font-bold text-blue-600">{convertAmount(availableBalance)}</div>
-                  <div className="text-xs text-gray-500">Available Balance</div>
-                </div>
-              </div>
+              <div className="text-2xl font-bold text-blue-600">{convertAmount(availableBalance)}</div>
+              <div className="text-xs text-gray-500">Available Balance</div>
             </div>
             
-            <div className="text-center">
-              <div>
-                <div className="text-2xl font-bold text-blue-600">{convertAmount(frozenBalance)}</div>
-                <div className="text-xs text-gray-500">Frozen</div>
-              </div>
+            {/* Center Section - Frozen */}
+            <div className="flex-1 text-center">
+              <div className="text-2xl font-bold text-blue-600 mt-8">{convertAmount(frozenBalance)}</div>
+              <div className="text-xs text-gray-500">Frozen</div>
             </div>
             
-            <div className="text-right">
-              <div>
-                <div className="text-2xl font-bold text-blue-600">{convertAmount(totalBalance)}</div>
-                <div className="text-xs text-gray-500">Balance</div>
-              </div>
+            {/* Right Section - Total Balance */}
+            <div className="flex-1 text-right">
+              <div className="text-2xl font-bold text-blue-600 mt-8">{convertAmount(totalBalance)}</div>
+              <div className="text-xs text-gray-500">Balance</div>
             </div>
           </div>
         </div>
