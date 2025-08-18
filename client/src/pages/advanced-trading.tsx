@@ -14,6 +14,17 @@ export default function AdvancedTrading() {
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
   const [quantity, setQuantity] = useState("9000");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [tradeHistory, setTradeHistory] = useState([
+    { time: "12:49:08", direction: "Buy", price: "115348.00", quantity: "0.0001" },
+    { time: "12:49:11", direction: "Buy", price: "115355.00", quantity: "0.0001" },
+    { time: "12:49:06", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:13", direction: "Buy", price: "115350.00", quantity: "0.0001" },
+    { time: "12:49:07", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:33", direction: "Buy", price: "115367.0700", quantity: "0.2000" },
+    { time: "12:49:13", direction: "Buy", price: "115362.5100", quantity: "0.0050" },
+    { time: "12:49:07", direction: "Buy", price: "115345.00", quantity: "0.0001" },
+    { time: "12:00:31", direction: "Sell", price: "115365.9900", quantity: "0.0001" }
+  ]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -207,9 +218,9 @@ export default function AdvancedTrading() {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-900 text-white flex flex-col">
-      {/* Header */}
-      <div className="bg-gray-800 px-4 py-3 flex items-center justify-between">
+    <div className="h-screen w-screen bg-gray-900 text-white flex flex-col overflow-hidden">
+      {/* Top Header */}
+      <div className="bg-gray-900 px-4 py-2 flex items-center justify-between border-b border-gray-700">
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
@@ -219,34 +230,37 @@ export default function AdvancedTrading() {
           >
             <Home className="w-4 h-4" />
           </Button>
-          <div className="text-lg font-bold">BTC/USDT</div>
+          <div className="text-white text-sm">BTC/USDT</div>
+        </div>
+        <div className="text-center">
+          <div className="text-white font-bold">BTC/USDT</div>
         </div>
         <div className="text-right">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setLocation('/spot-orders')}
-            className="text-white hover:bg-gray-700"
+            className="text-white hover:bg-gray-700 text-sm"
           >
             Spot Orders >
           </Button>
         </div>
       </div>
 
-      {/* Current Price Display */}
-      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
-        <div className="flex justify-between items-center">
+      {/* Price and Stats Display */}
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
+        <div className="flex justify-between items-start">
           <div>
             <div className="text-2xl font-bold text-red-400 font-mono">{parseFloat(btcPrice).toFixed(4)}</div>
             <div className="text-sm text-red-400">{btcChange}%</div>
           </div>
-          <div className="text-right text-xs text-gray-400">
-            <div>24H High: 116200.3000</div>
-            <div>24H Low: 114964.2603</div>
+          <div className="text-center text-xs text-gray-400">
+            <div>24H High: 116305.3500</div>
+            <div>24H Low: 115366.9629</div>
           </div>
           <div className="text-right text-xs text-gray-400">
-            <div>24H Volume: 182.69M</div>
-            <div>24H Turnover: 1.57K</div>
+            <div>24H Volume: 152.43M</div>
+            <div>24H Turnover: 1.31K</div>
           </div>
         </div>
       </div>
@@ -289,50 +303,36 @@ export default function AdvancedTrading() {
           <div>Quantity</div>
         </div>
         
-        {/* Sample Trade Rows */}
-        <div className="max-h-20 overflow-y-auto">
-          <div className="grid grid-cols-4 gap-4 px-4 py-1 text-sm">
-            <div>{currentTime.toLocaleTimeString()}</div>
-            <div className="text-red-400">Sell</div>
-            <div>{parseFloat(btcPrice).toFixed(2)}</div>
-            <div>0.0001</div>
-          </div>
-          <div className="grid grid-cols-4 gap-4 px-4 py-1 text-sm">
-            <div>16:22:18</div>
-            <div className="text-green-400">Buy</div>
-            <div>114937.89</div>
-            <div>0.0001</div>
-          </div>
+        {/* Dynamic Trade Rows */}
+        <div className="max-h-32 overflow-y-auto">
+          {tradeHistory.map((trade, index) => (
+            <div key={index} className="grid grid-cols-4 gap-4 px-4 py-1 text-sm text-white">
+              <div>{trade.time}</div>
+              <div className={trade.direction === "Buy" ? "text-green-400" : "text-red-400"}>
+                {trade.direction}
+              </div>
+              <div className="font-mono">{trade.price}</div>
+              <div className="font-mono">{trade.quantity}</div>
+            </div>
+          ))}
         </div>
 
-        {/* Buy/Sell Buttons */}
-        <div className="flex p-4 space-x-4">
-          <div className="flex-1">
-            <input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="Quantity"
-              className="w-full mb-2 px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 outline-none text-center"
-            />
+        {/* Bottom Buy/Sell Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4">
+          <div className="flex space-x-4">
             <Button
               onClick={() => handleTrade("Buy Up")}
               disabled={placeTrade.isPending}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg text-lg"
             >
               Buy Up
             </Button>
-          </div>
-          <div className="flex-1">
-            <div className="mb-2 px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 text-center font-mono">
-              {parseFloat(btcPrice).toFixed(4)}
-            </div>
             <Button
               onClick={() => handleTrade("Buy Down")}
               disabled={placeTrade.isPending}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg text-lg"
             >
-              Buy Down
+              Buy down
             </Button>
           </div>
         </div>

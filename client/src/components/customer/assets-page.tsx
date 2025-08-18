@@ -47,7 +47,7 @@ export function AssetsPage() {
   };
 
   const handleWithdrawalClick = () => {
-    setLocation('/top-up-records?tab=withdrawal');
+    setLocation('/withdrawal-request');
   };
   
   return (
