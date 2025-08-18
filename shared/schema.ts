@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, decimal, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -104,10 +105,15 @@ export const insertUserSchema = createInsertSchema(users).omit({
   balance: true,
   availableBalance: true,
   frozenBalance: true,
+  reputation: true,
+  creditScore: true,
   winLoseSetting: true,
   direction: true,
-  accountStatus: true,
-  withdrawalStatus: true,
+  isBanned: true,
+  withdrawalProhibited: true,
+  tasksBan: true,
+  userType: true,
+  registrationTime: true,
   isActive: true,
 });
 
@@ -147,6 +153,61 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   isRead: true,
   createdAt: true,
 });
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  bankAccounts: many(bankAccounts),
+  transactions: many(transactions),
+  bettingOrders: many(bettingOrders),
+  withdrawalRequests: many(withdrawalRequests),
+  sentMessages: many(messages, { relationName: "sentMessages" }),
+  receivedMessages: many(messages, { relationName: "receivedMessages" }),
+}));
+
+export const bankAccountsRelations = relations(bankAccounts, ({ one }) => ({
+  user: one(users, {
+    fields: [bankAccounts.userId],
+    references: [users.id],
+  }),
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  user: one(users, {
+    fields: [transactions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const bettingOrdersRelations = relations(bettingOrders, ({ one }) => ({
+  user: one(users, {
+    fields: [bettingOrders.userId],
+    references: [users.id],
+  }),
+}));
+
+export const withdrawalRequestsRelations = relations(withdrawalRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [withdrawalRequests.userId],
+    references: [users.id],
+  }),
+  bankAccount: one(bankAccounts, {
+    fields: [withdrawalRequests.bankAccountId],
+    references: [bankAccounts.id],
+  }),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  sender: one(users, {
+    fields: [messages.fromUserId],
+    references: [users.id],
+    relationName: "sentMessages",
+  }),
+  recipient: one(users, {
+    fields: [messages.toUserId],
+    references: [users.id],
+    relationName: "receivedMessages",
+  }),
+}));
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

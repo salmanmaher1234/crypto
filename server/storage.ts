@@ -21,6 +21,8 @@ import {
   type Message,
   type InsertMessage,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User management
@@ -72,727 +74,313 @@ export interface IStorage {
   markMessageAsRead(id: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private bankAccounts: Map<number, BankAccount>;
-  private transactions: Map<number, Transaction>;
-  private bettingOrders: Map<number, BettingOrder>;
-  private withdrawalRequests: Map<number, WithdrawalRequest>;
-  private announcements: Map<number, Announcement>;
-  private messages: Map<number, Message>;
-  private currentId: number;
-
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.bankAccounts = new Map();
-    this.transactions = new Map();
-    this.bettingOrders = new Map();
-    this.withdrawalRequests = new Map();
-    this.announcements = new Map();
-    this.messages = new Map();
-    this.currentId = 1;
-
-    // Create admin user with full data
-    const adminId = this.currentId++;
-    const admin: User = {
-      id: adminId,
-      username: "admin",
-      email: "admin@cryptoinvest.com", 
-      password: "admin123",
-      name: "Administrator",
-      role: "admin",
-      balance: "10000.00",
-      availableBalance: "10000.00",
-      frozenBalance: "0.00",
-      reputation: 5,
-      winLoseSetting: "To Win",
-      direction: "Actual",
-      accountStatus: "Active",
-      withdrawalStatus: "Allowed",
-      fundPassword: null,
-      invitationCode: null,
-      agentInvitationCode: null,
-      profileImage: null,
-      signatureData: null,
-      signatureName: null,
-      isActive: true,
-    };
-    this.users.set(adminId, admin);
-
-    // Create customer user with full data  
-    const customerId = this.currentId++;
-    const customer: User = {
-      id: customerId,
-      username: "sarah",
-      email: "sarah@email.com",
-      password: "password123", 
-      name: "Sarah Johnson",
-      role: "customer",
-      balance: "10500.00",
-      availableBalance: "10000.00",
-      frozenBalance: "500.00",
-      reputation: 5,
-      winLoseSetting: "To Win",
-      direction: "Actual",
-      accountStatus: "Active",
-      withdrawalStatus: "Allowed",
-      fundPassword: null,
-      invitationCode: null,
-      agentInvitationCode: null,
-      profileImage: null,
-      signatureData: null,
-      signatureName: null,
-      isActive: true,
-    };
-    this.users.set(customerId, customer);
-
-    // Create additional customer user
-    const johnId = this.currentId++;
-    const john: User = {
-      id: johnId,
-      username: "john",
-      email: "john@email.com",
-      password: "password123",
-      name: "John Smith", 
-      role: "customer",
-      balance: "8500.00",
-      availableBalance: "8000.00",
-      frozenBalance: "500.00",
-      reputation: 5,
-      winLoseSetting: "To Win",
-      direction: "Actual",
-      accountStatus: "Active",
-      withdrawalStatus: "Allowed",
-      fundPassword: null,
-      invitationCode: null,
-      agentInvitationCode: null,
-      profileImage: null,
-      signatureData: null,
-      signatureName: null,
-      isActive: true,
-    };
-    this.users.set(johnId, john);
-
-    // Add sample betting orders for sarah - use hard-coded ID 2 since that's the second user
-    this.addSampleBettingOrders(2);
-    
-    // Add sample messages from admin to customer
-    this.addSampleMessages(adminId, customerId);
-    
-    // Debug: Log the created orders
-    console.log(`Created ${this.bettingOrders.size} betting orders for user 2`);
+    // Initialize with sample data if needed
+    this.initializeSampleData();
   }
 
-  private addSampleBettingOrders(userId: number) {
-    const now = new Date();
-    const baseTime = new Date('2025-06-08T13:03:49.000Z');
+  private async initializeSampleData() {
+    try {
+      // Check if we already have users
+      const existingUsers = await db.select().from(users).limit(1);
+      if (existingUsers.length > 0) {
+        return; // Data already exists
+      }
 
-    // Sample closed orders
-    const closedOrder1: BettingOrder = {
-      id: this.currentId++,
-      userId: userId,
-      currency: "BTC/USDT",
-      orderType: "down",
-      amount: "12000",
-      entryPrice: "42150.00",
-      duration: "120s",
-      status: "completed",
-      profit: "14800",
-      exitPrice: "41950.00",
-      createdAt: baseTime,
-      updatedAt: baseTime,
-      expiresAt: new Date(baseTime.getTime() + 120000)
-    };
-    this.bettingOrders.set(closedOrder1.id, closedOrder1);
-    console.log(`Added order ${closedOrder1.id} for user ${userId}`);
+      // Create admin user
+      const [adminUser] = await db.insert(users).values({
+        username: "admin",
+        email: "admin@cryptoinvest.com",
+        password: "admin123",
+        name: "Administrator",
+        role: "admin",
+      }).returning();
 
-    const closedOrder2: BettingOrder = {
-      id: this.currentId++,
-      userId: userId,
-      currency: "BTC/USDT",
-      orderType: "down", 
-      amount: "12000",
-      entryPrice: "42200.00",
-      duration: "60s",
-      status: "completed",
-      profit: "16800",
-      exitPrice: "41800.00",
-      createdAt: new Date(baseTime.getTime() - 3600000),
-      updatedAt: new Date(baseTime.getTime() - 3600000),
-      expiresAt: new Date(baseTime.getTime() - 3600000 + 60000)
-    };
-    this.bettingOrders.set(closedOrder2.id, closedOrder2);
+      // Create sample customer users
+      const [customerUser] = await db.insert(users).values({
+        username: "sarah",
+        email: "sarah@email.com",
+        password: "password123",
+        name: "Sarah Johnson",
+        role: "customer",
+        balance: "10500.00",
+        availableBalance: "10000.00",
+        frozenBalance: "500.00",
+      }).returning();
 
-    const closedOrder3: BettingOrder = {
-      id: this.currentId++,
-      userId: userId,
-      currency: "BTC/USDT",
-      orderType: "up",
-      amount: "8000", 
-      entryPrice: "41900.00",
-      duration: "60s",
-      status: "completed",
-      profit: "9120",
-      exitPrice: "42150.00",
-      createdAt: new Date(baseTime.getTime() - 7200000),
-      updatedAt: new Date(baseTime.getTime() - 7200000),
-      expiresAt: new Date(baseTime.getTime() - 7200000 + 60000)
-    };
-    this.bettingOrders.set(closedOrder3.id, closedOrder3);
+      const [johnUser] = await db.insert(users).values({
+        username: "john",
+        email: "john@email.com",
+        password: "password123",
+        name: "John Smith",
+        role: "customer",
+        balance: "8500.00",
+        availableBalance: "8000.00",
+        frozenBalance: "500.00",
+      }).returning();
 
-    // Sample pending order
-    const pendingOrder: BettingOrder = {
-      id: this.currentId++,
-      userId: userId,
-      currency: "ETH/USDT",
-      orderType: "up",
-      amount: "5000",
-      entryPrice: "2450.00", 
-      duration: "180s",
-      status: "pending",
-      createdAt: new Date(now.getTime() - 1800000),
-      updatedAt: new Date(now.getTime() - 1800000),
-      expiresAt: new Date(now.getTime() - 1800000 + 180000)
-    };
-    this.bettingOrders.set(pendingOrder.id, pendingOrder);
+      // Create sample transactions
+      if (customerUser) {
+        await db.insert(transactions).values([
+          {
+            userId: customerUser.id,
+            type: "deposit",
+            amount: "1000.00",
+            status: "completed",
+            description: "Initial deposit",
+          },
+          {
+            userId: customerUser.id,
+            type: "trade_win",
+            amount: "500.00",
+            status: "completed",
+            description: "BTC/USDT trade win",
+          }
+        ]);
 
-    // Sample cancelled order
-    const cancelledOrder: BettingOrder = {
-      id: this.currentId++,
-      userId: userId,
-      currency: "SOL/USDT",
-      orderType: "down",
-      amount: "3000",
-      entryPrice: "98.50",
-      duration: "90s",
-      status: "cancelled", 
-      createdAt: new Date(baseTime.getTime() - 86400000),
-      updatedAt: new Date(baseTime.getTime() - 86400000),
-      expiresAt: new Date(baseTime.getTime() - 86400000 + 90000)
-    };
-    this.bettingOrders.set(cancelledOrder.id, cancelledOrder);
+        // Create sample betting orders
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + 120000); // 2 minutes from now
+
+        await db.insert(bettingOrders).values([
+          {
+            userId: customerUser.id,
+            orderId: `${Date.now()}-1`,
+            asset: "BTC/USD",
+            amount: "100.00",
+            direction: "Buy Up",
+            duration: 120,
+            entryPrice: "45000.00",
+            expiresAt,
+          },
+          {
+            userId: customerUser.id,
+            orderId: `${Date.now()}-2`,
+            asset: "ETH/USD",
+            amount: "50.00",
+            direction: "Buy Down",
+            duration: 60,
+            entryPrice: "3000.00",
+            expiresAt: new Date(now.getTime() + 60000),
+            status: "completed",
+            result: "win",
+            exitPrice: "2950.00",
+          }
+        ]);
+
+        // Create sample messages
+        await db.insert(messages).values([
+          {
+            fromUserId: adminUser.id,
+            toUserId: customerUser.id,
+            title: "Welcome to CryptoInvest Platform",
+            content: "Thank you for joining our platform. Your account has been successfully created.",
+            type: "General",
+          }
+        ]);
+      }
+
+      console.log("Sample data initialized successfully");
+    } catch (error) {
+      console.error("Error initializing sample data:", error);
+    }
   }
 
   // User management
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = {
-      id,
-      username: insertUser.username,
-      email: insertUser.email,
-      password: insertUser.password,
-      name: insertUser.name,
-      role: insertUser.role || "customer",
-      balance: "0.00",
-      availableBalance: "0.00",
-      frozenBalance: "0.00",
-      reputation: 5, // Always set to 5 for all new users
-      winLoseSetting: "To Win",
-      direction: "Actual",
-      accountStatus: "Active",
-      withdrawalStatus: "Allowed",
-      fundPassword: insertUser.fundPassword || null,
-      invitationCode: insertUser.invitationCode || null,
-      agentInvitationCode: null,
-      profileImage: null,
-      signatureData: null,
-      signatureName: null,
-      isActive: true,
-    };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-    
-    const updatedUser = { ...user, ...updates };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [user] = await db.update(users).set(updates).where(eq(users.id, id)).returning();
+    return user || undefined;
   }
 
   async deleteUser(id: number): Promise<boolean> {
-    const user = this.users.get(id);
-    if (!user) return false;
-    
-    // Don't allow deleting admin users
-    if (user.role === "admin") return false;
-    
-    // Delete all related data
-    this.users.delete(id);
-    
-    // Remove user's bank accounts
-    Array.from(this.bankAccounts.entries())
-      .filter(([, account]) => account.userId === id)
-      .forEach(([accountId]) => this.bankAccounts.delete(accountId));
-    
-    // Remove user's transactions
-    Array.from(this.transactions.entries())
-      .filter(([, transaction]) => transaction.userId === id)
-      .forEach(([transactionId]) => this.transactions.delete(transactionId));
-    
-    // Remove user's betting orders
-    Array.from(this.bettingOrders.entries())
-      .filter(([, order]) => order.userId === id)
-      .forEach(([orderId]) => this.bettingOrders.delete(orderId));
-    
-    // Remove user's withdrawal requests
-    Array.from(this.withdrawalRequests.entries())
-      .filter(([, request]) => request.userId === id)
-      .forEach(([requestId]) => this.withdrawalRequests.delete(requestId));
-    
-    // Remove user's messages
-    Array.from(this.messages.entries())
-      .filter(([, message]) => message.recipientId === id || message.senderId === id)
-      .forEach(([messageId]) => this.messages.delete(messageId));
-    
-    return true;
+    const result = await db.delete(users).where(eq(users.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
 
   // Bank accounts
   async getBankAccountsByUserId(userId: number): Promise<BankAccount[]> {
-    return Array.from(this.bankAccounts.values()).filter(account => account.userId === userId);
+    return await db.select().from(bankAccounts).where(eq(bankAccounts.userId, userId));
   }
 
   async createBankAccount(insertBankAccount: InsertBankAccount): Promise<BankAccount> {
-    const id = this.currentId++;
-    const bankAccount: BankAccount = {
-      ...insertBankAccount,
-      id,
-      isDefault: false,
-    };
-    this.bankAccounts.set(id, bankAccount);
+    const [bankAccount] = await db.insert(bankAccounts).values(insertBankAccount).returning();
     return bankAccount;
   }
 
   async getBankAccount(id: number): Promise<BankAccount | undefined> {
-    return this.bankAccounts.get(id);
+    const [bankAccount] = await db.select().from(bankAccounts).where(eq(bankAccounts.id, id));
+    return bankAccount || undefined;
   }
 
   async updateBankAccount(id: number, updates: Partial<BankAccount>): Promise<BankAccount | undefined> {
-    const existingAccount = this.bankAccounts.get(id);
-    if (!existingAccount) {
-      return undefined;
-    }
-    
-    const updatedAccount = { ...existingAccount, ...updates };
-    this.bankAccounts.set(id, updatedAccount);
-    return updatedAccount;
+    const [bankAccount] = await db.update(bankAccounts).set(updates).where(eq(bankAccounts.id, id)).returning();
+    return bankAccount || undefined;
   }
 
   async deleteBankAccount(id: number): Promise<boolean> {
-    return this.bankAccounts.delete(id);
+    const result = await db.delete(bankAccounts).where(eq(bankAccounts.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   // Transactions
   async getTransactionsByUserId(userId: number): Promise<Transaction[]> {
-    return Array.from(this.transactions.values())
-      .filter(transaction => transaction.userId === userId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(transactions)
+      .where(eq(transactions.userId, userId))
+      .orderBy(desc(transactions.createdAt));
   }
 
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
-    const id = this.currentId++;
-    const transaction: Transaction = {
-      id,
-      userId: insertTransaction.userId,
-      type: insertTransaction.type,
-      amount: insertTransaction.amount,
-      status: insertTransaction.status || "pending",
-      description: insertTransaction.description || null,
-      createdAt: new Date(),
-    };
-    this.transactions.set(id, transaction);
+    const [transaction] = await db.insert(transactions).values(insertTransaction).returning();
     return transaction;
   }
 
   async updateTransaction(id: number, updates: Partial<Transaction>): Promise<Transaction | undefined> {
-    const transaction = this.transactions.get(id);
-    if (!transaction) return undefined;
-    
-    const updatedTransaction = { ...transaction, ...updates };
-    this.transactions.set(id, updatedTransaction);
-    return updatedTransaction;
+    const [transaction] = await db.update(transactions).set(updates).where(eq(transactions.id, id)).returning();
+    return transaction || undefined;
   }
 
   async getAllTransactions(): Promise<Transaction[]> {
-    return Array.from(this.transactions.values())
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(transactions).orderBy(desc(transactions.createdAt));
   }
 
   // Betting orders
   async getBettingOrdersByUserId(userId: number): Promise<BettingOrder[]> {
-    return Array.from(this.bettingOrders.values())
-      .filter(order => order.userId === userId)
-      .map(order => {
-        const user = this.users.get(order.userId);
-        return {
-          ...order,
-          username: user?.username || `User${order.userId}`
-        };
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(bettingOrders)
+      .where(eq(bettingOrders.userId, userId))
+      .orderBy(desc(bettingOrders.createdAt));
   }
 
   async createBettingOrder(insertOrder: InsertBettingOrder): Promise<BettingOrder> {
-    const id = this.currentId++;
-    const userId = insertOrder.userId;
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + insertOrder.duration * 1000);
-    
-    // Deduct amount from user's available balance
-    const user = this.users.get(userId);
-    if (!user) throw new Error("User not found");
-    
-    const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
-    const orderAmount = parseFloat(insertOrder.amount);
-    
-    if (orderAmount > currentAvailable) {
-      throw new Error("Insufficient balance");
-    }
-    
-    // Simply deduct order amount from available balance
-    const newAvailable = currentAvailable - orderAmount;
-    
-    const updatedUser = {
-      ...user,
-      availableBalance: newAvailable.toFixed(2),
-    };
-    this.users.set(userId, updatedUser);
-    
-    // Generate static order ID that won't change
-    const orderNumber = `${insertOrder.asset.replace('/', '')}_${Date.now()}_${id}`;
-    
-    const order: BettingOrder = {
+    const [order] = await db.insert(bettingOrders).values({
       ...insertOrder,
-      id,
-      orderId: orderNumber,
-      status: "active",
-      result: null,
-      exitPrice: null,
-      createdAt: now,
-      expiresAt,
-    };
-    this.bettingOrders.set(id, order);
-    
-    console.log(`Created order ${order.orderId} - deducted ${orderAmount} from available balance`);
-    
-    // Set up automatic order expiration with precise timing
-    setTimeout(() => {
-      this.expireOrder(id);
-    }, insertOrder.duration * 1000);
-    
+      orderId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      expiresAt: new Date(Date.now() + insertOrder.duration * 1000),
+    }).returning();
     return order;
   }
 
-  private getScaleBasedProfitPercentage(duration: number): number {
-    // Scale-based profit calculation based on duration
-    switch (duration) {
-      case 30: return 20;  // 30s = 20% profit
-      case 60: return 30;  // 60s = 30% profit
-      case 120: return 40; // 120s = 40% profit
-      case 180: return 50; // 180s = 50% profit
-      case 240: return 60; // 240s = 60% profit
-      default: return 20;  // Default to 20%
-    }
-  }
-
-  private async expireOrder(orderId: number) {
-    const order = this.bettingOrders.get(orderId);
-    if (!order || order.status !== "active") return;
-    
-    // Calculate profit based on duration scale (percentage)
-    const orderAmount = parseFloat(order.amount);
-    const profitPercentage = this.getScaleBasedProfitPercentage(order.duration);
-    const baseProfitAmount = orderAmount * (profitPercentage / 100);
-    
-    // Update user's available balance with original amount + profit
-    const user = this.users.get(order.userId);
-    if (user) {
-      const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
-      const currentBalance = parseFloat(user.balance || "0");
-      
-      // Apply direction-based profit calculation
-      // Customer profits are always positive, but balance impact varies by direction
-      let finalProfitAmount = baseProfitAmount; // Always positive for customer display
-      let result: "win" | "loss" = "win";
-      let balanceImpact = baseProfitAmount; // This affects actual balance calculation
-      
-      if (user.direction === "Buy Up") {
-        // Buy Up = Profit is added to balance (positive impact)
-        balanceImpact = baseProfitAmount;
-        result = "win";
-      } else if (user.direction === "Buy Down") {
-        // Buy Down = Profit is subtracted from balance (negative impact) but shown as positive to customer
-        balanceImpact = -baseProfitAmount;
-        result = "loss"; // For display purposes, but profit amount stays positive
-      } else {
-        // Default "Actual" behavior - always positive
-        balanceImpact = baseProfitAmount;
-        result = "win";
-      }
-      
-      // Return original order amount + calculated profit to available balance (using balanceImpact)
-      const newAvailable = currentAvailable + orderAmount + balanceImpact;
-      // Add/subtract profit to/from total balance (using balanceImpact)
-      const newBalance = currentBalance + balanceImpact;
-      
-      const updatedUser = {
-        ...user,
-        availableBalance: newAvailable.toFixed(2),
-        balance: newBalance.toFixed(2),
-      };
-      this.users.set(order.userId, updatedUser);
-      
-      console.log(`User ${user.username} (Direction: ${user.direction}) balance updated: +${finalProfitAmount.toFixed(2)} profit (Balance Impact: ${balanceImpact >= 0 ? '+' : ''}${balanceImpact.toFixed(2)}). New available: ${newAvailable.toFixed(2)}, Total balance: ${newBalance.toFixed(2)}`);
-    }
-    
-    const updatedOrder = {
-      ...order,
-      status: "completed" as const,
-      result, // Dynamic result based on direction
-      exitPrice: order.entryPrice, // Using same price for simplicity
-    };
-    
-    this.bettingOrders.set(orderId, updatedOrder);
-    console.log(`Order ${order.orderId} expired and completed with ${profitPercentage}% profit: +${finalProfitAmount.toFixed(2)} (User Direction: ${user?.direction}, Balance Impact: ${balanceImpact >= 0 ? '+' : ''}${balanceImpact.toFixed(2)})`);
-  }
-
   async updateBettingOrder(id: number, updates: Partial<BettingOrder>): Promise<BettingOrder | undefined> {
-    const order = this.bettingOrders.get(id);
-    if (!order) return undefined;
-    
-    const updatedOrder = { ...order, ...updates };
-    this.bettingOrders.set(id, updatedOrder);
-    return updatedOrder;
+    const [order] = await db.update(bettingOrders).set(updates).where(eq(bettingOrders.id, id)).returning();
+    return order || undefined;
   }
 
   async getAllBettingOrders(): Promise<BettingOrder[]> {
-    return Array.from(this.bettingOrders.values())
-      .map(order => {
-        const user = this.users.get(order.userId);
-        return {
-          ...order,
-          username: user?.username || `User${order.userId}`
-        };
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(bettingOrders).orderBy(desc(bettingOrders.createdAt));
   }
 
   async getActiveBettingOrders(): Promise<BettingOrder[]> {
-    return Array.from(this.bettingOrders.values())
-      .filter(order => order.status === "active")
-      .map(order => {
-        const user = this.users.get(order.userId);
-        return {
-          ...order,
-          username: user?.username || `User${order.userId}`
-        };
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(bettingOrders)
+      .where(eq(bettingOrders.status, "active"))
+      .orderBy(desc(bettingOrders.createdAt));
   }
 
   // Withdrawal requests
   async getWithdrawalRequestsByUserId(userId: number): Promise<WithdrawalRequest[]> {
-    return Array.from(this.withdrawalRequests.values())
-      .filter(request => request.userId === userId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(withdrawalRequests)
+      .where(eq(withdrawalRequests.userId, userId))
+      .orderBy(desc(withdrawalRequests.createdAt));
   }
 
   async createWithdrawalRequest(insertRequest: InsertWithdrawalRequest): Promise<WithdrawalRequest> {
-    const id = this.currentId++;
-    const request: WithdrawalRequest = {
-      ...insertRequest,
-      id,
-      status: "pending",
-      createdAt: new Date(),
-      processedAt: null,
-    };
-    this.withdrawalRequests.set(id, request);
+    const [request] = await db.insert(withdrawalRequests).values(insertRequest).returning();
     return request;
   }
 
   async updateWithdrawalRequest(id: number, updates: Partial<WithdrawalRequest>): Promise<WithdrawalRequest | undefined> {
-    const request = this.withdrawalRequests.get(id);
-    if (!request) return undefined;
-    
-    const updatedRequest = { ...request, ...updates };
-    this.withdrawalRequests.set(id, updatedRequest);
-    return updatedRequest;
+    const [request] = await db.update(withdrawalRequests).set(updates).where(eq(withdrawalRequests.id, id)).returning();
+    return request || undefined;
   }
 
   async getPendingWithdrawalRequests(): Promise<WithdrawalRequest[]> {
-    return Array.from(this.withdrawalRequests.values())
-      .filter(request => request.status === "pending")
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(withdrawalRequests)
+      .where(eq(withdrawalRequests.status, "pending"))
+      .orderBy(desc(withdrawalRequests.createdAt));
   }
 
   // Announcements
   async getActiveAnnouncements(): Promise<Announcement[]> {
-    return Array.from(this.announcements.values())
-      .filter(announcement => announcement.isActive)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(announcements)
+      .where(eq(announcements.isActive, true))
+      .orderBy(desc(announcements.createdAt));
   }
 
   async createAnnouncement(insertAnnouncement: InsertAnnouncement): Promise<Announcement> {
-    const id = this.currentId++;
-    const announcement: Announcement = {
-      id,
-      title: insertAnnouncement.title,
-      content: insertAnnouncement.content,
-      type: insertAnnouncement.type || "News",
-      isActive: true,
-      createdAt: new Date(),
-    };
-    this.announcements.set(id, announcement);
+    const [announcement] = await db.insert(announcements).values(insertAnnouncement).returning();
     return announcement;
   }
 
   async updateAnnouncement(id: number, updates: Partial<Announcement>): Promise<Announcement | undefined> {
-    const announcement = this.announcements.get(id);
-    if (!announcement) return undefined;
-    
-    const updatedAnnouncement = { ...announcement, ...updates };
-    this.announcements.set(id, updatedAnnouncement);
-    return updatedAnnouncement;
+    const [announcement] = await db.update(announcements).set(updates).where(eq(announcements.id, id)).returning();
+    return announcement || undefined;
   }
 
   async getAllAnnouncements(): Promise<Announcement[]> {
-    return Array.from(this.announcements.values())
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(announcements).orderBy(desc(announcements.createdAt));
   }
 
   async getAllBankAccountsWithUsers(): Promise<any[]> {
-    const result: any[] = [];
-    for (const user of this.users.values()) {
-      if (user.role === 'customer') {
-        const userBankAccounts = Array.from(this.bankAccounts.values())
-          .filter(account => account.userId === user.id);
-        
-        if (userBankAccounts.length > 0) {
-          userBankAccounts.forEach(account => {
-            result.push({
-              userId: user.id,
-              userName: user.name,
-              userEmail: user.email,
-              bankAccountId: account.id,
-              accountHolderName: account.accountHolderName,
-              bankName: account.bankName,
-              accountNumber: account.accountNumber,
-              ifscCode: account.ifscCode,
-            });
-          });
-        } else {
-          result.push({
-            userId: user.id,
-            userName: user.name,
-            userEmail: user.email,
-            bankAccountId: null,
-            accountHolderName: null,
-            bankName: null,
-            accountNumber: null,
-            ifscCode: null,
-          });
-        }
-      }
-    }
+    const result = await db.select({
+      id: bankAccounts.id,
+      accountHolderName: bankAccounts.accountHolderName,
+      accountNumber: bankAccounts.accountNumber,
+      bankName: bankAccounts.bankName,
+      ifscCode: bankAccounts.ifscCode,
+      isDefault: bankAccounts.isDefault,
+      userId: bankAccounts.userId,
+      username: users.username,
+      email: users.email,
+    }).from(bankAccounts)
+      .leftJoin(users, eq(bankAccounts.userId, users.id));
+    
     return result;
   }
 
-  private addSampleMessages(adminId: number, customerId: number) {
-    const message1: Message = {
-      id: this.currentId++,
-      fromUserId: adminId,
-      toUserId: customerId,
-      title: "Welcome to SuperCoin",
-      content: "Welcome to SuperCoin platform! Your account has been successfully activated. You can now start trading cryptocurrencies.",
-      type: "General",
-      isRead: false,
-      createdAt: new Date('2025-07-01T10:00:00.000Z'),
-    };
-    this.messages.set(message1.id, message1);
-
-    const message2: Message = {
-      id: this.currentId++,
-      fromUserId: adminId,
-      toUserId: customerId,
-      title: "Trading Tips",
-      content: "Remember to always do your research before making any trades. Use stop-loss orders to manage your risk effectively.",
-      type: "Important",
-      isRead: false,
-      createdAt: new Date('2025-07-02T09:30:00.000Z'),
-    };
-    this.messages.set(message2.id, message2);
-
-    const message3: Message = {
-      id: this.currentId++,
-      fromUserId: adminId,
-      toUserId: customerId,
-      title: "System Maintenance Notice",
-      content: "Our system will undergo maintenance on Sunday from 2:00 AM to 4:00 AM UTC. Trading will be temporarily unavailable during this time.",
-      type: "System",
-      isRead: true,
-      createdAt: new Date('2025-06-30T15:00:00.000Z'),
-    };
-    this.messages.set(message3.id, message3);
-  }
-
-  // Message methods
+  // Messages
   async getMessagesByUserId(userId: number): Promise<Message[]> {
-    return Array.from(this.messages.values())
-      .filter(message => message.toUserId === userId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db.select().from(messages)
+      .where(eq(messages.toUserId, userId))
+      .orderBy(desc(messages.createdAt));
   }
 
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const message: Message = {
-      id: this.currentId++,
-      fromUserId: insertMessage.fromUserId,
-      toUserId: insertMessage.toUserId,
-      title: insertMessage.title,
-      content: insertMessage.content,
-      type: insertMessage.type || "General",
-      isRead: false,
-      createdAt: new Date(),
-    };
-    this.messages.set(message.id, message);
+    const [message] = await db.insert(messages).values(insertMessage).returning();
     return message;
   }
 
   async updateMessage(id: number, updates: Partial<Message>): Promise<Message | undefined> {
-    const message = this.messages.get(id);
-    if (!message) return undefined;
-    
-    const updatedMessage = { ...message, ...updates };
-    this.messages.set(id, updatedMessage);
-    return updatedMessage;
+    const [message] = await db.update(messages).set(updates).where(eq(messages.id, id)).returning();
+    return message || undefined;
   }
 
   async markMessageAsRead(id: number): Promise<boolean> {
-    const message = this.messages.get(id);
-    if (!message) return false;
-    
-    const updatedMessage = { ...message, isRead: true };
-    this.messages.set(id, updatedMessage);
-    return true;
+    const result = await db.update(messages).set({ isRead: true }).where(eq(messages.id, id));
+    return (result.rowCount || 0) > 0;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
