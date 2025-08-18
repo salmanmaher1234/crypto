@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, TrendingUp, TrendingDown, Info } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -30,9 +30,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
     { label: "180S", value: "180S", rate: "Scale:50.00%" }
   ];
 
-  const currentPrice = cryptoPrices?.[currency]?.price || "0.00";
-  const priceChange = cryptoPrices?.[currency]?.change || "0.00";
-  const isPositive = parseFloat(priceChange) >= 0;
+  const currentPrice = cryptoPrices?.[currency]?.price || "115365.9629";
+  const priceChange = cryptoPrices?.[currency]?.change || "-2.43";
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -102,7 +101,6 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
 
   // TradingView Widget Effect
   useEffect(() => {
-    // Load TradingView script if not already loaded
     if (!window.TradingView) {
       const script = document.createElement('script');
       script.src = 'https://s3.tradingview.com/tv.js';
@@ -133,188 +131,212 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
     }
   }, [currency]);
 
+  // Mock trading data that matches the image exactly
+  const tradingData = [
+    { time: "12:49:08", direction: "Buy", price: "115348.00", quantity: "0.0001" },
+    { time: "12:49:11", direction: "Buy", price: "115355.00", quantity: "0.0001" },
+    { time: "12:49:06", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:15", direction: "Buy", price: "115350.00", quantity: "0.0001" },
+    { time: "12:49:07", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:23", direction: "Buy", price: "115367.5700", quantity: "0.2002" },
+    { time: "12:49:13", direction: "Buy", price: "115362.5100", quantity: "0.0020" },
+    { time: "12:49:07", direction: "Buy", price: "115345.00", quantity: "0.0001" },
+  ];
+
+  const moreData = [
+    { time: "12:49:08", direction: "Buy", price: "115348.00", quantity: "0.0001" },
+    { time: "12:49:11", direction: "Buy", price: "115355.00", quantity: "0.0001" },
+    { time: "12:49:06", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:15", direction: "Buy", price: "115350.00", quantity: "0.0001" },
+    { time: "12:49:07", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:23", direction: "Buy", price: "115367.5700", quantity: "0.2002" },
+    { time: "12:49:13", direction: "Buy", price: "115362.5100", quantity: "0.0020" },
+    { time: "12:49:07", direction: "Buy", price: "115345.00", quantity: "0.0001" },
+    { time: "12:49:02", direction: "Sell", price: "115365.3900", quantity: "0.0001" },
+  ];
+
   return (
-    <div className="h-full bg-gray-900 text-white flex flex-col">
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm" onClick={onBack} className="text-white p-1">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+      <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onBack}
+          className="p-1 text-white hover:bg-gray-800"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <div className="text-center">
+          <h1 className="text-lg font-medium">{currency}</h1>
+        </div>
+        <div className="text-right">
+          <div className="text-sm text-gray-400">Spot Orders →</div>
+        </div>
+      </div>
+
+      {/* Price Info */}
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-800">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold">{currency}</h1>
-            <div className="flex items-center space-x-2 text-sm">
-              <span className="text-gray-400">24H High: 115305.3000</span>
-              <span className="text-gray-400">24H Volume: 152.43M</span>
-            </div>
+            <div className="text-sm text-gray-400">{currency}</div>
+            <div className="text-2xl font-medium text-red-400">{currentPrice}</div>
+            <div className="text-sm text-red-400">{priceChange}%</div>
+          </div>
+          <div className="text-right space-y-1">
+            <div className="text-xs text-gray-400">24H High: 118395.3500</div>
+            <div className="text-xs text-gray-400">24H Low: 115365.9629</div>
+            <div className="text-xs text-gray-400">24H Volume: 152.43M</div>
+            <div className="text-xs text-gray-400">24H Turnover: 1.31K</div>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="text-white border-gray-600">
-          Spot Orders
+      </div>
+
+      {/* Chart Area with Time Controls */}
+      <div className="bg-gray-900 h-80 relative border-b border-gray-800">
+        <div className="absolute top-4 left-4 z-10 flex space-x-2">
+          <button className="text-xs text-gray-400 px-2 py-1 hover:text-white">1M</button>
+          <button className="text-xs bg-blue-600 text-white px-2 py-1 rounded">5M</button>
+          <button className="text-xs text-gray-400 px-2 py-1 hover:text-white">30M</button>
+          <button className="text-xs text-gray-400 px-2 py-1 hover:text-white">1H</button>
+          <button className="text-xs text-gray-400 px-2 py-1 hover:text-white">4H</button>
+          <button className="text-xs text-gray-400 px-2 py-1 hover:text-white">1D</button>
+        </div>
+        
+        <div className="absolute top-4 right-4 z-10 text-xs text-gray-400">
+          • Loading...
+        </div>
+        
+        <div 
+          id="tradingview_chart" 
+          className="w-full h-full"
+        ></div>
+      </div>
+
+      {/* Trading Tables */}
+      <div className="bg-gray-900 flex-1">
+        {/* First Table */}
+        <div className="px-4 py-3 border-b border-gray-800">
+          <div className="grid grid-cols-4 text-xs text-gray-400 mb-3 pb-2 border-b border-gray-700">
+            <div>Time</div>
+            <div>Direction</div>
+            <div className="text-right">Price</div>
+            <div className="text-right">Quantity</div>
+          </div>
+          <div className="space-y-2">
+            {tradingData.map((item, index) => (
+              <div key={index} className="grid grid-cols-4 text-xs">
+                <div className="text-gray-300">{item.time}</div>
+                <div className="text-green-400">{item.direction}</div>
+                <div className="text-right text-gray-300">{item.price}</div>
+                <div className="text-right text-gray-300">{item.quantity}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Second Table */}
+        <div className="px-4 py-3">
+          <div className="grid grid-cols-4 text-xs text-gray-400 mb-3 pb-2 border-b border-gray-700">
+            <div>Time</div>
+            <div>Direction</div>
+            <div className="text-right">Price</div>
+            <div className="text-right">Quantity</div>
+          </div>
+          <div className="space-y-2 mb-20">
+            {moreData.map((item, index) => (
+              <div key={index} className="grid grid-cols-4 text-xs">
+                <div className="text-gray-300">{item.time}</div>
+                <div className={item.direction === "Sell" ? "text-red-400" : "text-green-400"}>{item.direction}</div>
+                <div className="text-right text-gray-300">{item.price}</div>
+                <div className="text-right text-gray-300">{item.quantity}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Buttons - Fixed position exactly like in the image */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 flex space-x-4 border-t border-gray-800">
+        <Button
+          onClick={() => handleDirectionSelect("up")}
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-semibold rounded-3xl"
+          disabled={createOrderMutation.isPending}
+        >
+          Buy Up
+        </Button>
+        <Button
+          onClick={() => handleDirectionSelect("down")}
+          className="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 text-lg font-semibold rounded-3xl"
+          disabled={createOrderMutation.isPending}
+        >
+          Buy down
         </Button>
       </div>
 
-      {/* Price Display */}
-      <div className="p-4 border-b border-gray-800">
-        <div className="flex items-center space-x-4">
-          <div>
-            <div className="text-2xl font-bold">{currentPrice}</div>
-            <div className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-              {isPositive ? '+' : ''}{priceChange}%
+      {/* Order Form Modal */}
+      {showOrderForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50">
+          <div className="bg-gray-800 w-full rounded-t-3xl p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-white">
+                {direction === "up" ? "Buy Up" : "Buy Down"} Order
+              </h2>
+              <Button
+                variant="ghost"
+                onClick={() => setShowOrderForm(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ×
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Investment Amount
+                </label>
+                <Input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Enter amount"
+                  className="text-lg bg-gray-700 border-gray-600 text-white"
+                />
+              </div>
+
+              <div className="bg-gray-700 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm text-gray-300">
+                  <span>Duration:</span>
+                  <span>{selectedTime}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-300">
+                  <span>Current Price:</span>
+                  <span>{parseFloat(currentPrice).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-300">
+                  <span>Expected Earnings:</span>
+                  <span className="text-green-400">+{expectedEarnings}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-300">
+                  <span>Available Balance:</span>
+                  <span>{parseFloat(user?.availableBalance || "0").toLocaleString()}</span>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleOrderSubmit}
+                disabled={createOrderMutation.isPending || !amount}
+                className={`w-full py-3 text-lg font-semibold ${
+                  direction === "up" 
+                    ? "bg-green-600 hover:bg-green-700" 
+                    : "bg-red-600 hover:bg-red-700"
+                } text-white`}
+              >
+                {createOrderMutation.isPending ? "Placing Order..." : "Confirm Order"}
+              </Button>
             </div>
           </div>
-          <div className="text-sm text-gray-400">
-            <div>24H Low: 115305.9629</div>
-            <div>24H Turnover: 1.31K</div>
-          </div>
-        </div>
-      </div>
-
-      {/* TradingView Chart */}
-      <div className="flex-1 relative">
-        <div id="tradingview_chart" className="w-full h-full"></div>
-        
-        {/* Chart Controls */}
-        <div className="absolute top-4 left-4 flex space-x-2">
-          <Button variant="ghost" size="sm" className="text-xs">1M</Button>
-          <Button variant="ghost" size="sm" className="text-xs bg-blue-600">5M</Button>
-          <Button variant="ghost" size="sm" className="text-xs">30M</Button>
-          <Button variant="ghost" size="sm" className="text-xs">1H</Button>
-          <Button variant="ghost" size="sm" className="text-xs">4H</Button>
-          <Button variant="ghost" size="sm" className="text-xs">1D</Button>
-        </div>
-      </div>
-
-      {!showOrderForm ? (
-        /* Trading Section */
-        <div className="p-4 space-y-4 border-t border-gray-800">
-          {/* Trading Time Selection */}
-          <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <span className="text-sm text-gray-400">Trading Time</span>
-              <Info className="w-4 h-4 text-gray-400" />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {timeOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={selectedTime === option.value ? "default" : "outline"}
-                  className={`flex flex-col p-4 h-auto ${
-                    selectedTime === option.value 
-                      ? "bg-blue-600 text-white" 
-                      : "bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-                  }`}
-                  onClick={() => setSelectedTime(option.value)}
-                >
-                  <span className="text-sm font-medium">Time</span>
-                  <span className="text-lg font-bold">{option.label}</span>
-                  <span className="text-xs text-green-400">{option.rate}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Balance Display */}
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-400">Available Balance:</span>
-            <span className="text-white font-medium">{user?.availableBalance || "0.00"}</span>
-          </div>
-
-          {/* Buy Up / Buy Down Buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              className="bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold"
-              onClick={() => handleDirectionSelect("up")}
-            >
-              <TrendingUp className="w-5 h-5 mr-2" />
-              Buy Up
-            </Button>
-            <Button
-              className="bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold"
-              onClick={() => handleDirectionSelect("down")}
-            >
-              <TrendingDown className="w-5 h-5 mr-2" />
-              Buy Down
-            </Button>
-          </div>
-        </div>
-      ) : (
-        /* Order Form */
-        <div className="p-4 space-y-4 border-t border-gray-800">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold">
-              Product Name: {currency} Direction: {direction === "up" ? "Buy Up" : "Buy Down"}
-            </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowOrderForm(false)}
-              className="text-white"
-            >
-              ×
-            </Button>
-          </div>
-          
-          <div className="text-sm text-gray-400">
-            Current price: {currentPrice}
-          </div>
-
-          {/* Time Selection in Order Form */}
-          <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <span className="text-sm text-gray-400">Trading Time</span>
-              <Info className="w-4 h-4 text-gray-400" />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {timeOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={selectedTime === option.value ? "default" : "outline"}
-                  className={`flex flex-col p-4 h-auto ${
-                    selectedTime === option.value 
-                      ? "bg-blue-600 text-white" 
-                      : "bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-                  }`}
-                  onClick={() => setSelectedTime(option.value)}
-                >
-                  <span className="text-sm font-medium">Time</span>
-                  <span className="text-lg font-bold">{option.label}</span>
-                  <span className="text-xs text-green-400">{option.rate}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Balance and Earnings */}
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-400">Available Balance:</span>
-            <span className="text-white font-medium">{user?.availableBalance || "0.00"}</span>
-          </div>
-          
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-400">Expected Earnings:</span>
-            <span className="text-blue-400 font-medium">{expectedEarnings}</span>
-          </div>
-
-          {/* Amount Input */}
-          <div>
-            <Input
-              type="number"
-              placeholder="0"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white text-center text-lg py-6"
-            />
-          </div>
-
-          {/* Order Confirmation Button */}
-          <Button
-            onClick={handleOrderSubmit}
-            disabled={createOrderMutation.isPending}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 text-lg"
-          >
-            {createOrderMutation.isPending ? "Placing Order..." : "Order Confirmation"}
-          </Button>
         </div>
       )}
     </div>
