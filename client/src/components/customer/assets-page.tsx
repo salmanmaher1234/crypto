@@ -43,11 +43,11 @@ export function AssetsPage() {
   }, []);
 
   const handleRechargeClick = () => {
-    setLocation('/recharge');
+    setLocation('/top-up-records');
   };
 
   const handleWithdrawalClick = () => {
-    setLocation('/withdrawal');
+    setLocation('/withdrawal-record');
   };
   
   return (

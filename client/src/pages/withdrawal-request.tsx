@@ -5,12 +5,14 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function WithdrawalRequest() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [withdrawalAmount, setWithdrawalAmount] = useState("0");
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Create withdrawal mutation
   const createWithdrawal = useMutation({
@@ -19,13 +21,26 @@ export default function WithdrawalRequest() {
       return res.json();
     },
     onSuccess: () => {
+      toast({
+        title: "Withdrawal Request Submitted",
+        description: "Your withdrawal request has been submitted successfully.",
+      });
+      setWithdrawalAmount("0");
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/withdrawal-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       
-      // Navigate to withdrawal record page
-      setLocation('/withdrawal-record');
+      // Navigate to withdrawal record page after delay
+      setTimeout(() => {
+        setLocation('/withdrawal-record');
+      }, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit withdrawal request",
+        variant: "destructive",
+      });
     }
   });
 

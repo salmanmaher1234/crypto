@@ -12,6 +12,7 @@ export default function WithdrawalPage() {
   const handleWithdrawalRecord = () => {
     // Navigate to withdrawal record page
     console.log('Navigate to withdrawal record');
+    window.location.href = '/withdrawal-record';
   };
 
   return (
