@@ -83,7 +83,7 @@ export function Profile() {
   });
 
   const handleCreateBankAccount = () => {
-    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName || !bankForm.ifscCode) {
+    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName || !bankForm.branchName || !bankForm.bkashNagadRocket) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",

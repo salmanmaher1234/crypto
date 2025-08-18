@@ -359,14 +359,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
-      const validatedData = insertBankAccountSchema.parse({
-        ...req.body,
-        userId: (req as any).userId,
-      });
+      console.log("==== BANK ACCOUNT CREATE START ====");
+      console.log("Request body:", req.body);
       
-      const bankAccount = await storage.createBankAccount(validatedData);
+      // Manual validation for new fields
+      const requiredFields = ['accountHolderName', 'accountNumber', 'bankName', 'branchName', 'bkashNagadRocket'];
+      for (const field of requiredFields) {
+        if (!req.body[field] || req.body[field].trim() === '') {
+          console.log(`Missing required field: ${field}`);
+          return res.status(400).json({ message: `${field} is required` });
+        }
+      }
+      
+      const bankAccountData = {
+        userId: (req as any).userId,
+        bindingType: req.body.bindingType || 'Bank Card',
+        currency: req.body.currency || 'BDT',
+        accountHolderName: req.body.accountHolderName,
+        accountNumber: req.body.accountNumber,
+        bankName: req.body.bankName,
+        branchName: req.body.branchName,
+        bkashNagadRocket: req.body.bkashNagadRocket,
+        isDefault: false
+      };
+      
+      console.log("Validated bank account data:", bankAccountData);
+      const bankAccount = await storage.createBankAccount(bankAccountData);
+      console.log("Created bank account:", bankAccount);
+      
       res.json(bankAccount);
     } catch (error) {
+      console.error("Bank account creation error:", error);
       res.status(400).json({ message: "Invalid bank account data" });
     }
   });
