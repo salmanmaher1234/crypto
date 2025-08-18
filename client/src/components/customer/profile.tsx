@@ -12,12 +12,14 @@ import {
   LogOut,
   Home,
   Key,
-  Globe
+  Globe,
+  Eye
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export function Profile() {
   const { user, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage'>('main');
 
   if (!user) return null;
 
@@ -189,6 +191,153 @@ export function Profile() {
     );
   }
 
+  // Login Password Page
+  if (currentView === 'loginPassword') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('settings')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Login Password</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 space-y-6">
+          {/* Old login password */}
+          <div>
+            <div className="relative">
+              <Input
+                type="password"
+                placeholder="Old login password"
+                className="h-12 pr-12 text-gray-600 placeholder-gray-500"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                <Eye className="w-5 h-5 text-gray-400" />
+              </Button>
+            </div>
+          </div>
+
+          {/* New Login Password */}
+          <div>
+            <div className="relative">
+              <Input
+                type="password"
+                placeholder="New Login Password"
+                className="h-12 pr-12 text-gray-600 placeholder-gray-500"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                <Eye className="w-5 h-5 text-gray-400" />
+              </Button>
+            </div>
+          </div>
+
+          {/* confirm new password */}
+          <div>
+            <div className="relative">
+              <Input
+                type="password"
+                placeholder="confirm new password"
+                className="h-12 pr-12 text-gray-600 placeholder-gray-500"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                <Eye className="w-5 h-5 text-gray-400" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Submit Settings Button */}
+          <div className="pt-6">
+            <Button
+              className="w-full h-12 text-white font-medium rounded-2xl"
+              style={{
+                background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+              }}
+            >
+              Submit Settings
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Switch Language Page
+  if (currentView === 'switchLanguage') {
+    const languages = [
+      { code: 'en', name: 'English' },
+      { code: 'rupiah', name: 'Rupiah' },
+      { code: 'bangla', name: 'বাংলা' },
+      { code: 'de', name: 'Deutsch' },
+      { code: 'ru', name: 'Russian' },
+      { code: 'vi', name: 'Tiếng Việt' },
+      { code: 'es', name: 'Español' },
+      { code: 'it', name: 'Italian' },
+      { code: 'ja', name: '日本語' },
+      { code: 'fr', name: 'Français' },
+      { code: 'pt', name: 'Portuguese' },
+      { code: 'zh', name: '简体中文' },
+      { code: 'ar', name: 'عربي' }
+    ];
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('settings')}
+              className="p-1 mr-2"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Switch Language</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Language Options */}
+        <div className="p-4">
+          {languages.map((language, index) => (
+            <div key={language.code} className="mb-3">
+              <Button
+                variant="ghost"
+                className={`w-full h-12 justify-center text-gray-900 bg-white border border-gray-200 rounded-full hover:bg-gray-50 ${
+                  language.code === 'en' ? 'border-blue-500 bg-blue-50' : ''
+                }`}
+              >
+                {language.name}
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   // Settings Page
   if (currentView === 'settings') {
     return (
@@ -216,6 +365,7 @@ export function Profile() {
             <Button 
               variant="ghost" 
               className="w-full justify-start h-14 px-4"
+              onClick={() => setCurrentView('loginPassword')}
             >
               <div className="flex items-center space-x-3">
                 <Key className="w-5 h-5 text-gray-600" />
@@ -242,6 +392,7 @@ export function Profile() {
             <Button 
               variant="ghost" 
               className="w-full justify-start h-14 px-4"
+              onClick={() => setCurrentView('switchLanguage')}
             >
               <div className="flex items-center space-x-3">
                 <Globe className="w-5 h-5 text-gray-600" />
