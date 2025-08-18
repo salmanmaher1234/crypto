@@ -14,6 +14,10 @@ interface CryptoMarketplaceProps {
 export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) {
   const { data: cryptoPrices } = useCryptoPrices();
   const { user } = useAuth();
+  
+  // Type-safe crypto prices access
+  const getCryptoPrice = (symbol: string) => (cryptoPrices as any)?.[symbol]?.price || "0.00";
+  const getCryptoChange = (symbol: string) => (cryptoPrices as any)?.[symbol]?.change || "0.00";
 
   // Real crypto data with proper icons and names from the image
   const cryptoData = [
@@ -21,96 +25,96 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
       symbol: "BTC/USDT",
       name: "Bitcoin",
       icon: "₿",
-      price: cryptoPrices?.["BTC/USDT"]?.price || "115112.9065",
-      change: cryptoPrices?.["BTC/USDT"]?.change || "-2.65",
+      price: getCryptoPrice("BTC/USDT") || "115112.9065",
+      change: getCryptoChange("BTC/USDT") || "-2.65",
       color: "#F7931A"
     },
     {
       symbol: "ETH/USDT", 
       name: "Ethereum",
       icon: "Ξ",
-      price: cryptoPrices?.["ETH/USDT"]?.price || "4239.2141",
-      change: cryptoPrices?.["ETH/USDT"]?.change || "-7.08",
+      price: getCryptoPrice("ETH/USDT") || "4239.2141",
+      change: getCryptoChange("ETH/USDT") || "-7.08",
       color: "#627EEA"
     },
     {
       symbol: "DOGE/USDT",
       name: "Dogecoin", 
       icon: "Ð",
-      price: cryptoPrices?.["DOGE/USDT"]?.price || "0.2223",
-      change: cryptoPrices?.["DOGE/USDT"]?.change || "-7.96",
+      price: getCryptoPrice("DOGE/USDT") || "0.2223",
+      change: getCryptoChange("DOGE/USDT") || "-7.96",
       color: "#C2A633"
     },
     {
       symbol: "CHZ/USDT",
       name: "Chiliz",
       icon: "🌶️",
-      price: cryptoPrices?.["CHZ/USDT"]?.price || "0.0397",
-      change: cryptoPrices?.["CHZ/USDT"]?.change || "-6.39",
+      price: getCryptoPrice("CHZ/USDT") || "0.0397",
+      change: getCryptoChange("CHZ/USDT") || "-6.39",
       color: "#CD212A"
     },
     {
       symbol: "PSG/USDT",
       name: "Paris Saint-Germain",
       icon: "⚽",
-      price: cryptoPrices?.["PSG/USDT"]?.price || "1.8354",
-      change: cryptoPrices?.["PSG/USDT"]?.change || "-2.87",
+      price: getCryptoPrice("PSG/USDT") || "1.8354",
+      change: getCryptoChange("PSG/USDT") || "-2.87",
       color: "#004170"
     },
     {
       symbol: "ATM/USDT",
       name: "Atletico Madrid",
       icon: "⚽",
-      price: cryptoPrices?.["ATM/USDT"]?.price || "1.4263",
-      change: cryptoPrices?.["ATM/USDT"]?.change || "-5.63",
+      price: getCryptoPrice("ATM/USDT") || "1.4263",
+      change: getCryptoChange("ATM/USDT") || "-5.63",
       color: "#CE3524"
     },
     {
       symbol: "JUV/USDT",
       name: "Juventus",
       icon: "⚽",
-      price: cryptoPrices?.["JUV/USDT"]?.price || "1.3628",
-      change: cryptoPrices?.["JUV/USDT"]?.change || "-4.91",
+      price: getCryptoPrice("JUV/USDT") || "1.3628",
+      change: getCryptoChange("JUV/USDT") || "-4.91",
       color: "#000000"
     },
     {
       symbol: "KSM/USDT",
       name: "Kusama",
       icon: "🔗",
-      price: cryptoPrices?.["KSM/USDT"]?.price || "14.6653",
-      change: cryptoPrices?.["KSM/USDT"]?.change || "-7.50",
+      price: getCryptoPrice("KSM/USDT") || "14.6653",
+      change: getCryptoChange("KSM/USDT") || "-7.50",
       color: "#000000"
     },
     {
       symbol: "LTC/USDT",
       name: "Litecoin",
       icon: "Ł",
-      price: cryptoPrices?.["LTC/USDT"]?.price || "116.4456",
-      change: cryptoPrices?.["LTC/USDT"]?.change || "-4.81",
+      price: getCryptoPrice("LTC/USDT") || "116.4456",
+      change: getCryptoChange("LTC/USDT") || "-4.81",
       color: "#345D9D"
     },
     {
       symbol: "EOS/USDT",
       name: "EOS",
       icon: "📡",
-      price: cryptoPrices?.["EOS/USDT"]?.price || "0.7240",
-      change: cryptoPrices?.["EOS/USDT"]?.change || "-1.23",
+      price: getCryptoPrice("EOS/USDT") || "0.7240",
+      change: getCryptoChange("EOS/USDT") || "-1.23",
       color: "#443F54"
     },
     {
       symbol: "BTS/USDT",
       name: "BitShares",
       icon: "💎",
-      price: cryptoPrices?.["BTS/USDT"]?.price || "10.2999",
-      change: cryptoPrices?.["BTS/USDT"]?.change || "-9.28",
+      price: getCryptoPrice("BTS/USDT") || "10.2999",
+      change: getCryptoChange("BTS/USDT") || "-9.28",
       color: "#35BAFF"
     },
     {
       symbol: "LINK/USDT",
       name: "Chainlink",
       icon: "🔗",
-      price: cryptoPrices?.["LINK/USDT"]?.price || "24.4868",
-      change: cryptoPrices?.["LINK/USDT"]?.change || "-6.86",
+      price: getCryptoPrice("LINK/USDT") || "24.4868",
+      change: getCryptoChange("LINK/USDT") || "-6.86",
       color: "#375BD2"
     }
   ];
@@ -149,25 +153,25 @@ export function CryptoMarketplace({ onSelectCurrency }: CryptoMarketplaceProps) 
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className="bg-white px-4 py-6 border-b border-gray-200">
-        <div className="flex justify-between space-x-4">
+      {/* Action buttons - without padding to match design */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="flex justify-between">
           <Link href="/recharge" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1">
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
               <RotateCcw className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Recharge</span>
             </Button>
           </Link>
           
           <Link href="/withdrawal" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1">
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
               <CreditCard className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Withdrawal</span>
             </Button>
           </Link>
           
           <Link href="/customer-service" className="flex-1">
-            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1">
+            <Button variant="ghost" className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none">
               <Headphones className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Customer Service</span>
             </Button>

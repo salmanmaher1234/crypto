@@ -34,10 +34,6 @@ export default function CustomerApp() {
         <CryptoTrading 
           currency={selectedCurrency}
           onBack={() => setSelectedCurrency(null)}
-          onOrderPlaced={() => {
-            setSelectedCurrency(null);
-            setActiveSection("orders");
-          }}
         />
       );
     }
@@ -52,11 +48,8 @@ export default function CustomerApp() {
       case "market":
         return (
           <CryptoTrading 
-            currency="BTC/USD"
+            currency="BTC/USDT"
             onBack={() => setActiveSection("home")}
-            onOrderPlaced={() => {
-              setActiveSection("orders");
-            }}
           />
         );
       case "orders":
