@@ -190,6 +190,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Withdrawal request routes
+  app.get("/api/withdrawal-requests", authenticateUser, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId);
+      let requests;
+      
+      if (user?.role === "admin") {
+        requests = await storage.getPendingWithdrawalRequests();
+      } else {
+        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId);
+      }
+      
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get withdrawal requests" });
+    }
+  });
+
+  app.post("/api/withdrawal-requests", authenticateUser, async (req, res) => {
+    try {
+      const validatedData = insertWithdrawalRequestSchema.parse({
+        ...req.body,
+        userId: req.session.userId,
+        status: "pending",
+      });
+      
+      // Check if user has sufficient balance
+      const user = await storage.getUser(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const withdrawalAmount = parseFloat(validatedData.amount);
+      const availableBalance = parseFloat(user.availableBalance);
+      
+      if (withdrawalAmount > availableBalance) {
+        return res.status(400).json({ message: "Insufficient balance" });
+      }
+      
+      const request = await storage.createWithdrawalRequest(validatedData);
+      res.json(request);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid withdrawal request data" });
+    }
+  });
+
+  app.patch("/api/withdrawal-requests/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      const updatedRequest = await storage.updateWithdrawalRequest(id, { status });
+      if (!updatedRequest) {
+        return res.status(404).json({ message: "Withdrawal request not found" });
+      }
+      
+      // If approved, create withdrawal transaction
+      if (status === "approved") {
+        await storage.createTransaction({
+          userId: updatedRequest.userId,
+          type: "withdrawal",
+          amount: updatedRequest.amount,
+          status: "completed",
+          description: `Withdrawal request #${id} approved`,
+        });
+      }
+      
+      res.json(updatedRequest);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update withdrawal request" });
+    }
+  });
+
   // Betting order routes
   app.get("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
@@ -433,75 +506,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Static crypto prices endpoint
+  // Real-time crypto prices endpoint with exact data from images
   app.get("/api/crypto-prices", (req, res) => {
-    res.json({
-      "BTC/USD": {
-        price: "107314.24",
-        change: "-0.41%",
-        changeType: "negative"
-      },
-      "ETH/USD": {
-        price: "2449.91",
-        change: "-1.44%",
-        changeType: "negative"
-      },
-      "DOGE/USD": {
-        price: "0.16147",
-        change: "-1.87%",
-        changeType: "negative"
-      },
-      "CHZ/USD": {
-        price: "0.03457",
-        change: "-2.59%",
-        changeType: "negative"
-      },
-      "BCH/USD": {
-        price: "502.8",
-        change: "0.50%",
-        changeType: "positive"
-      },
-      "PSG/USD": {
-        price: "1.417",
-        change: "-2.01%",
-        changeType: "negative"
-      },
-      "JUV/USD": {
-        price: "0.901",
-        change: "-1.42%",
-        changeType: "negative"
-      },
-      "ATM/USD": {
-        price: "0.999",
-        change: "-1.87%",
-        changeType: "negative"
-      },
-      "LTC/USD": {
-        price: "85.13",
-        change: "-0.28%",
-        changeType: "negative"
-      },
-      "EOS/USD": {
-        price: "0",
-        change: "0.00%",
-        changeType: "positive"
-      },
-      "TRX/USD": {
-        price: "0.2712",
-        change: "0.15%",
-        changeType: "positive"
-      },
-      "ETC/USD": {
-        price: "16.19",
-        change: "-2.00%",
-        changeType: "negative"
-      },
-      "BTS/USD": {
-        price: "502.8",
-        change: "0.50%",
-        changeType: "positive"
-      }
-    });
+    // Generate slight price variations to simulate real-time updates
+    const baseTime = Date.now();
+    const variation = (Math.sin(baseTime / 10000) * 0.02) + (Math.random() - 0.5) * 0.01;
+    
+    const baseData = {
+      "BTC/USDT": { basePrice: 115112.9065, baseChange: -2.65 },
+      "ETH/USDT": { basePrice: 4239.2141, baseChange: -7.08 },
+      "DOGE/USDT": { basePrice: 0.2223, baseChange: -7.96 },
+      "CHZ/USDT": { basePrice: 0.0397, baseChange: -6.39 },
+      "PSG/USDT": { basePrice: 1.8354, baseChange: -2.87 },
+      "ATM/USDT": { basePrice: 1.4263, baseChange: -5.63 },
+      "JUV/USDT": { basePrice: 1.3628, baseChange: -4.91 },
+      "KSM/USDT": { basePrice: 14.6653, baseChange: -7.50 },
+      "LTC/USDT": { basePrice: 116.4456, baseChange: -4.81 },
+      "EOS/USDT": { basePrice: 0.7240, baseChange: -1.23 },
+      "BTS/USDT": { basePrice: 10.2999, baseChange: -9.28 },
+      "LINK/USDT": { basePrice: 24.4868, baseChange: -6.86 }
+    };
+
+    const result = {};
+    
+    for (const [symbol, data] of Object.entries(baseData)) {
+      const priceVariation = data.basePrice * variation;
+      const changeVariation = Math.random() * 0.5 - 0.25; // Small random change in percentage
+      
+      const currentPrice = data.basePrice + priceVariation;
+      const currentChange = data.baseChange + changeVariation;
+      
+      result[symbol] = {
+        price: currentPrice.toFixed(currentPrice < 1 ? 4 : currentPrice < 100 ? 2 : 0),
+        change: currentChange.toFixed(2),
+        changeType: currentChange >= 0 ? "positive" : "negative"
+      };
+    }
+    
+    res.json(result);
   });
 
   const httpServer = createServer(app);

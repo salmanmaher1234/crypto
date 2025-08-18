@@ -6,6 +6,7 @@ import { TradingInterface } from "@/components/customer/trading-interface";
 import { TransactionHistory } from "@/components/customer/transaction-history";
 import { Profile } from "@/components/customer/profile";
 import { CryptoHome } from "@/components/customer/crypto-home";
+import { CryptoMarketplace } from "@/components/customer/crypto-marketplace";
 import { CryptoTrading } from "@/components/customer/crypto-trading";
 import { CustomerBettingOrders } from "@/components/customer/betting-orders";
 import { AssetsPage } from "@/components/customer/assets-page";
@@ -44,9 +45,8 @@ export default function CustomerApp() {
     switch (activeSection) {
       case "home":
         return (
-          <CryptoHome 
+          <CryptoMarketplace 
             onSelectCurrency={setSelectedCurrency}
-            onNavigateToProfile={() => setActiveSection("profile")}
           />
         );
       case "market":

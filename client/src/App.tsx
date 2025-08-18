@@ -8,6 +8,10 @@ import { LoginModal } from "@/components/auth/login-modal";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CustomerApp from "@/pages/customer-app";
 import { RechargeDetail } from "@/components/customer/recharge-detail";
+import RechargePage from "@/pages/recharge-page";
+import TopUpRecordsPage from "@/pages/top-up-records";
+import WithdrawalPage from "@/pages/withdrawal-page";
+import CustomerServicePage from "@/pages/customer-service";
 import NotFound from "@/pages/not-found";
 
 function AppContent() {
@@ -30,6 +34,10 @@ function AppContent() {
       <Route path="/" component={user.role === "admin" ? AdminDashboard : CustomerApp} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/customer" component={CustomerApp} />
+      <Route path="/recharge" component={RechargePage} />
+      <Route path="/top-up-records" component={TopUpRecordsPage} />
+      <Route path="/withdrawal" component={WithdrawalPage} />
+      <Route path="/customer-service" component={CustomerServicePage} />
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />
     </Switch>
