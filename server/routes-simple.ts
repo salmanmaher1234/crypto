@@ -5,58 +5,48 @@ import { DatabaseStorage } from "./db-storage";
 const storage = new DatabaseStorage();
 import { insertUserSchema, insertBankAccountSchema, insertTransactionSchema, insertBettingOrderSchema, insertWithdrawalRequestSchema, insertAnnouncementSchema } from "@shared/schema";
 
-// Simple in-memory session store for development
-const sessions = new Map<string, { userId: number; expires: number }>();
-
 function generateSessionId(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
-// Enhanced session validation with better error handling
-function getSessionUserId(req: any): number | null {
+// Database-persistent session validation
+async function getSessionUserId(req: any): Promise<number | null> {
   const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
   if (!sessionId) return null;
   
-  const session = sessions.get(sessionId);
+  const session = await storage.getSession(sessionId);
   if (!session) {
-    // Session not found - this is normal after server restart
-    console.log(`Session ${sessionId} not found in memory store`);
+    console.log(`Session ${sessionId} not found in database`);
     return null;
   }
   
-  if (session.expires < Date.now()) {
+  if (session.expiresAt < new Date()) {
     console.log(`Session ${sessionId} expired`);
-    sessions.delete(sessionId);
+    await storage.deleteSession(sessionId);
     return null;
   }
-  
-  // Refresh session on each request
-  refreshSession(sessionId);
   
   return session.userId;
 }
 
-function createSession(userId: number): string {
+async function createSession(userId: number): Promise<string> {
   const sessionId = generateSessionId();
-  sessions.set(sessionId, {
+  const expiresAt = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+  
+  await storage.createSession({
+    id: sessionId,
     userId,
-    expires: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 days
+    expiresAt
   });
+  
   console.log(`Created session ${sessionId} for user ${userId}`);
   return sessionId;
 }
 
-function refreshSession(sessionId: string): void {
-  const session = sessions.get(sessionId);
-  if (session) {
-    session.expires = Date.now() + (30 * 24 * 60 * 60 * 1000); // Extend for 30 days
-  }
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication middleware
-  const authenticateUser = (req: any, res: any, next: any) => {
-    const userId = getSessionUserId(req);
+  const authenticateUser = async (req: any, res: any, next: any) => {
+    const userId = await getSessionUserId(req);
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -65,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   const requireAdmin = async (req: any, res: any, next: any) => {
-    const userId = getSessionUserId(req);
+    const userId = await getSessionUserId(req);
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -89,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if username already exists
-      const existingUser = memStorage.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      const existingUser = await storage.getUserByUsername(username);
       
       res.json({ 
         available: !existingUser,
@@ -115,7 +105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Account has been suspended. Please contact support." });
       }
 
-      const sessionId = createSession(user.id);
+      const sessionId = await createSession(user.id);
       res.cookie('sessionId', sessionId, { 
         httpOnly: true, 
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
@@ -163,10 +153,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/logout", (req, res) => {
+  app.post("/api/auth/logout", async (req, res) => {
     const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
     if (sessionId) {
-      sessions.delete(sessionId);
+      await storage.deleteSession(sessionId);
     }
     res.clearCookie('sessionId');
     res.json({ message: "Logged out successfully" });

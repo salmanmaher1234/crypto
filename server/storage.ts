@@ -6,6 +6,7 @@ import {
   withdrawalRequests,
   announcements,
   messages,
+  sessions,
   type User,
   type InsertUser,
   type BankAccount,
@@ -20,6 +21,8 @@ import {
   type InsertAnnouncement,
   type Message,
   type InsertMessage,
+  type Session,
+  type InsertSession,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -72,6 +75,12 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   updateMessage(id: number, updates: Partial<Message>): Promise<Message | undefined>;
   markMessageAsRead(id: number): Promise<boolean>;
+  
+  // Sessions
+  createSession(session: InsertSession): Promise<Session>;
+  getSession(sessionId: string): Promise<Session | undefined>;
+  deleteSession(sessionId: string): Promise<boolean>;
+  cleanupExpiredSessions(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -349,7 +358,8 @@ export class DatabaseStorage implements IStorage {
       accountHolderName: bankAccounts.accountHolderName,
       accountNumber: bankAccounts.accountNumber,
       bankName: bankAccounts.bankName,
-      ifscCode: bankAccounts.ifscCode,
+      branchName: bankAccounts.branchName,
+      bkashNagadRocket: bankAccounts.bkashNagadRocket,
       isDefault: bankAccounts.isDefault,
       userId: bankAccounts.userId,
       username: users.username,
@@ -380,6 +390,28 @@ export class DatabaseStorage implements IStorage {
   async markMessageAsRead(id: number): Promise<boolean> {
     const result = await db.update(messages).set({ isRead: true }).where(eq(messages.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Sessions
+  async createSession(insertSession: InsertSession): Promise<Session> {
+    const [session] = await db.insert(sessions).values(insertSession).returning();
+    return session;
+  }
+
+  async getSession(sessionId: string): Promise<Session | undefined> {
+    const [session] = await db.select().from(sessions).where(eq(sessions.id, sessionId));
+    return session || undefined;
+  }
+
+  async deleteSession(sessionId: string): Promise<boolean> {
+    const result = await db.delete(sessions).where(eq(sessions.id, sessionId));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async cleanupExpiredSessions(): Promise<number> {
+    const now = new Date();
+    const result = await db.delete(sessions).where(eq(sessions.expiresAt, now));
+    return result.rowCount || 0;
   }
 }
 

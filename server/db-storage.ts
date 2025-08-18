@@ -6,7 +6,8 @@ import {
   bettingOrders, 
   withdrawalRequests, 
   announcements,
-  messages 
+  messages,
+  sessions 
 } from "@shared/schema";
 import type { 
   User, 
@@ -22,7 +23,9 @@ import type {
   Announcement, 
   InsertAnnouncement,
   Message,
-  InsertMessage 
+  InsertMessage,
+  Session,
+  InsertSession 
 } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { IStorage } from "./storage";
@@ -421,7 +424,8 @@ export class DatabaseStorage implements IStorage {
         accountHolderName: bankAccounts.accountHolderName,
         bankName: bankAccounts.bankName,
         accountNumber: bankAccounts.accountNumber,
-        ifscCode: bankAccounts.ifscCode,
+        branchName: bankAccounts.branchName,
+        bkashNagadRocket: bankAccounts.bkashNagadRocket,
       })
       .from(users)
       .leftJoin(bankAccounts, eq(users.id, bankAccounts.userId))
@@ -445,6 +449,45 @@ export class DatabaseStorage implements IStorage {
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+  // Sessions
+  async createSession(insertSession: InsertSession): Promise<Session> {
+    const result = await db.insert(sessions).values(insertSession).returning();
+    return result[0];
+  }
+
+  async getSession(sessionId: string): Promise<Session | undefined> {
+    const result = await db.select().from(sessions).where(eq(sessions.id, sessionId)).limit(1);
+    return result[0];
+  }
+
+  async deleteSession(sessionId: string): Promise<boolean> {
+    try {
+      await db.delete(sessions).where(eq(sessions.id, sessionId));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async cleanupExpiredSessions(): Promise<number> {
+    try {
+      const now = new Date();
+      const result = await db.delete(sessions).where(eq(sessions.expiresAt, now));
+      return result.rowCount || 0;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  async updateMessage(id: number, updates: Partial<Message>): Promise<Message | undefined> {
+    try {
+      const result = await db.update(messages).set(updates).where(eq(messages.id, id)).returning();
+      return result[0];
+    } catch (error) {
+      return undefined;
     }
   }
 }

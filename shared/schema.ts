@@ -36,10 +36,13 @@ export const users = pgTable("users", {
 export const bankAccounts = pgTable("bank_accounts", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
-  accountHolderName: text("account_holder_name").notNull(),
+  bindingType: text("binding_type").notNull().default("Bank Card"), // Bank Card, etc.
+  currency: text("currency").notNull().default("BDT"), // BDT, USD, etc.
   accountNumber: text("account_number").notNull(),
+  accountHolderName: text("account_holder_name").notNull(),
   bankName: text("bank_name").notNull(),
-  ifscCode: text("ifsc_code").notNull(),
+  branchName: text("branch_name").notNull(),
+  bkashNagadRocket: text("bkash_nagad_rocket").notNull(), // Bkash/Nagad/Rocket field
   isDefault: boolean("is_default").notNull().default(false),
 });
 
@@ -100,6 +103,13 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   balance: true,
@@ -152,6 +162,10 @@ export const insertAnnouncementSchema = createInsertSchema(announcements).omit({
 export const insertMessageSchema = createInsertSchema(messages).omit({
   id: true,
   isRead: true,
+  createdAt: true,
+});
+
+export const insertSessionSchema = createInsertSchema(sessions).omit({
   createdAt: true,
 });
 
@@ -224,3 +238,5 @@ export type Announcement = typeof announcements.$inferSelect;
 export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Session = typeof sessions.$inferSelect;
+export type InsertSession = z.infer<typeof insertSessionSchema>;

@@ -28,10 +28,13 @@ export function Profile() {
   const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage' | 'capitalCode' | 'addBank'>('main');
   const [fundsPassword, setFundsPassword] = useState<string[]>(Array(6).fill(''));
   const [bankForm, setBankForm] = useState({
-    accountHolderName: '',
+    bindingType: 'Bank Card',
+    currency: 'BDT',
     accountNumber: '',
+    accountHolderName: '',
     bankName: '',
-    ifscCode: ''
+    branchName: '',
+    bkashNagadRocket: ''
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -61,10 +64,13 @@ export function Profile() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
       setBankForm({
-        accountHolderName: '',
+        bindingType: 'Bank Card',
+        currency: 'BDT',
         accountNumber: '',
+        accountHolderName: '',
         bankName: '',
-        ifscCode: ''
+        branchName: '',
+        bkashNagadRocket: ''
       });
     },
     onError: (error: any) => {
@@ -132,7 +138,8 @@ export function Profile() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-xs text-gray-500">{account.ifscCode}</div>
+                            <div className="text-xs text-gray-500">{account.branchName}</div>
+                            <div className="text-xs text-gray-400">{account.bkashNagadRocket}</div>
                           </div>
                         </div>
                       </div>
@@ -147,53 +154,108 @@ export function Profile() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Account Holder Name *
+                      Binding Type
                     </label>
-                    <Input
-                      type="text"
-                      value={bankForm.accountHolderName}
-                      onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
-                      placeholder="Enter account holder name"
-                      className="w-full"
-                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant={bankForm.bindingType === 'Bank Card' ? 'default' : 'outline'}
+                        onClick={() => setBankForm({ ...bankForm, bindingType: 'Bank Card' })}
+                        className="px-4 py-2 rounded"
+                        style={{
+                          background: bankForm.bindingType === 'Bank Card' ? '#FFA500' : 'transparent',
+                          color: bankForm.bindingType === 'Bank Card' ? 'white' : '#666',
+                          border: '1px solid #ddd'
+                        }}
+                      >
+                        Bank Card
+                      </Button>
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Bank Name *
+                      Currency <span className="text-red-500">*</span>
                     </label>
-                    <Input
-                      type="text"
-                      value={bankForm.bankName}
-                      onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
-                      placeholder="Enter bank name"
-                      className="w-full"
-                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant={bankForm.currency === 'BDT' ? 'default' : 'outline'}
+                        onClick={() => setBankForm({ ...bankForm, currency: 'BDT' })}
+                        className="px-4 py-2 rounded"
+                        style={{
+                          background: bankForm.currency === 'BDT' ? '#FFA500' : 'transparent',
+                          color: bankForm.currency === 'BDT' ? 'white' : '#666',
+                          border: '1px solid #ddd'
+                        }}
+                      >
+                        BDT
+                      </Button>
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Account Number *
+                      Account Number
                     </label>
                     <Input
                       type="text"
                       value={bankForm.accountNumber}
                       onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
-                      placeholder="Enter account number"
-                      className="w-full"
+                      placeholder=""
+                      className="w-full border-red-300"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      IFSC Code *
+                      Holder Name
                     </label>
                     <Input
                       type="text"
-                      value={bankForm.ifscCode}
-                      onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
-                      placeholder="Enter IFSC code"
-                      className="w-full"
+                      value={bankForm.accountHolderName}
+                      onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
+                      placeholder=""
+                      className="w-full border-red-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bank Name
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.bankName}
+                      onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
+                      placeholder=""
+                      className="w-full border-red-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Branch Name
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.branchName}
+                      onChange={(e) => setBankForm({ ...bankForm, branchName: e.target.value })}
+                      placeholder=""
+                      className="w-full border-red-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bkash/Nagad/Rocket
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.bkashNagadRocket}
+                      onChange={(e) => setBankForm({ ...bankForm, bkashNagadRocket: e.target.value })}
+                      placeholder=""
+                      className="w-full border-red-300"
                     />
                   </div>
 
@@ -242,53 +304,108 @@ export function Profile() {
         <div className="p-4 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Account Holder Name *
+              Binding Type
             </label>
-            <Input
-              type="text"
-              value={bankForm.accountHolderName}
-              onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
-              placeholder="Enter account holder name"
-              className="w-full"
-            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={bankForm.bindingType === 'Bank Card' ? 'default' : 'outline'}
+                onClick={() => setBankForm({ ...bankForm, bindingType: 'Bank Card' })}
+                className="px-4 py-2 rounded"
+                style={{
+                  background: bankForm.bindingType === 'Bank Card' ? '#FFA500' : 'transparent',
+                  color: bankForm.bindingType === 'Bank Card' ? 'white' : '#666',
+                  border: '1px solid #ddd'
+                }}
+              >
+                Bank Card
+              </Button>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bank Name *
+              Currency <span className="text-red-500">*</span>
             </label>
-            <Input
-              type="text"
-              value={bankForm.bankName}
-              onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
-              placeholder="Enter bank name"
-              className="w-full"
-            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={bankForm.currency === 'BDT' ? 'default' : 'outline'}
+                onClick={() => setBankForm({ ...bankForm, currency: 'BDT' })}
+                className="px-4 py-2 rounded"
+                style={{
+                  background: bankForm.currency === 'BDT' ? '#FFA500' : 'transparent',
+                  color: bankForm.currency === 'BDT' ? 'white' : '#666',
+                  border: '1px solid #ddd'
+                }}
+              >
+                BDT
+              </Button>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Account Number *
+              Account Number
             </label>
             <Input
               type="text"
               value={bankForm.accountNumber}
               onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
-              placeholder="Enter account number"
-              className="w-full"
+              placeholder=""
+              className="w-full border-red-300"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              IFSC Code *
+              Holder Name
             </label>
             <Input
               type="text"
-              value={bankForm.ifscCode}
-              onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
-              placeholder="Enter IFSC code"
-              className="w-full"
+              value={bankForm.accountHolderName}
+              onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
+              placeholder=""
+              className="w-full border-red-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bank Name
+            </label>
+            <Input
+              type="text"
+              value={bankForm.bankName}
+              onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
+              placeholder=""
+              className="w-full border-red-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Branch Name
+            </label>
+            <Input
+              type="text"
+              value={bankForm.branchName}
+              onChange={(e) => setBankForm({ ...bankForm, branchName: e.target.value })}
+              placeholder=""
+              className="w-full border-red-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bkash/Nagad/Rocket
+            </label>
+            <Input
+              type="text"
+              value={bankForm.bkashNagadRocket}
+              onChange={(e) => setBankForm({ ...bankForm, bkashNagadRocket: e.target.value })}
+              placeholder=""
+              className="w-full border-red-300"
             />
           </div>
 
