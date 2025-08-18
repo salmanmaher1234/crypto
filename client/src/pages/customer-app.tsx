@@ -7,6 +7,7 @@ import { TransactionHistory } from "@/components/customer/transaction-history";
 import { Profile } from "@/components/customer/profile";
 import { CryptoHome } from "@/components/customer/crypto-home";
 import { CryptoMarketplace } from "@/components/customer/crypto-marketplace";
+import { CryptoMarket } from "@/components/customer/crypto-market";
 import { CryptoTrading } from "@/components/customer/crypto-trading";
 import { CustomerBettingOrders } from "@/components/customer/betting-orders";
 import { AssetsPage } from "@/components/customer/assets-page";
@@ -46,12 +47,7 @@ export default function CustomerApp() {
           />
         );
       case "market":
-        return (
-          <CryptoTrading 
-            currency="BTC/USDT"
-            onBack={() => setActiveSection("home")}
-          />
-        );
+        return <CryptoMarket />;
       case "orders":
         return <CustomerBettingOrders />;
       case "assets":
