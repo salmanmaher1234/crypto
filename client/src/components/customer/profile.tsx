@@ -505,19 +505,9 @@ export function Profile() {
       <div className="px-4 py-8">
         <div className="flex items-center space-x-4 text-white">
           <Avatar className="w-12 h-12">
-            <AvatarImage src="/api/placeholder/64/64" alt="Profile" />
+            <AvatarImage src="/fish-avatar.png" alt="Profile" />
             <AvatarFallback className="bg-white bg-opacity-20 text-white flex items-center justify-center">
-              <svg 
-                width="28" 
-                height="28" 
-                viewBox="0 0 24 24" 
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-white"
-              >
-                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM8 8C8.55 8 9 8.45 9 9C9 9.55 8.55 10 8 10C7.45 10 7 9.55 7 9C7 8.45 7.45 8 8 8ZM16 8C16.55 8 17 8.45 17 9C17 9.55 16.55 10 16 10C15.45 10 15 9.55 15 9C15 8.45 15.45 8 16 8ZM12 19C9.79 19 7.79 17.79 6.79 16C7.29 14.5 9.5 13.5 12 13.5C14.5 13.5 16.71 14.5 17.21 16C16.21 17.79 14.21 19 12 19Z"/>
-                <path d="M12 6C13.93 6 15.5 7.57 15.5 9.5C15.5 11.43 13.93 13 12 13C10.07 13 8.5 11.43 8.5 9.5C8.5 7.57 10.07 6 12 6Z" opacity="0.7"/>
-              </svg>
+              <img src="/fish-avatar.png" alt="Profile Avatar" className="w-full h-full rounded-full object-cover" />
             </AvatarFallback>
           </Avatar>
           <div>

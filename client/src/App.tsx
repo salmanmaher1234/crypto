@@ -37,6 +37,7 @@ function AppContent() {
       <Route path="/recharge" component={RechargePage} />
       <Route path="/top-up-records" component={TopUpRecordsPage} />
       <Route path="/withdrawal" component={WithdrawalPage} />
+
       <Route path="/customer-service" component={CustomerServicePage} />
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />
