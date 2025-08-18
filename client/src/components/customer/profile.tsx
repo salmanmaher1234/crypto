@@ -60,7 +60,6 @@ export function Profile() {
         description: "Your bank account has been added successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
-      setCurrentView('collection');
       setBankForm({
         accountHolderName: '',
         accountNumber: '',
@@ -115,46 +114,106 @@ export function Profile() {
             <div className="text-center text-gray-500 py-8">
               <div className="text-sm">Loading bank accounts...</div>
             </div>
-          ) : bankAccounts.length > 0 ? (
-            <div className="space-y-3">
-              {bankAccounts.map((account) => (
-                <div key={account.id} className="bg-white rounded-lg border border-gray-200 p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{account.bankName}</div>
-                      <div className="text-sm text-gray-600 mt-1">{account.accountHolderName}</div>
-                      <div className="text-sm text-gray-500">
-                        ***{account.accountNumber.slice(-4)}
+          ) : (
+            <>
+              {/* Existing Bank Accounts */}
+              {bankAccounts.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Your Bank Accounts</h3>
+                  <div className="space-y-3">
+                    {bankAccounts.map((account) => (
+                      <div key={account.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{account.bankName}</div>
+                            <div className="text-sm text-gray-600 mt-1">{account.accountHolderName}</div>
+                            <div className="text-sm text-gray-500">
+                              ***{account.accountNumber.slice(-4)}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-gray-500">{account.ifscCode}</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-gray-500">{account.ifscCode}</div>
-                    </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 py-8">
-              <div className="text-sm">No bank accounts added yet</div>
-              <div className="text-xs mt-1">Add your bank account information below</div>
-            </div>
+              )}
+
+              {/* Add New Bank Account Form */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-4">Add New Bank Account</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Account Holder Name *
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.accountHolderName}
+                      onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
+                      placeholder="Enter account holder name"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Bank Name *
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.bankName}
+                      onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
+                      placeholder="Enter bank name"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Account Number *
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.accountNumber}
+                      onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
+                      placeholder="Enter account number"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      IFSC Code *
+                    </label>
+                    <Input
+                      type="text"
+                      value={bankForm.ifscCode}
+                      onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
+                      placeholder="Enter IFSC code"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleCreateBankAccount}
+                    disabled={createBankAccount.isPending}
+                    className="w-full h-12 text-white font-medium rounded-2xl"
+                    style={{
+                      background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
+                    }}
+                  >
+                    {createBankAccount.isPending ? "Adding..." : "Add Bank Account"}
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
-        {/* Add Collection Information Button */}
-        <div className="p-4 fixed bottom-4 left-4 right-4">
-          <Button
-            onClick={() => setCurrentView('addBank')}
-            className="w-full h-12 text-white font-medium rounded-2xl"
-            style={{
-              background: "linear-gradient(90deg, #FFA500 0%, #FF6B35 100%)"
-            }}
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Add Bank Account
-          </Button>
-        </div>
+
       </div>
     );
   }
