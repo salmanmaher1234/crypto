@@ -15,7 +15,8 @@ export default function WithdrawalRequest() {
   // Create withdrawal mutation
   const createWithdrawal = useMutation({
     mutationFn: async (data: { amount: number; currency: string }) => {
-      return apiRequest('/api/withdrawal-requests', 'POST', data);
+      const res = await apiRequest('POST', '/api/withdrawal-requests', data);
+      return res.json();
     },
     onSuccess: () => {
       // Invalidate queries to refresh data

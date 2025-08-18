@@ -35,7 +35,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/betting-orders", "POST", data);
+      const res = await apiRequest("POST", "/api/betting-orders", data);
+      return res.json();
     },
     onSuccess: () => {
       toast({
