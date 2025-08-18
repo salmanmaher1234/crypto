@@ -45,12 +45,12 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-50 flex">
+    <div className="h-screen w-screen bg-gray-900 flex">
       {/* Sidebar */}
-      <div className="w-48 sm:w-56 lg:w-64 bg-white shadow-lg">
-        <div className="p-6 border-b">
-          <h1 className="text-lg sm:text-xl font-bold text-gray-900">SuperCoin Admin</h1>
-          <p className="text-xs sm:text-sm text-gray-600">Management Dashboard</p>
+      <div className="w-48 sm:w-56 lg:w-64 bg-gray-800 shadow-2xl border-r border-gray-700">
+        <div className="p-6 border-b border-gray-700">
+          <h1 className="text-lg sm:text-xl font-bold text-white">SuperCoin Admin</h1>
+          <p className="text-xs sm:text-sm text-gray-300">Management Dashboard</p>
         </div>
         
         <nav className="mt-8">
@@ -63,8 +63,8 @@ export default function AdminDashboard() {
                   onClick={() => setActiveSection(section.id)}
                   className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors text-sm sm:text-base ${
                     activeSection === section.id
-                      ? "bg-primary text-white"
-                      : "text-gray-700 hover:bg-primary hover:text-white"
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-3 flex-shrink-0" />
@@ -80,14 +80,14 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col min-w-0 h-screen">
         <div className="w-full flex flex-col flex-1">
           {/* Header */}
-          <div className="bg-white shadow-sm border-b p-6">
+          <div className="bg-gray-800 shadow-lg border-b border-gray-700 p-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{getSectionTitle()}</h2>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate">{getSectionTitle()}</h2>
               <div className="flex items-center space-x-4">
                 <Button
                   variant="outline"
                   onClick={() => setLocation("/customer")}
-                  className="flex items-center space-x-1 text-xs sm:text-sm"
+                  className="flex items-center space-x-1 text-xs sm:text-sm bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                   size="sm"
                 >
                   <Smartphone className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -95,14 +95,15 @@ export default function AdminDashboard() {
                   <span className="sm:hidden">Customer</span>
                 </Button>
                 <div className="flex items-center space-x-1">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs sm:text-sm font-medium">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs sm:text-sm font-medium">
                     {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
-                  <span className="text-gray-700 text-sm sm:text-base hidden md:inline truncate">{user?.name || user?.username}</span>
+                  <span className="text-gray-200 text-sm sm:text-base hidden md:inline truncate">{user?.name || user?.username}</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => logout()}
+                    className="text-gray-300 hover:text-white hover:bg-gray-700"
                   >
                     <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
@@ -112,7 +113,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto bg-gray-900">
             {renderSection()}
           </div>
         </div>

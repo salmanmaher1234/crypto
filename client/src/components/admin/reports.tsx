@@ -49,60 +49,60 @@ export function Reports() {
   }
 
   return (
-    <div className="p-1 h-full">
+    <div className="p-1 h-full bg-gray-900">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Deposits</p>
-                <p className="text-2xl font-bold text-success">${stats.totalDeposits.toFixed(2)}</p>
+                <p className="text-sm font-medium text-gray-400">Total Deposits</p>
+                <p className="text-2xl font-bold text-green-400">${stats.totalDeposits.toFixed(2)}</p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <TrendingDown className="w-5 h-5 text-success" />
+              <div className="bg-green-800 p-3 rounded-full">
+                <TrendingDown className="w-5 h-5 text-green-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Withdrawals</p>
-                <p className="text-2xl font-bold text-destructive">${stats.totalWithdrawals.toFixed(2)}</p>
+                <p className="text-sm font-medium text-gray-400">Total Withdrawals</p>
+                <p className="text-2xl font-bold text-red-400">${stats.totalWithdrawals.toFixed(2)}</p>
               </div>
-              <div className="bg-red-100 p-3 rounded-full">
-                <TrendingUp className="w-5 h-5 text-destructive" />
+              <div className="bg-red-800 p-3 rounded-full">
+                <TrendingUp className="w-5 h-5 text-red-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Customers</p>
-                <p className="text-2xl font-bold text-primary">{stats.activeCustomers}</p>
+                <p className="text-sm font-medium text-gray-400">Active Customers</p>
+                <p className="text-2xl font-bold text-blue-400">{stats.activeCustomers}</p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Users className="w-5 h-5 text-primary" />
+              <div className="bg-blue-800 p-3 rounded-full">
+                <Users className="w-5 h-5 text-blue-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Platform Profit</p>
-                <p className="text-2xl font-bold text-accent">${stats.platformProfit.toFixed(2)}</p>
+                <p className="text-sm font-medium text-gray-400">Platform Profit</p>
+                <p className="text-2xl font-bold text-purple-400">${stats.platformProfit.toFixed(2)}</p>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <BarChart3 className="w-5 h-5 text-accent" />
+              <div className="bg-purple-800 p-3 rounded-full">
+                <BarChart3 className="w-5 h-5 text-purple-400" />
               </div>
             </div>
           </CardContent>
@@ -110,9 +110,9 @@ export function Reports() {
       </div>
 
       {/* Recent Transactions - Withdrawal History */}
-      <Card>
+      <Card className="bg-gray-800 border-gray-700 mt-6">
         <CardHeader>
-          <CardTitle>Recent Transactions</CardTitle>
+          <CardTitle className="text-white">Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent>
           {!transactions || transactions.length === 0 ? (

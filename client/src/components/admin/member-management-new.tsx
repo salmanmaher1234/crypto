@@ -244,16 +244,16 @@ export function MemberManagement() {
   }
 
   return (
-    <div className="h-full">
-      <Card className="h-full">
+    <div className="h-full bg-gray-900">
+      <Card className="h-full bg-gray-800 border-gray-700">
         <CardHeader className="p-6">
-          <CardTitle>Member Management</CardTitle>
+          <CardTitle className="text-white">Member Management</CardTitle>
           <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
+              className="max-w-sm bg-gray-700 border-gray-600 text-white placeholder-gray-400"
             />
             <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
               <DialogTrigger asChild>
@@ -341,63 +341,63 @@ export function MemberManagement() {
             </Dialog>
           </div>
         </CardHeader>
-        <CardContent className="p-2">
+        <CardContent className="p-2 bg-gray-800">
           <div className="overflow-x-auto">
             <Table className="min-w-[1660px] table-fixed">
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px] text-center">ID</TableHead>
-                  <TableHead className="w-[100px]">Username</TableHead>
-                  <TableHead className="w-[180px]">Balance</TableHead>
-                  <TableHead className="w-[80px] text-center">Credit Score</TableHead>
-                  <TableHead className="w-[100px] text-center">General Agent</TableHead>
-                  <TableHead className="w-[100px] text-center">Invitation Code</TableHead>
-                  <TableHead className="w-[80px] text-center">Type</TableHead>
-                  <TableHead className="w-[90px] text-center">Direction</TableHead>
-                  <TableHead className="w-[60px] text-center">Ban</TableHead>
-                  <TableHead className="w-[80px] text-center">Withdraw</TableHead>
-                  <TableHead className="w-[110px] text-center">Registration Time</TableHead>
-                  <TableHead className="w-[100px] text-center">Remark</TableHead>
-                  <TableHead className="w-[500px] text-center">Operate</TableHead>
+                <TableRow className="border-gray-700">
+                  <TableHead className="w-[50px] text-center text-gray-300">ID</TableHead>
+                  <TableHead className="w-[100px] text-gray-300">Username</TableHead>
+                  <TableHead className="w-[180px] text-gray-300">Balance</TableHead>
+                  <TableHead className="w-[80px] text-center text-gray-300">Credit Score</TableHead>
+                  <TableHead className="w-[100px] text-center text-gray-300">General Agent</TableHead>
+                  <TableHead className="w-[100px] text-center text-gray-300">Invitation Code</TableHead>
+                  <TableHead className="w-[80px] text-center text-gray-300">Type</TableHead>
+                  <TableHead className="w-[90px] text-center text-gray-300">Direction</TableHead>
+                  <TableHead className="w-[60px] text-center text-gray-300">Ban</TableHead>
+                  <TableHead className="w-[80px] text-center text-gray-300">Withdraw</TableHead>
+                  <TableHead className="w-[110px] text-center text-gray-300">Registration Time</TableHead>
+                  <TableHead className="w-[100px] text-center text-gray-300">Remark</TableHead>
+                  <TableHead className="w-[500px] text-center text-gray-300">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-mono text-sm text-center w-[50px]">{user.id}</TableCell>
-                    <TableCell className="font-medium w-[100px] truncate">{user.username}</TableCell>
+                  <TableRow key={user.id} className="border-gray-700 hover:bg-gray-750">
+                    <TableCell className="font-mono text-sm text-center w-[50px] text-gray-200">{user.id}</TableCell>
+                    <TableCell className="font-medium w-[100px] truncate text-gray-200">{user.username}</TableCell>
                     <TableCell className="w-[180px]">
                       <div className="space-y-1 text-xs">
-                        <div>
+                        <div className="text-gray-200">
                           Total: {(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(2)}
                         </div>
-                        <div className="text-gray-600">
+                        <div className="text-gray-400">
                           Available: {parseFloat(user.availableBalance || "0").toFixed(2)}
                         </div>
-                        <div className="text-gray-600">
+                        <div className="text-gray-400">
                           Frozen: {parseFloat(user.frozenBalance || "0").toFixed(2)}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-center w-[80px]">
-                      <Badge variant="outline" className="text-xs px-1 py-0.5">
+                      <Badge variant="outline" className="text-xs px-1 py-0.5 border-gray-600 text-gray-200">
                         {user.creditScore || 100}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-center w-[100px] truncate">{user.generalAgent || "admin"}</TableCell>
-                    <TableCell className="text-xs text-center w-[100px] truncate">{user.invitationCode || "100025"}</TableCell>
+                    <TableCell className="text-xs text-center w-[100px] truncate text-gray-300">{user.generalAgent || "admin"}</TableCell>
+                    <TableCell className="text-xs text-center w-[100px] truncate text-gray-300">{user.invitationCode || "100025"}</TableCell>
                     <TableCell className="w-[80px]">
                       <Select
                         value={user.userType || "Normal"}
                         onValueChange={(value) => handleQuickUpdate(user, { userType: value })}
                       >
-                        <SelectTrigger className="w-full h-7 text-xs">
+                        <SelectTrigger className="w-full h-7 text-xs bg-gray-700 border-gray-600 text-gray-200">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Normal">Normal</SelectItem>
-                          <SelectItem value="VIP">VIP</SelectItem>
-                          <SelectItem value="Agent">Agent</SelectItem>
+                        <SelectContent className="bg-gray-700 border-gray-600">
+                          <SelectItem value="Normal" className="text-gray-200">Normal</SelectItem>
+                          <SelectItem value="VIP" className="text-gray-200">VIP</SelectItem>
+                          <SelectItem value="Agent" className="text-gray-200">Agent</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -406,13 +406,13 @@ export function MemberManagement() {
                         value={user.direction || "Actual"}
                         onValueChange={(value) => handleQuickUpdate(user, { direction: value })}
                       >
-                        <SelectTrigger className="w-full h-7 text-xs">
+                        <SelectTrigger className="w-full h-7 text-xs bg-gray-700 border-gray-600 text-gray-200">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Buy Up">Buy Up</SelectItem>
-                          <SelectItem value="Buy Down">Buy Down</SelectItem>
-                          <SelectItem value="Actual">Actual</SelectItem>
+                        <SelectContent className="bg-gray-700 border-gray-600">
+                          <SelectItem value="Buy Up" className="text-gray-200">Buy Up</SelectItem>
+                          <SelectItem value="Buy Down" className="text-gray-200">Buy Down</SelectItem>
+                          <SelectItem value="Actual" className="text-gray-200">Actual</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -431,7 +431,7 @@ export function MemberManagement() {
                       />
                     </TableCell>
                     <TableCell className="w-[110px]">
-                      <div className="text-xs text-center">
+                      <div className="text-xs text-center text-gray-300">
                         {user.registrationTime ? 
                           new Date(user.registrationTime).toLocaleDateString('en-GB') : 
                           new Date().toLocaleDateString('en-GB')
@@ -442,7 +442,7 @@ export function MemberManagement() {
                       <Input
                         value={user.remark || ""}
                         onChange={(e) => handleQuickUpdate(user, { remark: e.target.value })}
-                        className="w-full h-7 text-xs"
+                        className="w-full h-7 text-xs bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
                         placeholder="Remark"
                       />
                     </TableCell>

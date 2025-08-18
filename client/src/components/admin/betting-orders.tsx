@@ -136,17 +136,17 @@ export function BettingOrders() {
   }
 
   return (
-    <div className="p-1 h-full">
-      <Card className="h-full">
+    <div className="p-1 h-full bg-gray-900">
+      <Card className="h-full bg-gray-800 border-gray-700">
         <CardHeader className="p-2">
           <div className="flex justify-between items-center mb-2">
-            <CardTitle>All Betting Orders</CardTitle>
+            <CardTitle className="text-white">All Betting Orders</CardTitle>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={toggleNotifications}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 border-gray-600 ${isEnabled ? 'bg-green-800 border-green-600 text-green-200' : 'bg-red-800 border-red-600 text-red-200'}`}
               >
                 {isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 {isEnabled ? "Sound On" : "Sound Off"}
@@ -155,7 +155,7 @@ export function BettingOrders() {
                 variant="outline"
                 size="sm"
                 onClick={handleTestSound}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-blue-800 border-blue-600 text-blue-200"
               >
                 Test Sound
               </Button>
