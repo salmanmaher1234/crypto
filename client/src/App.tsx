@@ -41,6 +41,7 @@ function AppContent() {
 
       <Route path="/customer-service" component={CustomerServicePage} />
       <Route path="/funding-information" component={FundingInformation} />
+      <Route path="/spot-orders" component={() => import("./components/customer/spot-orders").then(m => m.SpotOrders)} />
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
       <Route component={NotFound} />
     </Switch>
