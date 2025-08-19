@@ -203,19 +203,11 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       {/* Header */}
       <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack}
-            className="p-1 text-white hover:bg-gray-800"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="text-white hover:bg-gray-800 flex items-center space-x-1 px-0 py-0 h-auto font-medium text-lg"
+                className="text-white hover:bg-gray-800 flex items-center space-x-1 px-2 py-1 h-auto font-medium text-lg"
               >
                 <span>{selectedCurrency}</span>
                 <Menu className="w-4 h-4" />
