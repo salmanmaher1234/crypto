@@ -33,10 +33,29 @@ const sections = [
 export default function CustomerApp() {
   const [activeSection, setActiveSection] = useState("home");
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
+  const [showFullMarketView, setShowFullMarketView] = useState(false);
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
 
   const renderSection = () => {
+    // If full market view is active, show market with back button
+    if (showFullMarketView) {
+      return (
+        <div className="h-full">
+          {/* Back button */}
+          <div className="bg-white px-4 py-3 border-b border-gray-200">
+            <button 
+              onClick={() => setShowFullMarketView(false)}
+              className="flex items-center text-gray-600 hover:text-gray-900"
+            >
+              ← Back to Home
+            </button>
+          </div>
+          <SpotOrders />
+        </div>
+      );
+    }
+
     // If a currency is selected, show the trading page
     if (selectedCurrency) {
       return (
@@ -109,14 +128,15 @@ export default function CustomerApp() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto pb-[90px] sm:pb-[100px] md:pb-[80px]">
+      <main className={`flex-1 overflow-auto ${showFullMarketView ? '' : 'pb-[90px] sm:pb-[100px] md:pb-[80px]'}`}>
         <div className="w-full h-full">
-          <div className="pb-6 sm:pb-8 md:pb-10">{renderSection()}</div>
+          <div className={showFullMarketView ? 'h-full' : 'pb-6 sm:pb-8 md:pb-10'}>{renderSection()}</div>
         </div>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-inset">
+      {/* Bottom Navigation - Hide when full market view is active */}
+      {!showFullMarketView && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-inset">
         <div className="w-full max-w-screen-xl mx-auto">
           <div className="grid grid-cols-5 py-3 sm:py-4 min-h-[70px] sm:min-h-[80px]">
             {sections.map((section) => {
@@ -126,10 +146,15 @@ export default function CustomerApp() {
                   key={section.id}
                   onClick={() => {
                     setSelectedCurrency(null);
-                    setActiveSection(section.id);
+                    if (section.id === 'market') {
+                      setShowFullMarketView(true);
+                    } else {
+                      setShowFullMarketView(false);
+                      setActiveSection(section.id);
+                    }
                   }}
                   className={`flex flex-col items-center justify-center py-2 px-1 transition-colors duration-200 ${
-                    activeSection === section.id && !selectedCurrency
+                    (activeSection === section.id && !selectedCurrency) || (section.id === 'market' && showFullMarketView)
                       ? "text-primary bg-primary/5"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
@@ -143,7 +168,8 @@ export default function CustomerApp() {
             })}
           </div>
         </div>
-      </nav>
+        </nav>
+      )}
     </div>
   );
 }
