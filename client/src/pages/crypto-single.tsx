@@ -50,7 +50,11 @@ export function CryptoSingle() {
   const cryptoId = match ? (match as any).cryptoId?.toUpperCase() : null;
   const { data: cryptoPrices } = useCryptoPrices();
   
+  console.log('CryptoSingle - match:', match, 'cryptoId:', cryptoId);
+  console.log('Available crypto data keys:', Object.keys(cryptoData));
+  
   const crypto = cryptoId ? cryptoData[cryptoId] : null;
+  console.log('Selected crypto:', crypto);
   
   if (!crypto) {
     return (
