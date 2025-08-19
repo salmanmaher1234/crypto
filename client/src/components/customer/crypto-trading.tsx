@@ -221,23 +221,34 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
                 <Menu className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48 bg-black border-gray-700">
+            <DropdownMenuContent className="w-56 bg-black border-gray-700">
               <div className="bg-black text-white max-h-96 overflow-y-auto">
-                <div className="px-2 py-2 text-xs text-orange-400 font-medium border-b border-gray-700">
+                <div className="px-3 py-2 text-xs text-red-500 font-medium border-b border-gray-800 bg-gray-900">
                   Spot
                 </div>
-                {cryptoOptions.map((crypto) => (
-                  <DropdownMenuItem
-                    key={crypto.symbol}
-                    className="text-white hover:bg-gray-800 cursor-pointer flex justify-between items-center px-3 py-2 focus:bg-gray-800"
-                    onClick={() => handleCurrencyChange(crypto.symbol)}
-                  >
-                    <span className="text-sm">{crypto.symbol}</span>
-                    <span className="text-xs text-red-400">
-                      {formatPrice((cryptoPrices as any)?.[crypto.symbol]?.price || "0.00")}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
+                {cryptoOptions.map((crypto) => {
+                  const price = (cryptoPrices as any)?.[crypto.symbol]?.price || "0.00";
+                  const change = (cryptoPrices as any)?.[crypto.symbol]?.change || "0.00";
+                  const isPositive = !change.toString().startsWith('-');
+                  
+                  return (
+                    <DropdownMenuItem
+                      key={crypto.symbol}
+                      className="text-white hover:bg-gray-800 cursor-pointer flex justify-between items-center px-3 py-2 focus:bg-gray-800 border-none"
+                      onClick={() => handleCurrencyChange(crypto.symbol)}
+                    >
+                      <span className="text-sm font-medium text-white">{crypto.symbol}</span>
+                      <div className="text-right">
+                        <div className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatPrice(price)}
+                        </div>
+                        <div className={`text-xs ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                          {change}%
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  );
+                })}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
