@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRoute, Link } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
-import { useCryptoPrices } from "@/lib/api";
+import { ArrowLeft, Home, TrendingUp, TrendingDown, X } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Crypto data matching the home page
 const cryptoData: { [key: string]: any } = {
@@ -81,12 +89,56 @@ const cryptoData: { [key: string]: any } = {
   },
 };
 
+const timeframes = ["1M", "5M", "30M", "1H", "4H", "1D"];
+
+interface CryptoPriceData {
+  price: string;
+  change: string;
+}
+
+interface CryptoPrices {
+  [key: string]: CryptoPriceData;
+}
+
 export function CryptoSingle() {
   const [match, params] = useRoute("/crypto/:cryptoId");
   const cryptoId = params?.cryptoId?.toUpperCase() || null;
-  const { data: cryptoPrices } = useCryptoPrices();
+  const [activeTimeframe, setActiveTimeframe] = useState("5M");
+  const [quantity, setQuantity] = useState("9000");
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [showTradePopup, setShowTradePopup] = useState(false);
+  const [tradeDirection, setTradeDirection] = useState<"up" | "down">("up");
+  const [selectedDuration, setSelectedDuration] = useState("60");
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const queryClient = useQueryClient();
   
   const crypto = cryptoId ? cryptoData[cryptoId] : null;
+
+  const tradeDurations = [
+    { value: "60", label: "60S", seconds: 60 },
+    { value: "120", label: "120S", seconds: 120 },
+    { value: "180", label: "180S", seconds: 180 },
+  ];
+
+  // Get real-time crypto prices
+  const { data: cryptoPrices = {} } = useQuery<CryptoPrices>({
+    queryKey: ["/api/crypto-prices"],
+    refetchInterval: 5000,
+  });
+
+  const [tradeHistory, setTradeHistory] = useState([
+    { time: "12:49:08", direction: "Buy", price: "115348.00", quantity: "0.0001" },
+    { time: "12:49:11", direction: "Buy", price: "115355.00", quantity: "0.0001" },
+    { time: "12:49:06", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:13", direction: "Buy", price: "115350.00", quantity: "0.0001" },
+    { time: "12:49:07", direction: "Buy", price: "115344.00", quantity: "0.0001" },
+    { time: "12:49:33", direction: "Buy", price: "115367.0700", quantity: "0.2000" },
+    { time: "12:49:13", direction: "Buy", price: "115362.5100", quantity: "0.0050" },
+    { time: "12:49:07", direction: "Buy", price: "115345.00", quantity: "0.0001" },
+    { time: "12:00:31", direction: "Sell", price: "115365.9900", quantity: "0.0001" },
+  ]);
   
   if (!crypto) {
     return (
@@ -104,116 +156,300 @@ export function CryptoSingle() {
     );
   }
 
-  // Get real-time price data
-  const getCryptoPrice = () =>
-    (cryptoPrices as any)?.[crypto.symbol]?.price || "0.00";
-  const getCryptoChange = () =>
-    (cryptoPrices as any)?.[crypto.symbol]?.change || "0.00";
+  // Update time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const price = getCryptoPrice();
-  const change = getCryptoChange();
+  // Get real-time price data
+  const price = cryptoPrices[crypto?.symbol]?.price || "115366.9629";
+  const change = cryptoPrices[crypto?.symbol]?.change || "-2.43";
   const isPositive = parseFloat(change) >= 0;
+  
+  // Handle trading functionality
+  const placeTradeMutation = useMutation({
+    mutationFn: async (tradeData: any) => {
+      return apiRequest("/api/betting-orders", {
+        method: "POST",
+        body: JSON.stringify(tradeData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Trade Placed Successfully",
+        description: `${tradeDirection === "up" ? "Buy Up" : "Buy Down"} order for ${quantity} USDT has been placed.`,
+      });
+      setShowTradePopup(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Trade Failed",
+        description: error.message || "Failed to place trade order",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePlaceTrade = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to place trades",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const tradeData = {
+      asset: crypto.symbol,
+      amount: quantity,
+      direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
+      duration: parseInt(selectedDuration) === 60 ? 1 : parseInt(selectedDuration) === 120 ? 2 : 3,
+      entryPrice: price,
+    };
+
+    placeTradeMutation.mutate(tradeData);
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header - Market Tab Style */}
+      {/* Header - Exact Blocnix Style */}
       <div className="bg-gray-900 border-b border-gray-800">
         <div className="px-4 py-3 flex items-center justify-between">
           <Link href="/">
-            <Button variant="ghost" className="text-gray-400 hover:text-white">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+            <Button variant="ghost" className="text-gray-400 hover:text-white p-2">
+              <Home className="w-5 h-5" />
             </Button>
           </Link>
           <div className="text-center">
-            <div 
-              className="w-8 h-8 rounded-full inline-flex items-center justify-center text-white text-sm font-bold mr-2"
-              style={{ backgroundColor: crypto.color }}
+            <h1 className="text-lg font-bold text-white">{crypto.symbol}</h1>
+          </div>
+          <div className="text-right">
+            <span className="text-sm text-gray-400">Spot Orders</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Price Section - Exact Blocnix Style */}
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="text-sm text-gray-400">{crypto.symbol}</div>
+            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          </div>
+          <div className="text-center flex-1">
+            <div className="text-2xl font-bold text-red-400">{price}</div>
+            <div className="text-sm text-red-400">{change}%</div>
+          </div>
+          <div className="text-right text-xs text-gray-400">
+            <div>24H High: 115395.3500</div>
+            <div>24H Low: 115366.9629</div>
+            <div>24H Volume: 152.43M</div>
+            <div>24H Turnover: 1.31K</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chart Timeframe Buttons - Exact Blocnix Style */}
+      <div className="bg-gray-900 border-b border-gray-800">
+        <div className="px-4 py-2 flex space-x-4">
+          {timeframes.map((tf) => (
+            <button
+              key={tf}
+              onClick={() => setActiveTimeframe(tf)}
+              className={`px-3 py-1 text-sm font-medium ${
+                activeTimeframe === tf
+                  ? "text-blue-400 border-b-2 border-blue-400"
+                  : "text-gray-400 hover:text-white"
+              }`}
             >
-              {crypto.icon}
+              {tf}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Trading Chart - Exact Blocnix Style */}
+      <div className="bg-gray-950 h-64 relative">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full"
+          style={{ background: 'linear-gradient(180deg, #1a1a1a 0%, #0d1117 100%)' }}
+        />
+        <div className="absolute bottom-2 left-2 text-xs text-gray-500">
+          Chart by TradingView
+        </div>
+        <div className="absolute top-4 left-4 text-xs text-gray-400">
+          <div className="flex space-x-4">
+            <span>O: 115394.00</span>
+            <span className="text-red-400">H: 115434.00</span>
+            <span>L: 115291.00</span>
+            <span className="text-red-400">C: 115367.99</span>
+          </div>
+        </div>
+        {/* Chart placeholder with trading data visualization */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-20">
+          <svg width="100%" height="100%" viewBox="0 0 1000 300">
+            {/* Mock candlestick chart */}
+            <path d="M50,150 Q200,100 350,120 T650,140 T950,160" 
+                  stroke="#ef4444" strokeWidth="2" fill="none" />
+            <path d="M50,180 Q200,160 350,170 T650,180 T950,190" 
+                  stroke="#22c55e" strokeWidth="1" fill="none" opacity="0.7" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Trading History Tables - Exact Blocnix Style */}
+      <div className="bg-gray-950 flex-1">
+        {/* First Table */}
+        <div className="px-4 py-3">
+          <div className="grid grid-cols-4 gap-4 text-xs text-gray-400 border-b border-gray-800 pb-2 mb-2">
+            <div>Time</div>
+            <div>Direction</div>
+            <div>Price</div>
+            <div>Quantity</div>
+          </div>
+          {tradeHistory.slice(0, 8).map((trade, index) => (
+            <div key={index} className="grid grid-cols-4 gap-4 text-xs py-1">
+              <div className="text-gray-400">{trade.time}</div>
+              <div className={trade.direction === "Buy" ? "text-green-400" : "text-red-400"}>
+                {trade.direction}
+              </div>
+              <div className="text-white">{trade.price}</div>
+              <div className="text-white">{trade.quantity}</div>
             </div>
-            <span className="text-lg font-bold">{crypto.name}</span>
+          ))}
+        </div>
+
+        {/* Second Table - Duplicate for visual effect */}
+        <div className="px-4 py-3 border-t border-gray-800">
+          <div className="grid grid-cols-4 gap-4 text-xs text-gray-400 border-b border-gray-800 pb-2 mb-2">
+            <div>Time</div>
+            <div>Direction</div>
+            <div>Price</div>
+            <div>Quantity</div>
           </div>
-          <div></div>
+          {tradeHistory.map((trade, index) => (
+            <div key={index} className="grid grid-cols-4 gap-4 text-xs py-1">
+              <div className="text-gray-400">{trade.time}</div>
+              <div className={trade.direction === "Buy" ? "text-green-400" : "text-red-400"}>
+                {trade.direction}
+              </div>
+              <div className="text-white">{trade.price}</div>
+              <div className="text-white">{trade.quantity}</div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Price Display - Market Tab Style */}
-      <div className="bg-gray-900 px-4 py-4 border-b border-gray-800">
-        <div className="text-center">
-          <div className="text-3xl font-bold text-white mb-1">{price}</div>
-          <div className={`text-lg font-medium ${
-            isPositive ? 'text-green-400' : 'text-red-400'
-          }`}>
-            {isPositive ? '+' : ''}{change}%
-          </div>
-          <div className="text-sm text-gray-400 mt-1">{crypto.symbol}</div>
+      {/* Buy Up / Buy Down Buttons - Exact Blocnix Style */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800">
+        <div className="flex">
+          <Button 
+            onClick={() => {
+              setTradeDirection("up");
+              setShowTradePopup(true);
+            }}
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold rounded-none"
+          >
+            Buy Up
+          </Button>
+          <Button 
+            onClick={() => {
+              setTradeDirection("down");
+              setShowTradePopup(true);
+            }}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold rounded-none"
+          >
+            Buy Down
+          </Button>
         </div>
       </div>
 
-      {/* Chart Section - Market Tab Style */}
-      <div className="bg-gray-900 px-4 py-6 border-b border-gray-800">
-        <div className="h-64 bg-gray-800 rounded-lg flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-gray-400 mb-2">📈</div>
-            <p className="text-gray-400">Price Chart</p>
-            <p className="text-sm text-gray-500">Coming Soon</p>
-          </div>
-        </div>
-      </div>
+      {/* Trade Popup Dialog - Same as Market Tab */}
+      <Dialog open={showTradePopup} onOpenChange={setShowTradePopup}>
+        <DialogContent className="bg-gray-900 text-white border-gray-700 max-w-sm mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-bold">
+              {tradeDirection === "up" ? "Buy Up" : "Buy Down"} - {crypto.symbol}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{price}</div>
+              <div className={`text-lg ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                {isPositive ? '+' : ''}{change}%
+              </div>
+            </div>
 
-      {/* Trading Actions - Market Tab Style */}
-      <div className="bg-gray-900 px-4 py-4 border-b border-gray-800">
-        <div className="grid grid-cols-2 gap-4">
-          <Link href={`/?tab=market&coin=${crypto.symbol.split('/')[0].toLowerCase()}`}>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold rounded-lg">
-              <TrendingUp className="w-5 h-5 mr-2" />
-              Buy Up
-            </Button>
-          </Link>
-          <Link href={`/?tab=market&coin=${crypto.symbol.split('/')[0].toLowerCase()}`}>
-            <Button className="w-full bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold rounded-lg">
-              <TrendingDown className="w-5 h-5 mr-2" />
-              Buy Down
-            </Button>
-          </Link>
-        </div>
-      </div>
+            {/* Duration Selection */}
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">Select Duration</label>
+              <div className="grid grid-cols-3 gap-2">
+                {tradeDurations.map((duration) => (
+                  <button
+                    key={duration.value}
+                    onClick={() => setSelectedDuration(duration.value)}
+                    className={`p-3 rounded-lg text-sm font-medium border ${
+                      selectedDuration === duration.value
+                        ? "bg-blue-600 border-blue-500 text-white"
+                        : "bg-gray-800 border-gray-600 text-gray-300"
+                    }`}
+                  >
+                    <div>{duration.label}</div>
+                    <div className="text-xs opacity-75">
+                      {duration.value === "60" ? "20%" : 
+                       duration.value === "120" ? "30%" : "50%"}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-      {/* Stats Section - Market Tab Style */}
-      <div className="bg-gray-900 px-4 py-4">
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm mb-1">Current Price</p>
-            <p className="text-white text-lg font-bold">{price}</p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm mb-1">24h Change</p>
-            <p className={`text-lg font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-              {isPositive ? '+' : ''}{change}%
-            </p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm mb-1">Trading Pair</p>
-            <p className="text-white text-lg font-bold">{crypto.symbol}</p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm mb-1">Status</p>
-            <p className="text-green-400 text-lg font-bold">Active</p>
-          </div>
-        </div>
+            {/* Quantity Input */}
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">Quantity (USDT)</label>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                placeholder="Enter amount"
+              />
+            </div>
 
-        {/* Call to Action - Market Tab Style */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-lg text-center">
-          <h2 className="text-xl font-bold text-white mb-2">Start Trading {crypto.name}</h2>
-          <p className="text-blue-100 mb-4">Login to access live trading features</p>
-          <Link href="/login">
-            <Button className="bg-white text-blue-600 hover:bg-gray-100 font-bold px-8 py-3 rounded-lg">
-              Login to Trade
-            </Button>
-          </Link>
-        </div>
-      </div>
+            {/* Action Buttons */}
+            <div className="flex space-x-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowTradePopup(false)}
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handlePlaceTrade}
+                disabled={placeTradeMutation.isPending}
+                className={`flex-1 font-bold ${
+                  tradeDirection === "up"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {placeTradeMutation.isPending
+                  ? "Placing..."
+                  : tradeDirection === "up"
+                  ? "Buy Up"
+                  : "Buy Down"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
