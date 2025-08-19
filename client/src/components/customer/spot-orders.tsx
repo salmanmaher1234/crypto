@@ -29,27 +29,24 @@ interface Candle {
 
 interface SpotOrdersProps {
   selectedCoin?: string | null;
+  onNavigateToOrders?: () => void;
 }
 
-export function SpotOrders({ selectedCoin }: SpotOrdersProps) {
+export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps) {
   const [, setLocation] = useLocation();
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
   const [quantity, setQuantity] = useState("9000");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showTradePopup, setShowTradePopup] = useState(false);
   const [tradeDirection, setTradeDirection] = useState<'up' | 'down'>('up');
-  const [selectedDuration, setSelectedDuration] = useState("1");
+  const [selectedDuration, setSelectedDuration] = useState("60");
   const { user } = useAuth();
   const { toast } = useToast();
   
   const tradeDurations = [
-    { value: "1", label: "1 Minute", seconds: 60 },
-    { value: "3", label: "3 Minutes", seconds: 180 },
-    { value: "5", label: "5 Minutes", seconds: 300 },
-    { value: "10", label: "10 Minutes", seconds: 600 },
-    { value: "15", label: "15 Minutes", seconds: 900 },
-    { value: "30", label: "30 Minutes", seconds: 1800 },
-    { value: "60", label: "1 Hour", seconds: 3600 }
+    { value: "60", label: "60S", seconds: 60 },
+    { value: "120", label: "120S", seconds: 120 },
+    { value: "180", label: "180S", seconds: 180 }
   ];
   const [tradeHistory, setTradeHistory] = useState([
     {
@@ -144,6 +141,13 @@ export function SpotOrders({ selectedCoin }: SpotOrdersProps) {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Navigate to pending orders
+      if (onNavigateToOrders) {
+        setTimeout(() => {
+          onNavigateToOrders();
+        }, 1000);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -480,68 +484,83 @@ export function SpotOrders({ selectedCoin }: SpotOrdersProps) {
         </div>
       </div>
 
-      {/* Trade Time Selection Popup */}
+      {/* Trade Time Selection Popup - Matching Screenshot Design */}
       <Dialog open={showTradePopup} onOpenChange={setShowTradePopup}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              {tradeDirection === 'up' ? (
-                <TrendingUp className="w-5 h-5 mr-2 text-green-500" />
-              ) : (
-                <TrendingDown className="w-5 h-5 mr-2 text-red-500" />
-              )}
-              {tradeDirection === 'up' ? 'Buy Up' : 'Buy Down'} - Select Time
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700">Trading Amount</label>
-              <input
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md"
-                placeholder="Enter amount"
-              />
+        <DialogContent className="sm:max-w-lg bg-gray-900 text-white border-gray-700">
+          <div className="space-y-6">
+            {/* Header with Product Info */}
+            <div className="border-b border-gray-700 pb-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="text-sm text-gray-400">Product Name</div>
+                  <div className="text-lg font-bold text-white">BTC/USDT</div>
+                  <div className="text-sm text-gray-400 mt-1">Direction</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-400">Current price</div>
+                  <div className="text-lg font-bold text-white">{btcPrice}</div>
+                  <div className={`text-sm ${tradeDirection === 'up' ? 'bg-green-600' : 'bg-red-600'} text-white px-3 py-1 rounded mt-2`}>
+                    {tradeDirection === 'up' ? 'Buy Up' : 'Buy Down'}
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Trading Time Selection */}
             <div>
-              <label className="text-sm font-medium text-gray-700">Select Duration</label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="flex items-center mb-4">
+                <div className="text-sm text-gray-400 mr-2">Trading Time</div>
+                <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
                 {tradeDurations.map((duration) => (
                   <button
                     key={duration.value}
                     onClick={() => setSelectedDuration(duration.value)}
-                    className={`p-3 text-sm rounded-lg border transition-colors ${
+                    className={`p-4 rounded-lg border-2 transition-all ${
                       selectedDuration === duration.value
-                        ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                        ? "bg-blue-600 border-blue-500 text-white"
+                        : "bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
                     }`}
                   >
-                    {duration.label}
+                    <div className="text-center">
+                      <div className="text-xs text-gray-400">Time</div>
+                      <div className="text-lg font-bold">{duration.label}</div>
+                      <div className="text-xs text-green-400">Scale:50.00%</div>
+                    </div>
                   </button>
                 ))}
               </div>
             </div>
-            <div className="flex space-x-3">
-              <Button
-                onClick={() => setShowTradePopup(false)}
-                variant="outline"
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handlePlaceTrade}
-                disabled={placeTrade.isPending}
-                className={`flex-1 ${
-                  tradeDirection === 'up'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-red-600 hover:bg-red-700'
-                } text-white`}
-              >
-                {placeTrade.isPending ? 'Placing...' : 'Place Trade'}
-              </Button>
+
+            {/* Balance and Expected Earnings */}
+            <div className="border-t border-gray-700 pt-4">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-gray-400">Available Balance: {user?.availableBalance || '0'}</div>
+                <div className="text-sm text-blue-400">Expected Earnings: 0</div>
+              </div>
+              
+              {/* Amount Input */}
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400"
+                placeholder="0"
+              />
             </div>
+
+            {/* Order Confirmation Button */}
+            <Button
+              onClick={handlePlaceTrade}
+              disabled={placeTrade.isPending}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 rounded-lg text-lg"
+            >
+              {placeTrade.isPending ? 'Processing...' : 'Order Confirmation'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -42,7 +42,13 @@ export default function CustomerApp() {
     if (showFullMarketView) {
       return (
         <div className="h-full">
-          <SpotOrders selectedCoin={selectedCurrency} />
+          <SpotOrders 
+            selectedCoin={selectedCurrency} 
+            onNavigateToOrders={() => {
+              setShowFullMarketView(false);
+              setActiveSection('orders');
+            }}
+          />
         </div>
       );
     }
@@ -110,6 +116,18 @@ export default function CustomerApp() {
                   <Settings className="w-4 h-4" />
                 </Button>
               )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  if (showFullMarketView) {
+                    setShowFullMarketView(false);
+                    setActiveSection('home');
+                  }
+                }}
+              >
+                <Home className="w-4 h-4" />
+              </Button>
               <Button variant="ghost" size="sm" onClick={() => logout()}>
                 <LogOut className="w-4 h-4" />
               </Button>
