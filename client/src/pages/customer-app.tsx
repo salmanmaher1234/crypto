@@ -88,7 +88,7 @@ export default function CustomerApp() {
 
     switch (activeSection) {
       case "home":
-        return <CryptoHome onSelectCurrency={handleCryptoSelection} />;
+        return <CryptoMarketplace onSelectCurrency={handleCryptoSelection} />;
       case "market":
         return <SpotOrders />;
       case "orders":
@@ -98,7 +98,7 @@ export default function CustomerApp() {
       case "profile":
         return <Profile />;
       default:
-        return <CryptoHome onSelectCurrency={handleCryptoSelection} />;
+        return <CryptoMarketplace onSelectCurrency={handleCryptoSelection} />;
     }
   };
 

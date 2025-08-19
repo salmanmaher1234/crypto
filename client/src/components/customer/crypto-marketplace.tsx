@@ -208,9 +208,9 @@ export function CryptoMarketplace({
       {/* Crypto list */}
       <div className="bg-white">
         {cryptoData.map((crypto, index) => (
-          <Link
+          <div
             key={crypto.symbol}
-            href={`/crypto/${crypto.symbol.split('/')[0].toLowerCase()}`}
+            onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
             className="flex items-center justify-between px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
           >
             <div className="flex items-center space-x-3">
@@ -235,7 +235,7 @@ export function CryptoMarketplace({
                 {formatChange(crypto.change)}
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 
