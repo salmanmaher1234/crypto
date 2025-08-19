@@ -416,13 +416,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
                 </div>
               </div>
 
-              {/* Direction - Remove Buy Up button */}
-              <div>
-                <div className="text-sm text-gray-400 mb-3">Direction</div>
-                <div className="text-gray-300">
-                  {direction === "up" ? "Buy Up" : "Buy Down"} selected
-                </div>
-              </div>
+              {/* Direction section removed - no buttons */}
 
               {/* Trading Time */}
               <div>
