@@ -13,6 +13,55 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+// TradingView Chart Component
+function TradingViewChart({ cryptoSymbol, timeframe }: { cryptoSymbol: string, timeframe: string }) {
+  const chartRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (chartRef.current) {
+      // Clear previous chart
+      chartRef.current.innerHTML = '';
+      
+      // Create TradingView widget
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.async = true;
+      script.onload = () => {
+        if ((window as any).TradingView && chartRef.current) {
+          new (window as any).TradingView.widget({
+            autosize: true,
+            symbol: `BINANCE:${cryptoSymbol.replace("/", "")}`,
+            interval: timeframe === "1M" ? "1" : 
+                     timeframe === "5M" ? "5" : 
+                     timeframe === "30M" ? "30" : 
+                     timeframe === "1H" ? "60" : 
+                     timeframe === "4H" ? "240" : "1D",
+            theme: "dark",
+            style: "1",
+            locale: "en",
+            toolbar_bg: "#1f2937",
+            enable_publishing: false,
+            hide_side_toolbar: true,
+            container_id: "tradingview-chart-widget",
+            width: "100%",
+            height: "100%",
+          });
+        }
+      };
+      
+      // Only add script if it doesn't exist
+      if (!document.querySelector('script[src="https://s3.tradingview.com/tv.js"]')) {
+        document.head.appendChild(script);
+      } else if ((window as any).TradingView) {
+        // TradingView is already loaded
+        script.onload?.({} as Event);
+      }
+    }
+  }, [cryptoSymbol, timeframe]);
+
+  return <div id="tradingview-chart-widget" ref={chartRef} className="w-full h-full" />;
+}
+
 // Crypto data matching the home page
 const cryptoData: { [key: string]: any } = {
   "BTC": {
@@ -217,7 +266,7 @@ export function CryptoSingle() {
       {/* Header - Exact Blocnix Style */}
       <div className="bg-gray-900 border-b border-gray-800">
         <div className="px-4 py-3 flex items-center justify-between">
-          <Link href="/">
+          <Link href="/customer">
             <Button variant="ghost" className="text-gray-400 hover:text-white p-2">
               <Home className="w-5 h-5" />
             </Button>
@@ -226,7 +275,11 @@ export function CryptoSingle() {
             <h1 className="text-lg font-bold text-white">{crypto.symbol}</h1>
           </div>
           <div className="text-right">
-            <span className="text-sm text-gray-400">Spot Orders</span>
+            <Link href="/customer/orders?tab=position">
+              <Button variant="ghost" className="text-gray-400 hover:text-white text-sm">
+                Spot Orders
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -270,34 +323,10 @@ export function CryptoSingle() {
         </div>
       </div>
 
-      {/* Trading Chart - Exact Blocnix Style */}
+      {/* TradingView Chart - Real-time cryptocurrency chart */}
       <div className="bg-gray-950 h-64 relative">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full"
-          style={{ background: 'linear-gradient(180deg, #1a1a1a 0%, #0d1117 100%)' }}
-        />
-        <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-          Chart by TradingView
-        </div>
-        <div className="absolute top-4 left-4 text-xs text-gray-400">
-          <div className="flex space-x-4">
-            <span>O: 115394.00</span>
-            <span className="text-red-400">H: 115434.00</span>
-            <span>L: 115291.00</span>
-            <span className="text-red-400">C: 115367.99</span>
-          </div>
-        </div>
-        {/* Chart placeholder with trading data visualization */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-20">
-          <svg width="100%" height="100%" viewBox="0 0 1000 300">
-            {/* Mock candlestick chart */}
-            <path d="M50,150 Q200,100 350,120 T650,140 T950,160" 
-                  stroke="#ef4444" strokeWidth="2" fill="none" />
-            <path d="M50,180 Q200,160 350,170 T650,180 T950,190" 
-                  stroke="#22c55e" strokeWidth="1" fill="none" opacity="0.7" />
-          </svg>
-        </div>
+        <div id="tradingview-chart" className="w-full h-full"></div>
+        <TradingViewChart cryptoSymbol={crypto.symbol} timeframe={activeTimeframe} />
       </div>
 
       {/* Trading History Tables - Exact Blocnix Style */}

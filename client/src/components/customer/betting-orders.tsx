@@ -16,7 +16,12 @@ export function CustomerBettingOrders() {
   const { data: allBettingOrders, isLoading, error } = useBettingOrders();
   const updateBettingOrder = useUpdateBettingOrder();
   // const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"position" | "closing">("position");
+  
+  // Check for tab parameter in URL to navigate directly to Position Orders
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabFromUrl = urlParams.get('tab') as 'position' | 'closing' | null;
+  
+  const [activeTab, setActiveTab] = useState<"position" | "closing">(tabFromUrl || "position");
   const [timeFilter, setTimeFilter] = useState("today");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailView, setShowDetailView] = useState(false);
