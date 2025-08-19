@@ -176,7 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Clear session if user no longer exists
         const sessionId = req.headers['x-session-id'] || req.cookies?.sessionId;
         if (sessionId) {
-          sessions.delete(sessionId);
+          await storage.deleteSession(sessionId);
         }
         res.clearCookie('sessionId');
         return res.status(404).json({ message: "User not found" });

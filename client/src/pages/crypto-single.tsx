@@ -242,6 +242,10 @@ export function CryptoSingle() {
       });
       setShowTradePopup(false);
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] }); // Update user balance
+      
+      // Redirect to Orders tab Position section
+      window.location.href = "/customer/orders?tab=position";
     },
     onError: (error: any) => {
       toast({
@@ -262,12 +266,29 @@ export function CryptoSingle() {
       return;
     }
 
+    // Calculate profit/loss based on direction and duration
+    const amount = parseFloat(quantity);
+    let profitLoss = 0;
+    
+    if (tradeDirection === "up") {
+      // Buy Up - Calculate profit
+      if (selectedDuration === "60") profitLoss = amount * 0.20; // 20% profit
+      else if (selectedDuration === "120") profitLoss = amount * 0.30; // 30% profit  
+      else if (selectedDuration === "180") profitLoss = amount * 0.50; // 50% profit
+    } else {
+      // Buy Down - Calculate loss (negative)
+      if (selectedDuration === "60") profitLoss = amount * -0.20; // 20% loss
+      else if (selectedDuration === "120") profitLoss = amount * -0.30; // 30% loss
+      else if (selectedDuration === "180") profitLoss = amount * -0.50; // 50% loss
+    }
+
     const tradeData = {
       asset: crypto.symbol,
       amount: quantity,
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
       duration: parseInt(selectedDuration), // Send actual seconds: 60, 120, or 180
       entryPrice: price,
+      profitLoss: profitLoss, // Send calculated profit/loss to backend
     };
 
     placeTradeMutation.mutate(tradeData);
@@ -363,15 +384,15 @@ export function CryptoSingle() {
         </div>
       </div>
 
-      {/* Buy Up / Buy Down Buttons - Exact Blocnix Style */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800">
-        <div className="flex">
+      {/* Buy Up / Buy Down Buttons with proper spacing */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 p-4">
+        <div className="flex space-x-4">
           <Button 
             onClick={() => {
               setTradeDirection("up");
               setShowTradePopup(true);
             }}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold rounded-none"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold rounded-lg"
           >
             Buy Up
           </Button>
@@ -380,7 +401,7 @@ export function CryptoSingle() {
               setTradeDirection("down");
               setShowTradePopup(true);
             }}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold rounded-none"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold rounded-lg"
           >
             Buy Down
           </Button>

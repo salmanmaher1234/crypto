@@ -66,6 +66,7 @@ export const bettingOrders = pgTable("betting_orders", {
   duration: integer("duration").notNull(), // in seconds: 30, 60, 120, 180, 240
   entryPrice: decimal("entry_price", { precision: 10, scale: 2 }).notNull(),
   exitPrice: decimal("exit_price", { precision: 10, scale: 2 }),
+  profitLoss: decimal("profit_loss", { precision: 10, scale: 2 }), // Calculated profit/loss amount
   status: text("status").notNull().default("active"), // active, completed, cancelled
   result: text("result"), // win, loss
   createdAt: timestamp("created_at").notNull().defaultNow(),

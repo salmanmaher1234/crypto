@@ -28,13 +28,13 @@ export function CustomerBettingOrders() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Auto-refresh betting orders every 2 seconds to catch completed orders
+  // Auto-refresh betting orders every 1 second to catch completed orders and update countdown
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    }, 2000); // Refresh every 2 seconds
+    }, 1000); // Refresh every 1 second for real-time countdown
 
     return () => clearInterval(interval);
   }, []);
@@ -49,6 +49,27 @@ export function CustomerBettingOrders() {
       240: "60%"
     };
     return payoutMap[duration] || "30%"; // Default to 30% if duration not found
+  };
+
+  // Function to calculate remaining time for position orders
+  const getRemainingTime = (order: any) => {
+    const now = new Date().getTime();
+    const expiresAt = new Date(order.expiresAt).getTime();
+    const remaining = Math.max(0, expiresAt - now);
+    
+    if (remaining <= 0) return "00:00";
+    
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Function to check if order should be moved to closed
+  const isOrderExpired = (order: any) => {
+    const now = new Date().getTime();
+    const expiresAt = new Date(order.expiresAt).getTime();
+    return now >= expiresAt;
   };
 
   // Function to calculate profit based on order amount and duration
@@ -368,13 +389,13 @@ export function CustomerBettingOrders() {
                       </div>
                     </div>
 
-                    {/* Settlement Timing - Centered */}
+                    {/* Settlement Timing - Centered with live countdown */}
                     <div className="text-center mb-4">
                       <div className="text-sm text-gray-600 mb-1">Settlement Timing</div>
                       <div className="text-lg font-bold text-gray-900">
                         {order.status === 'active' ? 
-                          `${Math.max(0, Math.floor((new Date(order.expiresAt).getTime() - new Date().getTime()) / 1000))} s` : 
-                          `${order.duration} s`
+                          getRemainingTime(order) : 
+                          `${order.duration}s`
                         }
                       </div>
                     </div>
@@ -398,7 +419,8 @@ export function CustomerBettingOrders() {
                         <div>
                           <div className="text-gray-500 text-xs mb-1">Profit</div>
                           <div className={`font-medium ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
-                            {isProfit ? '+' : ''}{profit.toFixed(0)}
+                            {/* Don't show profit for position orders, only for closed orders */}
+                            {order.status === 'active' ? '0.00' : (isProfit ? '+' : '') + profit.toFixed(0)}
                           </div>
                         </div>
                       </div>
