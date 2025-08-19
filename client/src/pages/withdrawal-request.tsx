@@ -24,7 +24,7 @@ export default function WithdrawalRequest() {
 
   // Create withdrawal mutation
   const createWithdrawal = useMutation({
-    mutationFn: async (data: { amount: number; bankAccountId: number }) => {
+    mutationFn: async (data: { amount: string; bankAccountId: number }) => {
       const res = await apiRequest('POST', '/api/withdrawal-requests', data);
       return res.json();
     },
@@ -85,13 +85,13 @@ export default function WithdrawalRequest() {
     }
 
     console.log("Creating withdrawal with data:", {
-      amount: parseFloat(withdrawalAmount),
+      amount: withdrawalAmount, // Send as string
       bankAccountId: selectedBankAccount.id,
       selectedBankAccount: selectedBankAccount
     });
     
     createWithdrawal.mutate({
-      amount: parseFloat(withdrawalAmount),
+      amount: withdrawalAmount, // Send as string, not number
       bankAccountId: selectedBankAccount.id
     });
   };
