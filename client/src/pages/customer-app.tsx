@@ -38,20 +38,11 @@ export default function CustomerApp() {
   const [, setLocation] = useLocation();
 
   const renderSection = () => {
-    // If full market view is active, show market with back button
+    // If full market view is active, show market
     if (showFullMarketView) {
       return (
         <div className="h-full">
-          {/* Back button */}
-          <div className="bg-white px-4 py-3 border-b border-gray-200">
-            <button 
-              onClick={() => setShowFullMarketView(false)}
-              className="flex items-center text-gray-600 hover:text-gray-900"
-            >
-              ← Back to Home
-            </button>
-          </div>
-          <SpotOrders />
+          <SpotOrders selectedCoin={selectedCurrency} />
         </div>
       );
     }
@@ -145,11 +136,15 @@ export default function CustomerApp() {
                 <button
                   key={section.id}
                   onClick={() => {
-                    setSelectedCurrency(null);
-                    if (section.id === 'market') {
+                    if (section.id === 'home') {
+                      setShowFullMarketView(false);
+                      setSelectedCurrency(null);
+                      setActiveSection(section.id);
+                    } else if (section.id === 'market') {
                       setShowFullMarketView(true);
                     } else {
                       setShowFullMarketView(false);
+                      setSelectedCurrency(null);
                       setActiveSection(section.id);
                     }
                   }}

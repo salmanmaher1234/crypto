@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home } from "lucide-react";
+import { ArrowLeft, Home, TrendingUp, TrendingDown, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const timeframes = ["1M", "5M", "30M", "1H", "4H", "1D"];
 
@@ -26,11 +27,30 @@ interface Candle {
   volume: number;
 }
 
-export function SpotOrders() {
+interface SpotOrdersProps {
+  selectedCoin?: string | null;
+}
+
+export function SpotOrders({ selectedCoin }: SpotOrdersProps) {
   const [, setLocation] = useLocation();
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
   const [quantity, setQuantity] = useState("9000");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showTradePopup, setShowTradePopup] = useState(false);
+  const [tradeDirection, setTradeDirection] = useState<'up' | 'down'>('up');
+  const [selectedDuration, setSelectedDuration] = useState("1");
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
+  const tradeDurations = [
+    { value: "1", label: "1 Minute", seconds: 60 },
+    { value: "3", label: "3 Minutes", seconds: 180 },
+    { value: "5", label: "5 Minutes", seconds: 300 },
+    { value: "10", label: "10 Minutes", seconds: 600 },
+    { value: "15", label: "15 Minutes", seconds: 900 },
+    { value: "30", label: "30 Minutes", seconds: 1800 },
+    { value: "60", label: "1 Hour", seconds: 3600 }
+  ];
   const [tradeHistory, setTradeHistory] = useState([
     {
       time: "12:49:08",
@@ -88,8 +108,6 @@ export function SpotOrders() {
     },
   ]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { user } = useAuth();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Get real-time crypto prices
@@ -135,6 +153,24 @@ export function SpotOrders() {
       });
     },
   });
+
+  const handleTradeClick = (direction: 'up' | 'down') => {
+    setTradeDirection(direction);
+    setShowTradePopup(true);
+  };
+
+  const handlePlaceTrade = () => {
+    const duration = tradeDurations.find(d => d.value === selectedDuration);
+    if (!duration || !user) return;
+
+    placeTrade.mutate({
+      direction: tradeDirection === 'up' ? 'Buy Up' : 'Buy Down',
+      amount: parseFloat(quantity),
+      duration: duration.seconds / 60, // Convert to minutes for API
+    });
+    
+    setShowTradePopup(false);
+  };
 
   // Advanced candlestick chart drawing
   useEffect(() => {
@@ -425,22 +461,90 @@ export function SpotOrders() {
         <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4">
           <div className="flex space-x-4">
             <Button
-              onClick={() => handleTrade("Buy Up")}
+              onClick={() => handleTradeClick('up')}
               disabled={placeTrade.isPending}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg text-lg"
             >
+              <TrendingUp className="w-5 h-5 mr-2" />
               Buy Up
             </Button>
             <Button
-              onClick={() => handleTrade("Buy Down")}
+              onClick={() => handleTradeClick('down')}
               disabled={placeTrade.isPending}
               className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg text-lg"
             >
-              Buy down
+              <TrendingDown className="w-5 h-5 mr-2" />
+              Buy Down
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Trade Time Selection Popup */}
+      <Dialog open={showTradePopup} onOpenChange={setShowTradePopup}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              {tradeDirection === 'up' ? (
+                <TrendingUp className="w-5 h-5 mr-2 text-green-500" />
+              ) : (
+                <TrendingDown className="w-5 h-5 mr-2 text-red-500" />
+              )}
+              {tradeDirection === 'up' ? 'Buy Up' : 'Buy Down'} - Select Time
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Trading Amount</label>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                placeholder="Enter amount"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Select Duration</label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {tradeDurations.map((duration) => (
+                  <button
+                    key={duration.value}
+                    onClick={() => setSelectedDuration(duration.value)}
+                    className={`p-3 text-sm rounded-lg border transition-colors ${
+                      selectedDuration === duration.value
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {duration.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex space-x-3">
+              <Button
+                onClick={() => setShowTradePopup(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handlePlaceTrade}
+                disabled={placeTrade.isPending}
+                className={`flex-1 ${
+                  tradeDirection === 'up'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                } text-white`}
+              >
+                {placeTrade.isPending ? 'Placing...' : 'Place Trade'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
