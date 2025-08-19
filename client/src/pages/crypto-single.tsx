@@ -115,134 +115,104 @@ export function CryptoSingle() {
   const isPositive = parseFloat(change) >= 0;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-950 text-white">
+      {/* Header - Market Tab Style */}
+      <div className="bg-gray-900 border-b border-gray-800">
+        <div className="px-4 py-3 flex items-center justify-between">
           <Link href="/">
-            <Button variant="ghost" className="text-gray-600">
+            <Button variant="ghost" className="text-gray-400 hover:text-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
           </Link>
-          <h1 className="text-xl font-bold text-gray-800">{crypto.name}</h1>
+          <div className="text-center">
+            <div 
+              className="w-8 h-8 rounded-full inline-flex items-center justify-center text-white text-sm font-bold mr-2"
+              style={{ backgroundColor: crypto.color }}
+            >
+              {crypto.icon}
+            </div>
+            <span className="text-lg font-bold">{crypto.name}</span>
+          </div>
           <div></div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        {/* Price Card */}
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
-                  style={{ backgroundColor: crypto.color }}
-                >
-                  {crypto.icon}
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">{crypto.name}</h2>
-                  <p className="text-gray-500">{crypto.symbol}</p>
-                </div>
-              </div>
-              
-              <div className="text-right">
-                <div className="text-3xl font-bold text-gray-800">{price}</div>
-                <div className={`flex items-center text-lg font-medium ${
-                  isPositive ? "text-green-500" : "text-red-500"
-                }`}>
-                  {isPositive ? (
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4 mr-1" />
-                  )}
-                  {change}%
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Price Display - Market Tab Style */}
+      <div className="bg-gray-900 px-4 py-4 border-b border-gray-800">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-white mb-1">{price}</div>
+          <div className={`text-lg font-medium ${
+            isPositive ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {isPositive ? '+' : ''}{change}%
+          </div>
+          <div className="text-sm text-gray-400 mt-1">{crypto.symbol}</div>
+        </div>
+      </div>
 
-        {/* Chart Placeholder */}
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Price Chart</h3>
-            <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-              <div className="text-gray-400 text-center">
-                <TrendingUp className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>Price chart visualization</p>
-                <p className="text-sm">Real-time data: {crypto.symbol}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Chart Section - Market Tab Style */}
+      <div className="bg-gray-900 px-4 py-6 border-b border-gray-800">
+        <div className="h-64 bg-gray-800 rounded-lg flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-gray-400 mb-2">📈</div>
+            <p className="text-gray-400">Price Chart</p>
+            <p className="text-sm text-gray-500">Coming Soon</p>
+          </div>
+        </div>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-white">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-gray-800">{price}</div>
-              <div className="text-sm text-gray-500">Current Price</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white">
-            <CardContent className="p-4 text-center">
-              <div className={`text-2xl font-bold ${isPositive ? "text-green-500" : "text-red-500"}`}>
-                {change}%
-              </div>
-              <div className="text-sm text-gray-500">24h Change</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-gray-800">
-                {crypto.symbol}
-              </div>
-              <div className="text-sm text-gray-500">Trading Pair</div>
-            </CardContent>
-          </Card>
+      {/* Trading Actions - Market Tab Style */}
+      <div className="bg-gray-900 px-4 py-4 border-b border-gray-800">
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/login">
+            <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold rounded-lg">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Buy Up
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button className="w-full bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold rounded-lg">
+              <TrendingDown className="w-5 h-5 mr-2" />
+              Buy Down
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Stats Section - Market Tab Style */}
+      <div className="bg-gray-900 px-4 py-4">
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <p className="text-gray-400 text-sm mb-1">Current Price</p>
+            <p className="text-white text-lg font-bold">{price}</p>
+          </div>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <p className="text-gray-400 text-sm mb-1">24h Change</p>
+            <p className={`text-lg font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+              {isPositive ? '+' : ''}{change}%
+            </p>
+          </div>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <p className="text-gray-400 text-sm mb-1">Trading Pair</p>
+            <p className="text-white text-lg font-bold">{crypto.symbol}</p>
+          </div>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <p className="text-gray-400 text-sm mb-1">Status</p>
+            <p className="text-green-400 text-lg font-bold">Active</p>
+          </div>
         </div>
 
-        {/* Trading Info */}
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">About {crypto.name}</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Symbol</span>
-                <span className="font-medium">{crypto.symbol}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Current Price</span>
-                <span className="font-medium">{price} USDT</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">24h Change</span>
-                <span className={`font-medium ${isPositive ? "text-green-500" : "text-red-500"}`}>
-                  {change}%
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Call-to-action for trading */}
-        <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-          <CardContent className="p-6 text-center">
-            <h3 className="text-xl font-bold mb-2">Start Trading {crypto.name}</h3>
-            <p className="mb-4 opacity-90">Join thousands of traders and start your journey</p>
-            <Link href="/login">
-              <Button className="bg-white text-blue-600 hover:bg-gray-100">
-                Login to Trade
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        {/* Call to Action - Market Tab Style */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-lg text-center">
+          <h2 className="text-xl font-bold text-white mb-2">Start Trading {crypto.name}</h2>
+          <p className="text-blue-100 mb-4">Login to access live trading features</p>
+          <Link href="/login">
+            <Button className="bg-white text-blue-600 hover:bg-gray-100 font-bold px-8 py-3 rounded-lg">
+              Login to Trade
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
