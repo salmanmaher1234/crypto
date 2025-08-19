@@ -43,6 +43,42 @@ const cryptoData: { [key: string]: any } = {
     icon: "⚽", 
     color: "#CE3524",
   },
+  "JUV": {
+    symbol: "JUV/USDT",
+    name: "Juventus",
+    icon: "⚽",
+    color: "#000000",
+  },
+  "KSM": {
+    symbol: "KSM/USDT",
+    name: "Kusama",
+    icon: "🔗",
+    color: "#000000",
+  },
+  "LTC": {
+    symbol: "LTC/USDT",
+    name: "Litecoin",
+    icon: "Ł",
+    color: "#345D9D",
+  },
+  "EOS": {
+    symbol: "EOS/USDT",
+    name: "EOS",
+    icon: "📡",
+    color: "#443F54",
+  },
+  "BTS": {
+    symbol: "BTS/USDT",
+    name: "BitShares",
+    icon: "💎",
+    color: "#35BAFF",
+  },
+  "LINK": {
+    symbol: "LINK/USDT",
+    name: "Chainlink",
+    icon: "🔗",
+    color: "#375BD2",
+  },
 };
 
 export function CryptoSingle() {
@@ -50,11 +86,7 @@ export function CryptoSingle() {
   const cryptoId = params?.cryptoId?.toUpperCase() || null;
   const { data: cryptoPrices } = useCryptoPrices();
   
-  console.log('CryptoSingle - match:', match, 'params:', params, 'cryptoId:', cryptoId);
-  console.log('Available crypto data keys:', Object.keys(cryptoData));
-  
   const crypto = cryptoId ? cryptoData[cryptoId] : null;
-  console.log('Selected crypto:', crypto);
   
   if (!crypto) {
     return (
