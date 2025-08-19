@@ -143,6 +143,12 @@ export default function TopUpRecordsPage() {
                         <span className="text-sm text-black">Withdrawal Status</span>
                         {getStatusBadge(request.status)}
                       </div>
+                      {request.status === 'rejected' && request.note && (
+                        <div className="flex justify-between py-1">
+                          <span className="text-sm text-black">Rejection Reason</span>
+                          <span className="text-sm text-red-600 max-w-[200px] text-right">{request.note}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

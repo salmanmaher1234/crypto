@@ -53,7 +53,7 @@ export function SpotOrders({
 
   // Set crypto based on selectedCoin parameter or default to BTC
   const [selectedCrypto, setSelectedCrypto] = useState(
-    selectedCoin ? selectedCoin.replace('/USDT', '') : 'BTC'
+    selectedCoin ? selectedCoin.replace("/USDT", "") : "BTC",
   );
 
   const tradeDurations = [
@@ -128,8 +128,14 @@ export function SpotOrders({
 
   // Get price data for selected crypto or default to BTC
   const cryptoSymbol = `${selectedCrypto}/USDT`;
-  const btcPrice = cryptoPrices[cryptoSymbol]?.price || cryptoPrices["BTC/USDT"]?.price || "115044.00";
-  const btcChange = cryptoPrices[cryptoSymbol]?.change || cryptoPrices["BTC/USDT"]?.change || "+2.84";
+  const btcPrice =
+    cryptoPrices[cryptoSymbol]?.price ||
+    cryptoPrices["BTC/USDT"]?.price ||
+    "115044.00";
+  const btcChange =
+    cryptoPrices[cryptoSymbol]?.change ||
+    cryptoPrices["BTC/USDT"]?.change ||
+    "+2.84";
 
   // Update current time every second
   useEffect(() => {
@@ -190,17 +196,21 @@ export function SpotOrders({
     // Calculate profit/loss based on direction and duration
     const amount = parseFloat(quantity);
     let profitLoss = 0;
-    
+
     if (tradeDirection === "up") {
       // Buy Up - Calculate profit
-      if (selectedDuration === "60") profitLoss = amount * 0.20; // 20% profit
-      else if (selectedDuration === "120") profitLoss = amount * 0.30; // 30% profit  
-      else if (selectedDuration === "180") profitLoss = amount * 0.50; // 50% profit
+      if (selectedDuration === "60")
+        profitLoss = amount * 0.2; // 20% profit
+      else if (selectedDuration === "120")
+        profitLoss = amount * 0.3; // 30% profit
+      else if (selectedDuration === "180") profitLoss = amount * 0.5; // 50% profit
     } else {
       // Buy Down - Calculate loss (negative)
-      if (selectedDuration === "60") profitLoss = amount * -0.20; // 20% loss
-      else if (selectedDuration === "120") profitLoss = amount * -0.30; // 30% loss
-      else if (selectedDuration === "180") profitLoss = amount * -0.50; // 50% loss
+      if (selectedDuration === "60")
+        profitLoss = amount * -0.2; // 20% loss
+      else if (selectedDuration === "120")
+        profitLoss = amount * -0.3; // 30% loss
+      else if (selectedDuration === "180") profitLoss = amount * -0.5; // 50% loss
     }
 
     placeTrade.mutate({
@@ -538,11 +548,6 @@ export function SpotOrders({
                 <div className="text-right">
                   <div className="text-sm text-gray-400">Current price</div>
                   <div className="text-lg font-bold text-white">{btcPrice}</div>
-                  <div
-                    className={`text-sm ${tradeDirection === "up" ? "bg-green-600" : "bg-red-600"} text-white px-3 py-1 rounded mt-2`}
-                  >
-                    {tradeDirection === "up" ? "Buy Up" : "Buy Down"}
-                  </div>
                 </div>
               </div>
             </div>
@@ -570,7 +575,15 @@ export function SpotOrders({
                     <div className="text-center">
                       <div className="text-xs text-gray-400">Time</div>
                       <div className="text-lg font-bold">{duration.label}</div>
-                      <div className="text-xs text-green-400">Scale:{duration.value === "60" ? "20" : duration.value === "120" ? "30" : "50"}%</div>
+                      <div className="text-xs text-green-400">
+                        Scale:
+                        {duration.value === "60"
+                          ? "20"
+                          : duration.value === "120"
+                            ? "30"
+                            : "50"}
+                        %
+                      </div>
                     </div>
                   </button>
                 ))}
