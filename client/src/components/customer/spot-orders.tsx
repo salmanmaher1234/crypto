@@ -157,10 +157,17 @@ export function SpotOrders({
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
 
-      // Navigate to pending orders (Position Orders tab)
-      setTimeout(() => {
-        window.location.href = "/customer/orders?tab=position";
-      }, 1000);
+      // Navigate to pending orders using React routing to prevent logout
+      if (onNavigateToOrders) {
+        setTimeout(() => {
+          onNavigateToOrders();
+        }, 1000);
+      } else {
+        // Fallback: use React router navigation
+        setTimeout(() => {
+          setLocation("/customer");
+        }, 1000);
+      }
     },
     onError: (error: any) => {
       toast({

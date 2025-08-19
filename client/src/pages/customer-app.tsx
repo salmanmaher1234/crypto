@@ -52,6 +52,13 @@ export default function CustomerApp() {
     }
   }, []);
 
+  // Handle crypto selection from home dashboard
+  const handleCryptoSelection = (crypto: string) => {
+    setSelectedCurrency(`${crypto.toUpperCase()}/USDT`);
+    setActiveSection('market');
+    setShowFullMarketView(true);
+  };
+
   const renderSection = () => {
     // If full market view is active, show market
     if (showFullMarketView) {
@@ -62,6 +69,7 @@ export default function CustomerApp() {
             onNavigateToOrders={() => {
               setShowFullMarketView(false);
               setActiveSection('orders');
+              setSelectedCurrency(null); // Clear selected currency
             }}
           />
         </div>
@@ -69,7 +77,7 @@ export default function CustomerApp() {
     }
 
     // If a currency is selected, show the trading page
-    if (selectedCurrency) {
+    if (selectedCurrency && !showFullMarketView) {
       return (
         <CryptoTrading
           currency={selectedCurrency}
@@ -80,7 +88,7 @@ export default function CustomerApp() {
 
     switch (activeSection) {
       case "home":
-        return <CryptoMarketplace onSelectCurrency={setSelectedCurrency} />;
+        return <CryptoHome onSelectCurrency={handleCryptoSelection} />;
       case "market":
         return <SpotOrders />;
       case "orders":
@@ -90,7 +98,7 @@ export default function CustomerApp() {
       case "profile":
         return <Profile />;
       default:
-        return <CryptoHome onSelectCurrency={setSelectedCurrency} />;
+        return <CryptoHome onSelectCurrency={handleCryptoSelection} />;
     }
   };
 

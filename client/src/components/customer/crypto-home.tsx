@@ -244,7 +244,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
                 <div className="px-1.5">
                   <Card 
                     className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
-                    onClick={() => window.location.href = `/customer?tab=market&crypto=${crypto.symbol.split('/')[0]}`}
+                    onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
                   >
                     <CardContent className="p-1 sm:p-1.5 lg:p-2">
                       <div className="text-center space-y-0.5 sm:space-y-1">
