@@ -86,8 +86,10 @@ export function CustomerBettingOrders() {
 
 
 
-  // Filter orders for current user
+  // Filter orders for current user - Debug logging
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
+  
+
 
   // Auto-expire orders when their duration is reached
   useEffect(() => {
@@ -321,6 +323,7 @@ export function CustomerBettingOrders() {
 
       {/* Orders Content */}
       <div className="min-h-96">
+
         {filteredOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-96 text-gray-400">
             {/* Empty state icon matching screenshot */}
