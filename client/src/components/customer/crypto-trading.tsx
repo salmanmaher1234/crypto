@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowLeft, Menu } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,12 +29,47 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
   const [direction, setDirection] = useState<"up" | "down" | null>(null);
   const [amount, setAmount] = useState("");
   const [showOrderForm, setShowOrderForm] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState(currency + "/USDT");
 
   const timeOptions = [
     { label: "60S", value: "60S", rate: "Scale:20.00%" },
     { label: "120S", value: "120S", rate: "Scale:30.00%" },
     { label: "180S", value: "180S", rate: "Scale:50.00%" }
   ];
+
+  // Available cryptocurrency options for the dropdown
+  const cryptoOptions = [
+    { symbol: "BTC/USDT", name: "Bitcoin" },
+    { symbol: "ETH/USDT", name: "Ethereum" },
+    { symbol: "DOGE/USDT", name: "Dogecoin" },
+    { symbol: "CHZ/USDT", name: "Chiliz" },
+    { symbol: "PSG/USDT", name: "Paris Saint-Germain" },
+    { symbol: "ATM/USDT", name: "Atletico Madrid" },
+    { symbol: "JUV/USDT", name: "Juventus" },
+    { symbol: "KSM/USDT", name: "Kusama" },
+    { symbol: "LTC/USDT", name: "Litecoin" },
+    { symbol: "EOS/USDT", name: "EOS" },
+    { symbol: "BTS/USDT", name: "BitShares" },
+    { symbol: "LINK/USDT", name: "Chainlink" },
+  ];
+
+  const formatPrice = (price: string | number) => {
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    if (numPrice < 1) {
+      return numPrice.toFixed(4);
+    } else if (numPrice < 100) {
+      return numPrice.toFixed(2);
+    } else {
+      return numPrice.toFixed(0);
+    }
+  };
+
+  const handleCurrencyChange = (newCurrency: string) => {
+    setSelectedCurrency(newCurrency);
+    // Extract the base currency (e.g., BTC from BTC/USDT) 
+    const baseCurrency = newCurrency.split('/')[0];
+    // We could trigger an onCurrencyChange callback here if needed
+  };
 
   const currentPrice = (cryptoPrices as any)?.[currency]?.price || "115365.9629";
   const priceChange = (cryptoPrices as any)?.[currency]?.change || "-2.43";
@@ -159,18 +200,47 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onBack}
-          className="p-1 text-white hover:bg-gray-800"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="text-center">
-          <h1 className="text-lg font-medium">{currency}</h1>
+      {/* Currency Selector Header */}
+      <div className="bg-black px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onBack}
+            className="p-1 text-white hover:bg-gray-800"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-gray-800 flex items-center space-x-2 px-2 py-1"
+              >
+                <span className="text-sm font-medium">{selectedCurrency}</span>
+                <Menu className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48 bg-black border-gray-700">
+              <div className="bg-black text-white max-h-96 overflow-y-auto">
+                <div className="px-2 py-2 text-xs text-orange-400 font-medium border-b border-gray-700">
+                  Spot
+                </div>
+                {cryptoOptions.map((crypto) => (
+                  <DropdownMenuItem
+                    key={crypto.symbol}
+                    className="text-white hover:bg-gray-800 cursor-pointer flex justify-between items-center px-3 py-2 focus:bg-gray-800"
+                    onClick={() => handleCurrencyChange(crypto.symbol)}
+                  >
+                    <span className="text-sm">{crypto.symbol}</span>
+                    <span className="text-xs text-red-400">
+                      {formatPrice((cryptoPrices as any)?.[crypto.symbol]?.price || "0.00")}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="text-right flex items-center gap-3">
           <Button

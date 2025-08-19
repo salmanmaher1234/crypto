@@ -151,51 +151,8 @@ export function CryptoMarketplace({
       : `${numChange.toFixed(2)}%`;
   };
 
-  const handleCurrencySelect = (currency: string) => {
-    setSelectedCurrency(currency);
-    onSelectCurrency(currency.split('/')[0]);
-  };
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Currency Selector Header */}
-      <div className="bg-black px-4 py-3 flex items-center justify-between">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="text-white hover:bg-gray-800 flex items-center space-x-2 px-2 py-1"
-            >
-              <span className="text-sm font-medium">{selectedCurrency}</span>
-              <Menu className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 bg-black border-gray-700">
-            <div className="bg-black text-white max-h-96 overflow-y-auto">
-              <div className="px-2 py-2 text-xs text-orange-400 font-medium border-b border-gray-700">
-                Spot
-              </div>
-              {cryptoData.map((crypto) => (
-                <DropdownMenuItem
-                  key={crypto.symbol}
-                  className="text-white hover:bg-gray-800 cursor-pointer flex justify-between items-center px-3 py-2 focus:bg-gray-800"
-                  onClick={() => handleCurrencySelect(crypto.symbol)}
-                >
-                  <span className="text-sm">{crypto.symbol}</span>
-                  <span 
-                    className={`text-xs ${
-                      parseFloat(crypto.change) >= 0 ? 'text-green-400' : 'text-red-400'
-                    }`}
-                  >
-                    {formatPrice(crypto.price)}
-                  </span>
-                </DropdownMenuItem>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
       {/* Top crypto prices header - clickable */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex justify-between space-x-4">
