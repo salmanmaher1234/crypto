@@ -323,36 +323,15 @@ export function CryptoSingle() {
         </div>
       </div>
 
-      {/* TradingView Chart - Real-time cryptocurrency chart */}
-      <div className="bg-gray-950 h-64 relative">
+      {/* TradingView Chart - Increased height */}
+      <div className="bg-gray-950 h-96 relative">
         <div id="tradingview-chart" className="w-full h-full"></div>
         <TradingViewChart cryptoSymbol={crypto.symbol} timeframe={activeTimeframe} />
       </div>
 
-      {/* Trading History Tables - Exact Blocnix Style */}
+      {/* Trading History Table - Single table without duplication */}
       <div className="bg-gray-950 flex-1">
-        {/* First Table */}
         <div className="px-4 py-3">
-          <div className="grid grid-cols-4 gap-4 text-xs text-gray-400 border-b border-gray-800 pb-2 mb-2">
-            <div>Time</div>
-            <div>Direction</div>
-            <div>Price</div>
-            <div>Quantity</div>
-          </div>
-          {tradeHistory.slice(0, 8).map((trade, index) => (
-            <div key={index} className="grid grid-cols-4 gap-4 text-xs py-1">
-              <div className="text-gray-400">{trade.time}</div>
-              <div className={trade.direction === "Buy" ? "text-green-400" : "text-red-400"}>
-                {trade.direction}
-              </div>
-              <div className="text-white">{trade.price}</div>
-              <div className="text-white">{trade.quantity}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Second Table - Duplicate for visual effect */}
-        <div className="px-4 py-3 border-t border-gray-800">
           <div className="grid grid-cols-4 gap-4 text-xs text-gray-400 border-b border-gray-800 pb-2 mb-2">
             <div>Time</div>
             <div>Direction</div>
@@ -396,83 +375,85 @@ export function CryptoSingle() {
         </div>
       </div>
 
-      {/* Trade Popup Dialog - Same as Market Tab */}
+      {/* Trading Popup - Exact match to uploaded image */}
       <Dialog open={showTradePopup} onOpenChange={setShowTradePopup}>
-        <DialogContent className="bg-gray-900 text-white border-gray-700 max-w-sm mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-center text-lg font-bold">
-              {tradeDirection === "up" ? "Buy Up" : "Buy Down"} - {crypto.symbol}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{price}</div>
-              <div className={`text-lg ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                {isPositive ? '+' : ''}{change}%
+        <DialogContent className="bg-gray-900 text-white border-gray-700 max-w-md mx-auto p-0">
+          <div className="p-6">
+            {/* Header Section */}
+            <div className="mb-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <div className="text-gray-400 text-sm">Product Name</div>
+                  <div className="text-white font-bold text-lg">{crypto.symbol}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-gray-400 text-sm">Direction</div>
+                  <div className={`text-lg font-bold ${tradeDirection === "up" ? "text-green-400" : "text-red-400"}`}>
+                    {tradeDirection === "up" ? "Buy Up" : "Buy Down"}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <div className="text-gray-400 text-sm">Current price</div>
+                <div className="text-white font-bold text-lg">{price}</div>
+              </div>
+
+              <div className="flex items-center space-x-2 mb-6">
+                <span className="text-gray-400 text-sm">Trading Time</span>
+                <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                  i
+                </div>
               </div>
             </div>
 
-            {/* Duration Selection */}
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">Select Duration</label>
-              <div className="grid grid-cols-3 gap-2">
-                {tradeDurations.map((duration) => (
-                  <button
-                    key={duration.value}
-                    onClick={() => setSelectedDuration(duration.value)}
-                    className={`p-3 rounded-lg text-sm font-medium border ${
-                      selectedDuration === duration.value
-                        ? "bg-blue-600 border-blue-500 text-white"
-                        : "bg-gray-800 border-gray-600 text-gray-300"
-                    }`}
-                  >
-                    <div>{duration.label}</div>
-                    <div className="text-xs opacity-75">
-                      {duration.value === "60" ? "20%" : 
-                       duration.value === "120" ? "30%" : "50%"}
-                    </div>
-                  </button>
-                ))}
-              </div>
+            {/* Time Selection Cards */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {tradeDurations.map((duration) => (
+                <button
+                  key={duration.value}
+                  onClick={() => setSelectedDuration(duration.value)}
+                  className={`p-4 rounded-lg border text-center transition-all ${
+                    selectedDuration === duration.value
+                      ? "bg-blue-600 border-blue-500 text-white"
+                      : "bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  <div className="text-blue-300 text-sm mb-1">Time</div>
+                  <div className="text-lg font-bold mb-1">{duration.label}</div>
+                  <div className="text-green-400 text-xs">
+                    Scale: {duration.value === "60" ? "20.00%" : 
+                           duration.value === "120" ? "30.00%" : "50.00%"}
+                  </div>
+                </button>
+              ))}
             </div>
 
-            {/* Quantity Input */}
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">Quantity (USDT)</label>
+            {/* Available Balance */}
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-white">Available Balance: {user?.availableBalance || user?.balance || "671902.6000"}</span>
+              <span className="text-blue-400">Expected Earnings: 0</span>
+            </div>
+
+            {/* Amount Input */}
+            <div className="mb-6">
               <input
                 type="number"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
-                placeholder="Enter amount"
+                className="w-full p-4 bg-transparent border border-gray-600 rounded-lg text-white text-lg"
+                placeholder="0"
               />
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex space-x-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowTradePopup(false)}
-                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handlePlaceTrade}
-                disabled={placeTradeMutation.isPending}
-                className={`flex-1 font-bold ${
-                  tradeDirection === "up"
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                {placeTradeMutation.isPending
-                  ? "Placing..."
-                  : tradeDirection === "up"
-                  ? "Buy Up"
-                  : "Buy Down"}
-              </Button>
-            </div>
+            {/* Order Confirmation Button */}
+            <Button
+              onClick={handlePlaceTrade}
+              disabled={placeTradeMutation.isPending}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 text-lg rounded-lg"
+            >
+              {placeTradeMutation.isPending ? "Processing..." : "Order Confirmation"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
