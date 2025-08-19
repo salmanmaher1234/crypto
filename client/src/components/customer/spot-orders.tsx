@@ -539,7 +539,7 @@ export function SpotOrders({
                     <div className="text-center">
                       <div className="text-xs text-gray-400">Time</div>
                       <div className="text-lg font-bold">{duration.label}</div>
-                      <div className="text-xs text-green-400">Scale:50.00%</div>
+                      <div className="text-xs text-green-400">Scale:{duration.value === "60" ? "20" : duration.value === "120" ? "30" : "50"}%</div>
                     </div>
                   </button>
                 ))}
@@ -553,7 +553,7 @@ export function SpotOrders({
                   Available Balance: {user?.availableBalance || "0"}
                 </div>
                 <div className="text-sm text-blue-400">
-                  Expected Earnings: 0
+                  Billing Time: {selectedDuration}s
                 </div>
               </div>
 

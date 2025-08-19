@@ -46,11 +46,11 @@ const cryptoData: { [key: string]: any } = {
 };
 
 export function CryptoSingle() {
-  const [match] = useRoute("/crypto/:cryptoId");
-  const cryptoId = match ? (match as any).cryptoId?.toUpperCase() : null;
+  const [match, params] = useRoute("/crypto/:cryptoId");
+  const cryptoId = params?.cryptoId?.toUpperCase() || null;
   const { data: cryptoPrices } = useCryptoPrices();
   
-  console.log('CryptoSingle - match:', match, 'cryptoId:', cryptoId);
+  console.log('CryptoSingle - match:', match, 'params:', params, 'cryptoId:', cryptoId);
   console.log('Available crypto data keys:', Object.keys(cryptoData));
   
   const crypto = cryptoId ? cryptoData[cryptoId] : null;
