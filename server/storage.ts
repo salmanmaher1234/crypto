@@ -25,7 +25,7 @@ import {
   type InsertSession,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User management
@@ -285,10 +285,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBettingOrder(insertOrder: InsertBettingOrder): Promise<BettingOrder> {
+    // Convert duration to seconds based on the trading interface values
+    const durationInSeconds = insertOrder.duration === 1 ? 60 : 
+                             insertOrder.duration === 2 ? 120 : 
+                             insertOrder.duration === 3 ? 180 : 
+                             insertOrder.duration * 60; // fallback to minutes if unknown
+    
     const [order] = await db.insert(bettingOrders).values({
       ...insertOrder,
       orderId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      expiresAt: new Date(Date.now() + insertOrder.duration * 1000),
+      expiresAt: new Date(Date.now() + durationInSeconds * 1000),
     }).returning();
     return order;
   }
@@ -412,6 +418,47 @@ export class DatabaseStorage implements IStorage {
     const now = new Date();
     const result = await db.delete(sessions).where(eq(sessions.expiresAt, now));
     return result.rowCount || 0;
+  }
+
+  // Check expired betting orders and complete them with exact timing
+  async checkExpiredOrders(): Promise<void> {
+    const now = new Date();
+    const expiredOrders = await db.select().from(bettingOrders)
+      .where(
+        and(
+          eq(bettingOrders.status, "active"),
+          lte(bettingOrders.expiresAt, now)
+        )
+      );
+
+    for (const order of expiredOrders) {
+      // Calculate profit based on duration: 60s=20%, 120s=30%, 180s=50%
+      const profitPercentage = order.duration === 1 ? 0.20 : 
+                              order.duration === 2 ? 0.30 : 
+                              order.duration === 3 ? 0.50 : 0.20;
+      
+      const orderAmount = parseFloat(order.amount);
+      const profit = orderAmount * profitPercentage;
+      
+      // Update order to completed
+      await this.updateBettingOrder(order.id, {
+        status: "completed",
+        result: "win", // Always win for now (as per existing logic)
+        exitPrice: order.entryPrice,
+      });
+
+      // Update user balance
+      const user = await this.getUser(order.userId);
+      if (user) {
+        const newBalance = (parseFloat(user.availableBalance) + orderAmount + profit).toFixed(2);
+        await this.updateUser(order.userId, {
+          availableBalance: newBalance,
+          balance: newBalance
+        });
+      }
+
+      console.log(`Order ${order.orderId} completed with ${profitPercentage * 100}% profit: +${profit.toFixed(2)} (Duration: ${order.duration === 1 ? '60s' : order.duration === 2 ? '120s' : '180s'})`);
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BalanceCard } from "@/components/customer/balance-card";
@@ -36,6 +36,21 @@ export default function CustomerApp() {
   const [showFullMarketView, setShowFullMarketView] = useState(false);
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
+
+  // Check URL parameters for navigation from crypto single pages  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    const coin = urlParams.get('coin');
+    
+    if (tab === 'market') {
+      setActiveSection('market');
+      setShowFullMarketView(true);
+      if (coin) {
+        setSelectedCurrency(`${coin.toUpperCase()}/USDT`);
+      }
+    }
+  }, []);
 
   const renderSection = () => {
     // If full market view is active, show market

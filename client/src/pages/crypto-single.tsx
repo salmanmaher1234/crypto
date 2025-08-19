@@ -165,13 +165,13 @@ export function CryptoSingle() {
       {/* Trading Actions - Market Tab Style */}
       <div className="bg-gray-900 px-4 py-4 border-b border-gray-800">
         <div className="grid grid-cols-2 gap-4">
-          <Link href="/login">
+          <Link href={`/?tab=market&coin=${crypto.symbol.split('/')[0].toLowerCase()}`}>
             <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg font-bold rounded-lg">
               <TrendingUp className="w-5 h-5 mr-2" />
               Buy Up
             </Button>
           </Link>
-          <Link href="/login">
+          <Link href={`/?tab=market&coin=${crypto.symbol.split('/')[0].toLowerCase()}`}>
             <Button className="w-full bg-red-600 hover:bg-red-700 text-white py-6 text-lg font-bold rounded-lg">
               <TrendingDown className="w-5 h-5 mr-2" />
               Buy Down
