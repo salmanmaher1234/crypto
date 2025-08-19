@@ -51,6 +51,11 @@ export function SpotOrders({
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Set crypto based on selectedCoin parameter or default to BTC
+  const [selectedCrypto, setSelectedCrypto] = useState(
+    selectedCoin ? selectedCoin.replace('/USDT', '') : 'BTC'
+  );
+
   const tradeDurations = [
     { value: "60", label: "60S", seconds: 60 },
     { value: "120", label: "120S", seconds: 120 },
@@ -121,8 +126,10 @@ export function SpotOrders({
     refetchInterval: 5000,
   });
 
-  const btcPrice = cryptoPrices["BTC/USDT"]?.price || "115044.00";
-  const btcChange = cryptoPrices["BTC/USDT"]?.change || "+2.84";
+  // Get price data for selected crypto or default to BTC
+  const cryptoSymbol = `${selectedCrypto}/USDT`;
+  const btcPrice = cryptoPrices[cryptoSymbol]?.price || cryptoPrices["BTC/USDT"]?.price || "115044.00";
+  const btcChange = cryptoPrices[cryptoSymbol]?.change || cryptoPrices["BTC/USDT"]?.change || "+2.84";
 
   // Update current time every second
   useEffect(() => {
@@ -150,12 +157,10 @@ export function SpotOrders({
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
 
-      // Navigate to pending orders
-      if (onNavigateToOrders) {
-        setTimeout(() => {
-          onNavigateToOrders();
-        }, 1000);
-      }
+      // Navigate to pending orders (Position Orders tab)
+      setTimeout(() => {
+        window.location.href = "/customer/orders?tab=position";
+      }, 1000);
     },
     onError: (error: any) => {
       toast({
@@ -175,10 +180,29 @@ export function SpotOrders({
     const duration = tradeDurations.find((d) => d.value === selectedDuration);
     if (!duration || !user) return;
 
+    // Calculate profit/loss based on direction and duration
+    const amount = parseFloat(quantity);
+    let profitLoss = 0;
+    
+    if (tradeDirection === "up") {
+      // Buy Up - Calculate profit
+      if (selectedDuration === "60") profitLoss = amount * 0.20; // 20% profit
+      else if (selectedDuration === "120") profitLoss = amount * 0.30; // 30% profit  
+      else if (selectedDuration === "180") profitLoss = amount * 0.50; // 50% profit
+    } else {
+      // Buy Down - Calculate loss (negative)
+      if (selectedDuration === "60") profitLoss = amount * -0.20; // 20% loss
+      else if (selectedDuration === "120") profitLoss = amount * -0.30; // 30% loss
+      else if (selectedDuration === "180") profitLoss = amount * -0.50; // 50% loss
+    }
+
     placeTrade.mutate({
+      asset: cryptoSymbol, // Send the selected crypto symbol
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
       amount: parseFloat(quantity),
       duration: duration.seconds, // Send actual seconds: 60, 120, or 180
+      entryPrice: btcPrice, // Current price
+      profitLoss: profitLoss, // Send calculated profit/loss to backend
     });
 
     setShowTradePopup(false);

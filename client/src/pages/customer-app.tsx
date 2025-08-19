@@ -37,17 +37,17 @@ export default function CustomerApp() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
 
-  // Check URL parameters for navigation from crypto single pages  
+  // Check URL parameters for navigation from crypto single pages and home selections
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
-    const coin = urlParams.get('coin');
+    const crypto = urlParams.get('crypto');
     
     if (tab === 'market') {
       setActiveSection('market');
       setShowFullMarketView(true);
-      if (coin) {
-        setSelectedCurrency(`${coin.toUpperCase()}/USDT`);
+      if (crypto) {
+        setSelectedCurrency(`${crypto.toUpperCase()}/USDT`);
       }
     }
   }, []);
