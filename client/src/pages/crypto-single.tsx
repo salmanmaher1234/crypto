@@ -221,7 +221,19 @@ export function CryptoSingle() {
   // Handle trading functionality
   const placeTradeMutation = useMutation({
     mutationFn: async (tradeData: any) => {
-      return apiRequest("/api/betting-orders", "POST", tradeData);
+      const response = await fetch("/api/betting-orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tradeData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({
