@@ -18,6 +18,7 @@ import WithdrawalRequest from "@/pages/withdrawal-request";
 import WithdrawalRecord from "@/pages/withdrawal-record";
 import OrderRecord from "@/pages/order-record";
 import NotFound from "@/pages/not-found";
+import { CryptoSingle } from "@/pages/crypto-single";
 
 function AppContent() {
   const { user, isLoading } = useAuth();
@@ -27,6 +28,18 @@ function AppContent() {
       <div className="h-screen w-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
+    );
+  }
+
+  // Allow access to crypto single pages without login
+  const currentPath = window.location.pathname;
+  if (currentPath.startsWith('/crypto/')) {
+    return (
+      <Switch>
+        <Route path="/crypto/:cryptoId" component={CryptoSingle} />
+        <Route path="/login" component={LoginModal} />
+        <Route component={NotFound} />
+      </Switch>
     );
   }
 
@@ -69,6 +82,7 @@ function AppContent() {
         }}
       </Route>
       <Route path="/recharge-detail/:id" component={RechargeDetail} />
+      <Route path="/crypto/:cryptoId" component={CryptoSingle} />
       <Route component={NotFound} />
     </Switch>
   );

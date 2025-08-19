@@ -150,21 +150,22 @@ export function CryptoMarketplace({
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex justify-between space-x-4">
           {topCryptos.map((crypto) => (
-            <div
-              key={crypto.symbol}
-              className="text-center flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
-              onClick={() => (window.location.href = "/advanced-trading")}
+            <Link 
+              key={crypto.symbol} 
+              href={`/crypto/${crypto.symbol.split('/')[0].toLowerCase()}`}
             >
-              <div className="text-xs font-medium text-gray-900">
-                {crypto.symbol}
+              <div className="text-center flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
+                <div className="text-xs font-medium text-gray-900">
+                  {crypto.symbol}
+                </div>
+                <div className="text-sm font-bold text-red-600">
+                  {formatPrice(crypto.price)}
+                </div>
+                <div className="text-xs text-red-600">
+                  {formatChange(crypto.change)}
+                </div>
               </div>
-              <div className="text-sm font-bold text-red-600">
-                {formatPrice(crypto.price)}
-              </div>
-              <div className="text-xs text-red-600">
-                {formatChange(crypto.change)}
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -207,9 +208,9 @@ export function CryptoMarketplace({
       {/* Crypto list */}
       <div className="bg-white">
         {cryptoData.map((crypto, index) => (
-          <div
+          <Link
             key={crypto.symbol}
-            onClick={() => (window.location.href = "/advanced-trading")}
+            href={`/crypto/${crypto.symbol.split('/')[0].toLowerCase()}`}
             className="flex items-center justify-between px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
           >
             <div className="flex items-center space-x-3">
@@ -234,7 +235,7 @@ export function CryptoMarketplace({
                 {formatChange(crypto.change)}
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

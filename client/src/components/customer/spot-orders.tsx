@@ -6,7 +6,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const timeframes = ["1M", "5M", "30M", "1H", "4H", "1D"];
 
@@ -32,21 +37,24 @@ interface SpotOrdersProps {
   onNavigateToOrders?: () => void;
 }
 
-export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps) {
+export function SpotOrders({
+  selectedCoin,
+  onNavigateToOrders,
+}: SpotOrdersProps) {
   const [, setLocation] = useLocation();
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
   const [quantity, setQuantity] = useState("9000");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showTradePopup, setShowTradePopup] = useState(false);
-  const [tradeDirection, setTradeDirection] = useState<'up' | 'down'>('up');
+  const [tradeDirection, setTradeDirection] = useState<"up" | "down">("up");
   const [selectedDuration, setSelectedDuration] = useState("60");
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const tradeDurations = [
     { value: "60", label: "60S", seconds: 60 },
     { value: "120", label: "120S", seconds: 120 },
-    { value: "180", label: "180S", seconds: 180 }
+    { value: "180", label: "180S", seconds: 180 },
   ];
   const [tradeHistory, setTradeHistory] = useState([
     {
@@ -141,7 +149,7 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
       });
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      
+
       // Navigate to pending orders
       if (onNavigateToOrders) {
         setTimeout(() => {
@@ -158,21 +166,21 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
     },
   });
 
-  const handleTradeClick = (direction: 'up' | 'down') => {
+  const handleTradeClick = (direction: "up" | "down") => {
     setTradeDirection(direction);
     setShowTradePopup(true);
   };
 
   const handlePlaceTrade = () => {
-    const duration = tradeDurations.find(d => d.value === selectedDuration);
+    const duration = tradeDurations.find((d) => d.value === selectedDuration);
     if (!duration || !user) return;
 
     placeTrade.mutate({
-      direction: tradeDirection === 'up' ? 'Buy Up' : 'Buy Down',
+      direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
       amount: parseFloat(quantity),
       duration: duration.seconds / 60, // Convert to minutes for API
     });
-    
+
     setShowTradePopup(false);
   };
 
@@ -465,7 +473,7 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
         <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4">
           <div className="flex space-x-4">
             <Button
-              onClick={() => handleTradeClick('up')}
+              onClick={() => handleTradeClick("up")}
               disabled={placeTrade.isPending}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg text-lg"
             >
@@ -473,7 +481,7 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
               Buy Up
             </Button>
             <Button
-              onClick={() => handleTradeClick('down')}
+              onClick={() => handleTradeClick("down")}
               disabled={placeTrade.isPending}
               className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg text-lg"
             >
@@ -499,8 +507,10 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
                 <div className="text-right">
                   <div className="text-sm text-gray-400">Current price</div>
                   <div className="text-lg font-bold text-white">{btcPrice}</div>
-                  <div className={`text-sm ${tradeDirection === 'up' ? 'bg-green-600' : 'bg-red-600'} text-white px-3 py-1 rounded mt-2`}>
-                    {tradeDirection === 'up' ? 'Buy Up' : 'Buy Down'}
+                  <div
+                    className={`text-sm ${tradeDirection === "up" ? "bg-green-600" : "bg-red-600"} text-white px-3 py-1 rounded mt-2`}
+                  >
+                    {tradeDirection === "up" ? "Buy Up" : "Buy Down"}
                   </div>
                 </div>
               </div>
@@ -514,7 +524,7 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-4">
                 {tradeDurations.map((duration) => (
                   <button
@@ -539,10 +549,14 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
             {/* Balance and Expected Earnings */}
             <div className="border-t border-gray-700 pt-4">
               <div className="flex justify-between items-center mb-4">
-                <div className="text-sm text-gray-400">Available Balance: {user?.availableBalance || '0'}</div>
-                <div className="text-sm text-blue-400">Expected Earnings: 0</div>
+                <div className="text-sm text-gray-400">
+                  Available Balance: {user?.availableBalance || "0"}
+                </div>
+                <div className="text-sm text-blue-400">
+                  Expected Earnings: 0
+                </div>
               </div>
-              
+
               {/* Amount Input */}
               <input
                 type="number"
@@ -559,7 +573,7 @@ export function SpotOrders({ selectedCoin, onNavigateToOrders }: SpotOrdersProps
               disabled={placeTrade.isPending}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 rounded-lg text-lg"
             >
-              {placeTrade.isPending ? 'Processing...' : 'Order Confirmation'}
+              {placeTrade.isPending ? "Processing..." : "Order Confirmation"}
             </Button>
           </div>
         </DialogContent>

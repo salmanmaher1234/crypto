@@ -16,7 +16,7 @@ export function CustomerBettingOrders() {
   const { data: allBettingOrders, isLoading, error } = useBettingOrders();
   const updateBettingOrder = useUpdateBettingOrder();
   // const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">("pending");
+  const [activeTab, setActiveTab] = useState<"position" | "closing">("position");
   const [timeFilter, setTimeFilter] = useState("today");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailView, setShowDetailView] = useState(false);
@@ -115,11 +115,11 @@ export function CustomerBettingOrders() {
     return () => clearInterval(interval);
   }, [userBettingOrders, updateBettingOrder]);
 
-  // Filter by status and time
+  // Filter by status and time - Position Order (active) and Closing Order (completed)
   const filteredOrders = userBettingOrders.filter(order => {
-    const statusMatch = activeTab === "pending" ? order.status === "active" :
-                       activeTab === "closed" ? order.status === "completed" :
-                       order.status === "cancelled";
+    const statusMatch = activeTab === "position" ? order.status === "active" :
+                       activeTab === "closing" ? order.status === "completed" :
+                       false;
 
     // Time filtering logic
     const orderDate = new Date(order.createdAt);
@@ -288,43 +288,53 @@ export function CustomerBettingOrders() {
         )}
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex bg-gray-100 rounded-lg p-1">
-        <Button
-          variant="ghost"
-          className={`flex-1 ${activeTab === "pending" ? "bg-white shadow-sm text-black" : ""}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          Pending
-        </Button>
-        <Button
-          variant="ghost"
-          className={`flex-1 ${activeTab === "closed" ? "bg-white shadow-sm text-black" : ""}`}
-          onClick={() => setActiveTab("closed")}
-        >
-          Closed
-        </Button>
-        <Button
-          variant="ghost"
-          className={`flex-1 ${activeTab === "cancelled" ? "bg-white shadow-sm text-black" : ""}`}
-          onClick={() => setActiveTab("cancelled")}
-        >
-          Cancelled
-        </Button>
+      {/* Order Record Header */}
+      <div className="text-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Order Record</h2>
+        
+        {/* Tab Navigation - Exact Match to Screenshot */}
+        <div className="flex justify-center space-x-1">
+          <Button
+            variant={activeTab === "position" ? "default" : "outline"}
+            className={`px-6 py-2 rounded-full text-sm font-medium ${
+              activeTab === "position" 
+                ? "bg-yellow-500 text-black hover:bg-yellow-600" 
+                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+            }`}
+            onClick={() => setActiveTab("position")}
+          >
+            Position Order
+          </Button>
+          <Button
+            variant={activeTab === "closing" ? "default" : "outline"}
+            className={`px-6 py-2 rounded-full text-sm font-medium ${
+              activeTab === "closing"
+                ? "bg-yellow-500 text-black hover:bg-yellow-600"
+                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+            }`}
+            onClick={() => setActiveTab("closing")}
+          >
+            Closing Order
+          </Button>
+        </div>
       </div>
 
       {/* Orders Content */}
       <div className="min-h-96">
         {filteredOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-96 text-gray-500">
-            <FileText className="w-16 h-16 mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium mb-2">No data available</h3>
-            <p className="text-sm text-center">
-              {activeTab === "pending" && "You have no pending orders"}
-              {activeTab === "closed" && "You have no completed orders"}
-              {activeTab === "cancelled" && "You have no cancelled orders"}
-            </p>
-            <div className="w-8 h-8 bg-yellow-400 rounded-full mt-4"></div>
+          <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+            {/* Empty state icon matching screenshot */}
+            <div className="w-24 h-24 mb-4 flex items-center justify-center">
+              <div className="relative">
+                <div className="w-16 h-12 border-2 border-gray-300 rounded bg-gray-50 flex items-center justify-center">
+                  <div className="w-8 h-6 border border-gray-300 rounded bg-white"></div>
+                </div>
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                  <div className="w-6 h-4 border border-gray-300 rounded-b bg-gray-50"></div>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-400 text-sm">No More</p>
           </div>
         ) : (
           <div className="space-y-3">
