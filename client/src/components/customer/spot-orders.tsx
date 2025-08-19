@@ -178,7 +178,7 @@ export function SpotOrders({
     placeTrade.mutate({
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
       amount: parseFloat(quantity),
-      duration: duration.seconds / 60, // Convert to minutes for API
+      duration: duration.seconds, // Send actual seconds: 60, 120, or 180
     });
 
     setShowTradePopup(false);

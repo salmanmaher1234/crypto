@@ -285,16 +285,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBettingOrder(insertOrder: InsertBettingOrder): Promise<BettingOrder> {
-    // Convert duration to seconds based on the trading interface values
-    const durationInSeconds = insertOrder.duration === 1 ? 60 : 
-                             insertOrder.duration === 2 ? 120 : 
-                             insertOrder.duration === 3 ? 180 : 
-                             insertOrder.duration * 60; // fallback to minutes if unknown
-    
+    // Store actual duration in seconds (60, 120, 180) as provided by the user
     const [order] = await db.insert(bettingOrders).values({
       ...insertOrder,
       orderId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      expiresAt: new Date(Date.now() + durationInSeconds * 1000),
+      expiresAt: new Date(Date.now() + insertOrder.duration * 1000), // duration is already in seconds
     }).returning();
     return order;
   }
@@ -433,9 +428,9 @@ export class DatabaseStorage implements IStorage {
 
     for (const order of expiredOrders) {
       // Calculate profit based on duration: 60s=20%, 120s=30%, 180s=50%
-      const profitPercentage = order.duration === 1 ? 0.20 : 
-                              order.duration === 2 ? 0.30 : 
-                              order.duration === 3 ? 0.50 : 0.20;
+      const profitPercentage = order.duration === 60 ? 0.20 : 
+                              order.duration === 120 ? 0.30 : 
+                              order.duration === 180 ? 0.50 : 0.20;
       
       const orderAmount = parseFloat(order.amount);
       const profit = orderAmount * profitPercentage;
@@ -457,7 +452,7 @@ export class DatabaseStorage implements IStorage {
         });
       }
 
-      console.log(`Order ${order.orderId} completed with ${profitPercentage * 100}% profit: +${profit.toFixed(2)} (Duration: ${order.duration === 1 ? '60s' : order.duration === 2 ? '120s' : '180s'})`);
+      console.log(`Order ${order.orderId} completed with ${profitPercentage * 100}% profit: +${profit.toFixed(2)} (Duration: ${order.duration}s)`);
     }
   }
 }

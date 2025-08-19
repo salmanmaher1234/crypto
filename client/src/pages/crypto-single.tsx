@@ -172,10 +172,7 @@ export function CryptoSingle() {
   // Handle trading functionality
   const placeTradeMutation = useMutation({
     mutationFn: async (tradeData: any) => {
-      return apiRequest("/api/betting-orders", {
-        method: "POST",
-        body: JSON.stringify(tradeData),
-      });
+      return apiRequest("/api/betting-orders", "POST", tradeData);
     },
     onSuccess: () => {
       toast({
@@ -208,7 +205,7 @@ export function CryptoSingle() {
       asset: crypto.symbol,
       amount: quantity,
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
-      duration: parseInt(selectedDuration) === 60 ? 1 : parseInt(selectedDuration) === 120 ? 2 : 3,
+      duration: parseInt(selectedDuration), // Send actual seconds: 60, 120, or 180
       entryPrice: price,
     };
 

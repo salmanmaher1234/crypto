@@ -211,11 +211,11 @@ export function CustomerBettingOrders() {
             { label: "Close Price", value: selectedOrder.exitPrice || selectedOrder.entryPrice },
             { label: "Buy Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') },
             { label: "Close Time", value: selectedOrder.status === 'completed' ? format(new Date(selectedOrder.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending' },
-            { label: "Billing Time", value: `${selectedOrder.duration === 1 ? '60' : selectedOrder.duration === 2 ? '120' : '180'}s` },
+            { label: "Billing Time", value: `${selectedOrder.duration}s` },
             { label: "Order Amount", value: selectedOrder.amount },
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
             { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}{profit.toFixed(0)}`, isProfit: true },
-            { label: "Scale", value: `${selectedOrder.duration === 1 ? '20' : selectedOrder.duration === 2 ? '30' : '50'}%` },
+            { label: "Scale", value: `${selectedOrder.duration === 60 ? '20' : selectedOrder.duration === 120 ? '30' : '50'}%` },
             { label: "Buy Direction", value: user?.direction === "Actual" ? (selectedOrder.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
             { label: "Order Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
