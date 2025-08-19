@@ -200,9 +200,9 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Currency Selector Header */}
-      <div className="bg-black px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
+        <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -215,9 +215,9 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="text-white hover:bg-gray-800 flex items-center space-x-2 px-2 py-1"
+                className="text-white hover:bg-gray-800 flex items-center space-x-1 px-0 py-0 h-auto font-medium text-lg"
               >
-                <span className="text-sm font-medium">{selectedCurrency}</span>
+                <span>{selectedCurrency}</span>
                 <Menu className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -241,6 +241,9 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+        <div className="text-center">
+          <h1 className="text-lg font-medium">{selectedCurrency}</h1>
         </div>
         <div className="text-right flex items-center gap-3">
           <Button
