@@ -84,6 +84,12 @@ export default function WithdrawalRequest() {
       return;
     }
 
+    console.log("Creating withdrawal with data:", {
+      amount: parseFloat(withdrawalAmount),
+      bankAccountId: selectedBankAccount.id,
+      selectedBankAccount: selectedBankAccount
+    });
+    
     createWithdrawal.mutate({
       amount: parseFloat(withdrawalAmount),
       bankAccountId: selectedBankAccount.id

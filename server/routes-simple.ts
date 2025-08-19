@@ -776,15 +776,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Withdrawal is prohibited for this account. Please contact support." });
       }
 
+      console.log("Withdrawal request data:", req.body);
+      
       const validatedData = insertWithdrawalRequestSchema.parse({
         ...req.body,
         userId,
       });
       
+      console.log("Validated withdrawal data:", validatedData);
+      
       const request = await storage.createWithdrawalRequest(validatedData);
       res.json(request);
     } catch (error) {
-      res.status(400).json({ message: "Invalid withdrawal request data" });
+      console.error("Withdrawal request validation error:", error);
+      res.status(400).json({ message: "Invalid withdrawal request data", error: String(error) });
     }
   });
 
