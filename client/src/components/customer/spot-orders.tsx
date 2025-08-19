@@ -1,572 +1,443 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, ChevronRight } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
-interface CryptoPair {
-  symbol: string;
+const timeframes = ["1M", "5M", "30M", "1H", "4H", "1D"];
+
+interface CryptoPriceData {
   price: string;
-  change24h: string;
-  volume24h: string;
+  change: string;
 }
 
-interface OrderBookEntry {
-  price: string;
-  quantity: string;
-  type: 'buy' | 'sell';
+interface CryptoPrices {
+  [key: string]: CryptoPriceData;
 }
 
-interface TradeHistoryEntry {
-  time: string;
-  direction: 'Buy' | 'Sell';
-  price: string;
-  quantity: string;
+interface Candle {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
 }
 
 export function SpotOrders() {
   const [, setLocation] = useLocation();
+  const [activeTimeframe, setActiveTimeframe] = useState("5M");
+  const [quantity, setQuantity] = useState("9000");
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [tradeHistory, setTradeHistory] = useState([
+    {
+      time: "12:49:08",
+      direction: "Buy",
+      price: "115348.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:11",
+      direction: "Buy",
+      price: "115355.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:06",
+      direction: "Buy",
+      price: "115344.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:13",
+      direction: "Buy",
+      price: "115350.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:07",
+      direction: "Buy",
+      price: "115344.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:33",
+      direction: "Buy",
+      price: "115367.0700",
+      quantity: "0.2000",
+    },
+    {
+      time: "12:49:13",
+      direction: "Buy",
+      price: "115362.5100",
+      quantity: "0.0050",
+    },
+    {
+      time: "12:49:07",
+      direction: "Buy",
+      price: "115345.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:00:31",
+      direction: "Sell",
+      price: "115365.9900",
+      quantity: "0.0001",
+    },
+  ]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedPair, setSelectedPair] = useState("BTC/USDT");
-  const [selectedTimeframe, setSelectedTimeframe] = useState("1H");
-  const [orderAmount, setOrderAmount] = useState("");
-  const [showBuyForm, setShowBuyForm] = useState(false);
-  const [showSellForm, setShowSellForm] = useState(false);
-  const chartRef = useRef<HTMLCanvasElement>(null);
 
-  // Crypto pairs data
-  const cryptoPairs: CryptoPair[] = [
-    { symbol: "BTC/USDT", price: "115239.9128", change24h: "2.54", volume24h: "143.25M" },
-    { symbol: "ETH/USDT", price: "4247.2503", change24h: "-1.23", volume24h: "89.45M" },
-    { symbol: "DOGE/USDT", price: "0.2228", change24h: "5.67", volume24h: "25.12M" },
-    { symbol: "CHZ/USDT", price: "0.0397", change24h: "-2.34", volume24h: "12.45M" },
-    { symbol: "PSG/USDT", price: "1.6339", change24h: "3.45", volume24h: "8.23M" },
-    { symbol: "ATM/USDT", price: "1.4274", change24h: "-0.89", volume24h: "6.78M" },
-    { symbol: "JUV/USDT", price: "1.3612", change24h: "1.23", volume24h: "5.67M" },
-    { symbol: "K/USDT", price: "14.7080", change24h: "-3.45", volume24h: "15.23M" },
-    { symbol: "LTC/USDT", price: "118.6532", change24h: "2.67", volume24h: "45.67M" },
-    { symbol: "EOS/USDT", price: "0.7548", change24h: "-1.89", volume24h: "18.45M" },
-    { symbol: "BTS/USDT", price: "10.3101", change24h: "4.23", volume24h: "7.89M" },
-    { symbol: "LINK/USDT", price: "24.5509", change24h: "-2.45", volume24h: "32.45M" }
-  ];
+  // Get real-time crypto prices
+  const { data: cryptoPrices = {} } = useQuery<CryptoPrices>({
+    queryKey: ["/api/crypto-prices"],
+    refetchInterval: 5000,
+  });
 
-  // Order book data
-  const orderBook: OrderBookEntry[] = [
-    { price: "115135.50", quantity: "0.0001", type: "buy" },
-    { price: "115134.00", quantity: "0.0001", type: "buy" },
-    { price: "115132.50", quantity: "0.0001", type: "buy" },
-    { price: "115131.00", quantity: "0.0001", type: "buy" },
-    { price: "115130.00", quantity: "0.0000", type: "buy" },
-    { price: "115127.50", quantity: "0.0001", type: "buy" },
-    { price: "115126.00", quantity: "0.0000", type: "buy" },
-    { price: "115142.00", quantity: "0.0001", type: "sell" },
-    { price: "115143.50", quantity: "0.0001", type: "sell" },
-    { price: "115145.00", quantity: "0.0001", type: "sell" },
-  ];
+  const btcPrice = cryptoPrices["BTC/USDT"]?.price || "115044.00";
+  const btcChange = cryptoPrices["BTC/USDT"]?.change || "+2.84";
 
-  // Trade history data
-  const tradeHistory: TradeHistoryEntry[] = [
-    { time: "11:56:43", direction: "Buy", price: "115234.1900", quantity: "0.9789" },
-    { time: "11:56:02", direction: "Buy", price: "115235.00", quantity: "0.0001" },
-    { time: "11:56:41", direction: "Buy", price: "115234.1900", quantity: "0.0025" },
-    { time: "11:51:08", direction: "Buy", price: "115235.8600", quantity: "0.0005" },
-    { time: "11:56:36", direction: "Sell", price: "115235.8200", quantity: "0.0047" },
-    { time: "11:56:45", direction: "Buy", price: "115236.9500", quantity: "0.0052" },
-    { time: "11:51:10", direction: "Sell", price: "115236.9000", quantity: "0.0005" },
-    { time: "11:51:08", direction: "Buy", price: "115233.8600", quantity: "0.0003" },
-    { time: "11:56:43", direction: "Buy", price: "115234.1900", quantity: "0.0012" },
-    { time: "11:56:27", direction: "Buy", price: "115230.50", quantity: "0.0001" }
-  ];
+  // Update current time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  const timeframes = ["1M", "5M", "30M", "1H", "4H", "1D"];
-
-  const currentPrice = cryptoPairs.find(p => p.symbol === selectedPair)?.price || "0";
-  const currentChange = cryptoPairs.find(p => p.symbol === selectedPair)?.change24h || "0";
-
-  // Create betting order mutation
-  const createOrderMutation = useMutation({
-    mutationFn: (orderData: {
-      currency: string;
+  // Trading mutation
+  const placeTrade = useMutation({
+    mutationFn: async (data: {
       direction: string;
       amount: number;
       duration: number;
-    }) => apiRequest("/api/betting-orders", {
-      method: "POST",
-      body: orderData
-    }),
+    }) => {
+      const res = await apiRequest("POST", "/api/betting-orders", data);
+      return res.json();
+    },
     onSuccess: () => {
+      toast({
+        title: "Trade Placed Successfully",
+        description: "Your trading order has been placed.",
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-      setOrderAmount("");
-      setShowBuyForm(false);
-      setShowSellForm(false);
-    }
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Trade Failed",
+        description: error.message || "Failed to place trade",
+        variant: "destructive",
+      });
+    },
   });
 
-  // Enhanced Canvas chart drawing with better grid and professional styling
+  // Advanced candlestick chart drawing
   useEffect(() => {
-    if (!chartRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const canvas = chartRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size for high DPI
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
-    canvas.style.width = rect.width + "px";
-    canvas.style.height = rect.height + "px";
+    // Set canvas size
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
-    // Clear canvas with dark background
-    ctx.fillStyle = "#0a0e27";
-    ctx.fillRect(0, 0, rect.width, rect.height);
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
 
-    // Draw enhanced grid lines
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    // Dark background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, "#0a0e27");
+    gradient.addColorStop(1, "#1a1e37");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Grid lines
+    ctx.strokeStyle = "#252841";
     ctx.lineWidth = 0.5;
-    
-    // Major vertical grid lines
-    const majorVerticalLines = 8;
-    for (let i = 0; i <= majorVerticalLines; i++) {
-      const x = (rect.width / majorVerticalLines) * i;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, rect.height * 0.8); // Don't draw through volume area
-      ctx.stroke();
-    }
 
-    // Major horizontal grid lines
-    const majorHorizontalLines = 8;
-    for (let i = 0; i <= majorHorizontalLines; i++) {
-      const y = (rect.height * 0.8 / majorHorizontalLines) * i;
+    // Horizontal grid lines
+    for (let i = 0; i <= 10; i++) {
+      const y = (height / 10) * i;
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(rect.width, y);
+      ctx.lineTo(width, y);
       ctx.stroke();
     }
 
-    // Minor grid lines for better precision
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
-    ctx.lineWidth = 0.3;
-    
-    // Minor vertical lines
-    for (let i = 0; i <= majorVerticalLines * 2; i++) {
-      const x = (rect.width / (majorVerticalLines * 2)) * i;
+    // Vertical grid lines
+    for (let i = 0; i <= 20; i++) {
+      const x = (width / 20) * i;
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, rect.height * 0.8);
+      ctx.lineTo(x, height);
       ctx.stroke();
     }
 
-    // Minor horizontal lines
-    for (let i = 0; i <= majorHorizontalLines * 2; i++) {
-      const y = (rect.height * 0.8 / (majorHorizontalLines * 2)) * i;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(rect.width, y);
-      ctx.stroke();
+    // Price scale on right
+    ctx.fillStyle = "#8892b0";
+    ctx.font = "10px monospace";
+    const basePrice = parseFloat(btcPrice);
+    for (let i = 0; i <= 10; i++) {
+      const y = (height / 10) * i;
+      const price = basePrice + (5 - i) * 20; // Price range
+      ctx.fillText(price.toFixed(2), width - 60, y + 3);
     }
 
     // Generate realistic candlestick data
-    const candleCount = 80;
-    const candleWidth = rect.width / candleCount;
-    const basePrice = parseFloat(currentPrice);
-    const chartHeight = rect.height * 0.8;
-    const priceRange = 4000; // Price range for the chart
-    
-    let lastClose = basePrice;
-    
-    for (let i = 0; i < candleCount; i++) {
-      const x = i * candleWidth;
-      
-      // Create more realistic price movement
-      const trend = Math.sin(i * 0.1) * 200; // Overall trend
-      const volatility = (Math.random() - 0.5) * 400; // Random volatility
-      const open = lastClose + (Math.random() - 0.5) * 50;
-      const close = open + trend + volatility;
-      const high = Math.max(open, close) + Math.random() * 200;
-      const low = Math.min(open, close) - Math.random() * 200;
-      
-      lastClose = close;
-      
-      const isGreen = close > open;
-      
-      // Convert prices to Y coordinates
-      const highY = chartHeight - ((high - (basePrice - priceRange/2)) / priceRange) * chartHeight;
-      const lowY = chartHeight - ((low - (basePrice - priceRange/2)) / priceRange) * chartHeight;
-      const openY = chartHeight - ((open - (basePrice - priceRange/2)) / priceRange) * chartHeight;
-      const closeY = chartHeight - ((close - (basePrice - priceRange/2)) / priceRange) * chartHeight;
+    const candles: Candle[] = [];
+    const numCandles = 50;
+    let price = basePrice;
 
-      // Draw wick/shadow
+    for (let i = 0; i < numCandles; i++) {
+      const volatility = 0.02;
+      const change = (Math.random() - 0.5) * volatility * price;
+      const open = price;
+      const close = price + change;
+      const high = Math.max(open, close) + Math.random() * 10;
+      const low = Math.min(open, close) - Math.random() * 10;
+
+      candles.push({
+        open,
+        high,
+        low,
+        close,
+        volume: Math.random() * 1000 + 500,
+      });
+      price = close;
+    }
+
+    // Draw candlesticks
+    const candleWidth = (width / numCandles) * 0.8;
+    const priceRange =
+      Math.max(...candles.map((c) => c.high)) -
+      Math.min(...candles.map((c) => c.low));
+    const chartHeight = height * 0.7; // Leave space for volume
+
+    candles.forEach((candle, i) => {
+      const x = (width / numCandles) * i + candleWidth / 4;
+      const bodyTop =
+        chartHeight -
+        ((candle.open - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+      const bodyBottom =
+        chartHeight -
+        ((candle.close - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+      const wickTop =
+        chartHeight -
+        ((candle.high - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+      const wickBottom =
+        chartHeight -
+        ((candle.low - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+
+      const isGreen = candle.close > candle.open;
+      ctx.fillStyle = isGreen ? "#26a69a" : "#ef5350";
       ctx.strokeStyle = isGreen ? "#26a69a" : "#ef5350";
+
+      // Draw wick
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(x + candleWidth/2, highY);
-      ctx.lineTo(x + candleWidth/2, lowY);
+      ctx.moveTo(x + candleWidth / 2, wickTop);
+      ctx.lineTo(x + candleWidth / 2, wickBottom);
       ctx.stroke();
 
-      // Draw candle body
-      ctx.fillStyle = isGreen ? "#26a69a" : "#ef5350";
-      const bodyHeight = Math.abs(closeY - openY);
-      const bodyY = Math.min(openY, closeY);
-      
-      if (bodyHeight < 1) {
-        // Doji candle - draw thin line
-        ctx.fillRect(x + 1, bodyY, candleWidth - 2, 1);
-      } else {
-        ctx.fillRect(x + 1, bodyY, candleWidth - 2, bodyHeight);
-      }
-    }
+      // Draw body
+      ctx.fillRect(
+        x,
+        Math.min(bodyTop, bodyBottom),
+        candleWidth,
+        Math.abs(bodyTop - bodyBottom),
+      );
 
-    // Draw volume bars with better styling
-    const volumeAreaHeight = rect.height * 0.15;
-    const volumeStartY = rect.height * 0.85;
-    
-    for (let i = 0; i < candleCount; i++) {
-      const x = i * candleWidth;
-      const volumeHeight = Math.random() * volumeAreaHeight;
-      const y = volumeStartY + (volumeAreaHeight - volumeHeight);
-      
-      // Color volume bars based on price movement
-      const isGreenVolume = Math.random() > 0.5;
-      ctx.fillStyle = isGreenVolume 
-        ? "rgba(38, 166, 154, 0.6)" 
-        : "rgba(239, 83, 80, 0.6)";
-      ctx.fillRect(x + 1, y, candleWidth - 2, volumeHeight);
-    }
-
-    // Draw price scale on the right
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.font = "10px monospace";
-    ctx.textAlign = "left";
-    
-    for (let i = 0; i <= 8; i++) {
-      const y = (chartHeight / 8) * i;
-      const price = basePrice + (priceRange/2) - (i * priceRange / 8);
-      ctx.fillText(price.toFixed(0), rect.width - 60, y + 3);
-    }
-
-    // Draw time labels at bottom
-    ctx.textAlign = "center";
-    const timeLabels = ["22:30", "23:30", "00:30", "01:30", "02:30", "03:30", "04:30", "05:30"];
-    for (let i = 0; i < timeLabels.length; i++) {
-      const x = (rect.width / (timeLabels.length - 1)) * i;
-      ctx.fillText(timeLabels[i], x, rect.height - 5);
-    }
+      // Draw volume bars
+      const volumeHeight = (candle.volume / 1500) * (height - chartHeight);
+      ctx.fillStyle = isGreen ? "#26a69a40" : "#ef535040";
+      ctx.fillRect(x, chartHeight, candleWidth, volumeHeight);
+    });
 
     // Current price line
-    const currentPriceY = chartHeight - ((basePrice - (basePrice - priceRange/2)) / priceRange) * chartHeight;
-    ctx.strokeStyle = "#ffeb3b";
+    const currentPriceY =
+      chartHeight -
+      ((basePrice - Math.min(...candles.map((c) => c.low))) / priceRange) *
+        chartHeight;
+    ctx.strokeStyle = "#ffd700";
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
     ctx.moveTo(0, currentPriceY);
-    ctx.lineTo(rect.width - 70, currentPriceY);
+    ctx.lineTo(width, currentPriceY);
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Current price label
-    ctx.fillStyle = "#ffeb3b";
-    ctx.fillRect(rect.width - 70, currentPriceY - 10, 65, 20);
+    // Price label
+    ctx.fillStyle = "#ffd700";
+    ctx.fillRect(width - 80, currentPriceY - 10, 75, 20);
     ctx.fillStyle = "#000";
-    ctx.textAlign = "center";
-    ctx.fillText(basePrice.toFixed(2), rect.width - 37, currentPriceY + 3);
+    ctx.font = "bold 10px monospace";
+    ctx.fillText(basePrice.toFixed(2), width - 75, currentPriceY + 3);
 
-  }, [currentPrice, selectedTimeframe]);
+    // TradingView watermark
+    ctx.fillStyle = "#ffffff20";
+    ctx.font = "12px Arial";
+    ctx.fillText("Chart by TradingView", 10, height - 20);
+  }, [btcPrice, activeTimeframe]);
 
-  const handleBuyOrder = () => {
-    if (!orderAmount || !user) return;
-    
-    createOrderMutation.mutate({
-      currency: selectedPair,
-      direction: "Buy Up",
-      amount: parseFloat(orderAmount),
-      duration: 300 // 5 minutes
+  const handleTrade = (direction: "Buy Up" | "Buy Down") => {
+    const amount = parseFloat(quantity);
+    if (!amount || amount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid trade amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    placeTrade.mutate({
+      direction,
+      amount,
+      duration: 180, // 3 minutes default
     });
-  };
-
-  const handleSellOrder = () => {
-    if (!orderAmount || !user) return;
-    
-    createOrderMutation.mutate({
-      currency: selectedPair,
-      direction: "Buy Down", 
-      amount: parseFloat(orderAmount),
-      duration: 300 // 5 minutes
-    });
-  };
-
-  const handleBack = () => {
-    setLocation('/customer');
-  };
-
-  const handleHome = () => {
-    setLocation('/customer');
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-800">
+    <div className="h-screen w-screen bg-gray-900 text-white flex flex-col overflow-hidden">
+      {/* Top Header */}
+      <div className="bg-gray-900 px-4 py-2 flex items-center justify-between border-b border-gray-700">
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleHome}
-            className="text-white hover:bg-gray-800"
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/customer")}
+            className="text-white hover:bg-gray-700"
           >
-            <Home className="w-5 h-5" />
+            <Home className="w-4 h-4" />
           </Button>
-          <div className="flex items-center space-x-2">
-            <span className="text-lg font-bold">{selectedPair}</span>
-            <Button variant="ghost" size="sm" className="text-white hover:bg-gray-800">
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
+          <div className="text-white text-sm">BTC/USDT</div>
+        </div>
+        <div className="text-center">
+          <div className="text-white font-bold">BTC/USDT</div>
         </div>
         <div className="text-right">
-          <Button 
-            variant="ghost" 
-            className="text-blue-400 hover:text-blue-300"
-            onClick={() => setLocation('/customer')}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/spot-orders")}
+            className="text-white hover:bg-gray-700 text-sm"
           >
-            Spot Orders <ChevronRight className="w-4 h-4 ml-1" />
+            Spot Orders &gt;
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-screen">
-        {/* Left Sidebar - Crypto Pairs */}
-        <div className="w-full lg:w-80 bg-gray-900 border-r border-gray-800 overflow-y-auto">
-          <div className="p-4">
-            <h2 className="text-lg font-bold mb-4">Spot</h2>
-            <div className="space-y-1">
-              {cryptoPairs.map((pair) => (
-                <div
-                  key={pair.symbol}
-                  className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors ${
-                    selectedPair === pair.symbol ? 'bg-gray-800' : 'hover:bg-gray-800'
-                  }`}
-                  onClick={() => setSelectedPair(pair.symbol)}
-                >
-                  <div>
-                    <div className="font-medium text-white">{pair.symbol}</div>
-                    <div className="text-xs text-gray-400">Vol {pair.volume24h}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-mono text-red-400">{pair.price}</div>
-                    <div className={`text-xs ${
-                      parseFloat(pair.change24h) >= 0 ? 'text-green-400' : 'text-red-400'
-                    }`}>
-                      {parseFloat(pair.change24h) >= 0 ? '+' : ''}{pair.change24h}%
-                    </div>
-                  </div>
-                </div>
-              ))}
+      {/* Price and Stats Display */}
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="text-2xl font-bold text-red-400 font-mono">
+              {parseFloat(btcPrice).toFixed(4)}
             </div>
+            <div className="text-sm text-red-400">{btcChange}%</div>
+          </div>
+          <div className="text-center text-xs text-gray-400">
+            <div>24H High: 116305.3500</div>
+            <div>24H Low: 115366.9629</div>
+          </div>
+          <div className="text-right text-xs text-gray-400">
+            <div>24H Volume: 152.43M</div>
+            <div>24H Turnover: 1.31K</div>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Price Header */}
-          <div className="p-4 border-b border-gray-800">
-            <div className="flex flex-wrap items-center justify-between">
-              <div className="flex items-center space-x-6">
-                <div>
-                  <div className="text-2xl font-bold text-red-400">{currentPrice}</div>
-                  <div className="text-sm text-gray-400">
-                    24H High: {(parseFloat(currentPrice) * 1.02).toFixed(2)} 
-                    <span className="ml-4">24H Low: {(parseFloat(currentPrice) * 0.98).toFixed(2)}</span>
-                  </div>
-                </div>
-                <div className={`text-lg ${parseFloat(currentChange) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {parseFloat(currentChange) >= 0 ? '+' : ''}{currentChange}%
-                </div>
-              </div>
-              <div className="text-sm text-gray-400">
-                <div>24H Volume: 143.25M</div>
-                <div>24H Turnover: 1.23K</div>
-              </div>
-            </div>
-          </div>
+      {/* Timeframe Tabs */}
+      <div className="bg-gray-800 px-4 py-2 border-b border-gray-700">
+        <div className="flex space-x-1">
+          {timeframes.map((tf) => (
+            <button
+              key={tf}
+              onClick={() => setActiveTimeframe(tf)}
+              className={`px-4 py-2 text-sm rounded transition-colors ${
+                activeTimeframe === tf
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700"
+              }`}
+            >
+              {tf}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          <div className="flex-1 flex flex-col lg:flex-row">
-            {/* Chart Section with Professional Grid */}
-            <div className="flex-1 p-4">
-              {/* Enhanced Timeframe Buttons */}
-              <div className="flex space-x-1 bg-gray-800 rounded-lg p-1 w-fit mb-4">
-                {timeframes.map((tf) => (
-                  <Button
-                    key={tf}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedTimeframe(tf)}
-                    className={`px-4 py-2 rounded-md transition-all duration-200 ${
-                      selectedTimeframe === tf 
-                        ? 'bg-blue-600 text-white shadow-lg' 
-                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    {tf}
-                  </Button>
-                ))}
-              </div>
+      {/* Chart Area */}
+      <div className="flex-1 p-4">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full rounded-lg"
+          style={{
+            background: "linear-gradient(180deg, #0a0e27 0%, #1a1e37 100%)",
+          }}
+        />
+      </div>
 
-              {/* Professional Chart Canvas with Grid Layout */}
-              <div className="relative rounded-lg border border-gray-700 mb-4 overflow-hidden" 
-                   style={{ 
-                     height: '450px',
-                     background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)'
-                   }}>
-                <canvas 
-                  ref={chartRef}
-                  className="w-full h-full"
-                  style={{ width: '100%', height: '100%' }}
-                />
-                
-                {/* Chart branding and info overlay */}
-                <div className="absolute bottom-3 left-3 flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-xs text-blue-400 font-medium">Chart by TradingView</span>
-                  </div>
-                </div>
-                
-                {/* Price info overlay */}
-                <div className="absolute top-3 left-3 flex items-center space-x-6 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-400">O</span>
-                    <span className="text-white font-mono">{(parseFloat(currentPrice) * 0.999).toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-400">H</span>
-                    <span className="text-white font-mono">{(parseFloat(currentPrice) * 1.002).toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-400">L</span>
-                    <span className="text-white font-mono">{(parseFloat(currentPrice) * 0.998).toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-400">C</span>
-                    <span className="text-white font-mono">{currentPrice}</span>
-                  </div>
-                </div>
-                
-                {/* Volume indicator */}
-                <div className="absolute top-3 right-3 text-xs text-gray-400">
-                  <div>24H Volume: 143.25M</div>
-                  <div className="text-right">24H Turnover: 1.56K</div>
-                </div>
-              </div>
+      {/* Trading Panel */}
+      <div className="bg-gray-800 border-t border-gray-700">
+        {/* Trade Table Header */}
+        <div className="grid grid-cols-4 gap-4 px-4 py-2 text-sm text-gray-400 border-b border-gray-700">
+          <div>Time</div>
+          <div>Direction</div>
+          <div>Price</div>
+          <div>Quantity</div>
+        </div>
 
-              {/* Enhanced Trade History Table with Better Layout */}
-              <div className="bg-gray-900 rounded-lg border border-gray-700 shadow-xl">
-                <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-700 text-sm text-gray-300 font-medium bg-gray-800">
-                  <div>Time</div>
-                  <div>Direction</div>
-                  <div>Price</div>
-                  <div>Quantity</div>
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {tradeHistory.map((trade, index) => (
-                    <div key={index} className="grid grid-cols-4 gap-4 p-3 border-b border-gray-800 text-sm hover:bg-gray-800 transition-colors">
-                      <div className="text-gray-400 font-mono">{trade.time}</div>
-                      <div className={`font-medium ${trade.direction === 'Buy' ? 'text-green-400' : 'text-red-400'}`}>
-                        {trade.direction}
-                      </div>
-                      <div className="font-mono text-white">{trade.price}</div>
-                      <div className="text-gray-300 font-mono">{trade.quantity}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Enhanced Right Sidebar - Order Book */}
-            <div className="w-full lg:w-80 p-4 border-l border-gray-700">
-              <div className="bg-gray-900 rounded-lg border border-gray-700 shadow-xl mb-4">
-                <div className="grid grid-cols-2 gap-4 p-4 border-b border-gray-700 text-sm text-gray-300 font-medium bg-gray-800">
-                  <div>Price</div>
-                  <div>Quantity</div>
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {orderBook.map((order, index) => (
-                    <div key={index} className="grid grid-cols-2 gap-4 p-3 hover:bg-gray-800 transition-colors text-sm">
-                      <div className={`font-mono ${order.type === 'buy' ? 'text-green-400' : 'text-red-400'}`}>
-                        {order.price}
-                      </div>
-                      <div className="text-gray-300 font-mono">{order.quantity}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Trading Buttons */}
-          <div className="p-4 border-t border-gray-800">
-            <div className="flex space-x-4">
-              <Button
-                onClick={() => setShowBuyForm(!showBuyForm)}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg"
+        {/* Dynamic Trade Rows */}
+        <div className="max-h-32 overflow-y-auto">
+          {tradeHistory.map((trade, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-4 gap-4 px-4 py-1 text-sm text-white"
+            >
+              <div>{trade.time}</div>
+              <div
+                className={
+                  trade.direction === "Buy" ? "text-green-400" : "text-red-400"
+                }
               >
-                Buy Up
-              </Button>
-              <Button
-                onClick={() => setShowSellForm(!showSellForm)}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg"
-              >
-                Buy Down
-              </Button>
-            </div>
-
-            {/* Order Forms */}
-            {(showBuyForm || showSellForm) && (
-              <div className="mt-4 p-4 bg-gray-800 rounded-lg">
-                <div className="mb-4">
-                  <label className="block text-sm text-gray-400 mb-2">Amount (USDT)</label>
-                  <input
-                    type="number"
-                    value={orderAmount}
-                    onChange={(e) => setOrderAmount(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white"
-                    placeholder="Enter amount"
-                  />
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={showBuyForm ? handleBuyOrder : handleSellOrder}
-                    disabled={createOrderMutation.isPending || !orderAmount}
-                    className={`flex-1 ${
-                      showBuyForm 
-                        ? 'bg-green-600 hover:bg-green-700' 
-                        : 'bg-red-600 hover:bg-red-700'
-                    } text-white font-bold py-2 rounded`}
-                  >
-                    {createOrderMutation.isPending ? 'Placing Order...' : 
-                     showBuyForm ? 'Confirm Buy Up' : 'Confirm Buy Down'}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setShowBuyForm(false);
-                      setShowSellForm(false);
-                      setOrderAmount("");
-                    }}
-                    variant="ghost"
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Cancel
-                  </Button>
-                </div>
+                {trade.direction}
               </div>
-            )}
+              <div className="font-mono">{trade.price}</div>
+              <div className="font-mono">{trade.quantity}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Buy/Sell Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4">
+          <div className="flex space-x-4">
+            <Button
+              onClick={() => handleTrade("Buy Up")}
+              disabled={placeTrade.isPending}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg text-lg"
+            >
+              Buy Up
+            </Button>
+            <Button
+              onClick={() => handleTrade("Buy Down")}
+              disabled={placeTrade.isPending}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg text-lg"
+            >
+              Buy down
+            </Button>
           </div>
         </div>
       </div>

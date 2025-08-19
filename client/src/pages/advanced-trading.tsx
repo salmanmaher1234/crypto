@@ -32,15 +32,60 @@ export default function AdvancedTrading() {
   const [quantity, setQuantity] = useState("9000");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tradeHistory, setTradeHistory] = useState([
-    { time: "12:49:08", direction: "Buy", price: "115348.00", quantity: "0.0001" },
-    { time: "12:49:11", direction: "Buy", price: "115355.00", quantity: "0.0001" },
-    { time: "12:49:06", direction: "Buy", price: "115344.00", quantity: "0.0001" },
-    { time: "12:49:13", direction: "Buy", price: "115350.00", quantity: "0.0001" },
-    { time: "12:49:07", direction: "Buy", price: "115344.00", quantity: "0.0001" },
-    { time: "12:49:33", direction: "Buy", price: "115367.0700", quantity: "0.2000" },
-    { time: "12:49:13", direction: "Buy", price: "115362.5100", quantity: "0.0050" },
-    { time: "12:49:07", direction: "Buy", price: "115345.00", quantity: "0.0001" },
-    { time: "12:00:31", direction: "Sell", price: "115365.9900", quantity: "0.0001" }
+    {
+      time: "12:49:08",
+      direction: "Buy",
+      price: "115348.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:11",
+      direction: "Buy",
+      price: "115355.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:06",
+      direction: "Buy",
+      price: "115344.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:13",
+      direction: "Buy",
+      price: "115350.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:07",
+      direction: "Buy",
+      price: "115344.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:49:33",
+      direction: "Buy",
+      price: "115367.0700",
+      quantity: "0.2000",
+    },
+    {
+      time: "12:49:13",
+      direction: "Buy",
+      price: "115362.5100",
+      quantity: "0.0050",
+    },
+    {
+      time: "12:49:07",
+      direction: "Buy",
+      price: "115345.00",
+      quantity: "0.0001",
+    },
+    {
+      time: "12:00:31",
+      direction: "Sell",
+      price: "115365.9900",
+      quantity: "0.0001",
+    },
   ]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { user } = useAuth();
@@ -66,8 +111,12 @@ export default function AdvancedTrading() {
 
   // Trading mutation
   const placeTrade = useMutation({
-    mutationFn: async (data: { direction: string; amount: number; duration: number }) => {
-      const res = await apiRequest('POST', '/api/betting-orders', data);
+    mutationFn: async (data: {
+      direction: string;
+      amount: number;
+      duration: number;
+    }) => {
+      const res = await apiRequest("POST", "/api/betting-orders", data);
       return res.json();
     },
     onSuccess: () => {
@@ -84,7 +133,7 @@ export default function AdvancedTrading() {
         description: error.message || "Failed to place trade",
         variant: "destructive",
       });
-    }
+    },
   });
 
   // Advanced candlestick chart drawing
@@ -92,7 +141,7 @@ export default function AdvancedTrading() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas size
@@ -105,15 +154,15 @@ export default function AdvancedTrading() {
 
     // Dark background gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, '#0a0e27');
-    gradient.addColorStop(1, '#1a1e37');
+    gradient.addColorStop(0, "#0a0e27");
+    gradient.addColorStop(1, "#1a1e37");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
     // Grid lines
-    ctx.strokeStyle = '#252841';
+    ctx.strokeStyle = "#252841";
     ctx.lineWidth = 0.5;
-    
+
     // Horizontal grid lines
     for (let i = 0; i <= 10; i++) {
       const y = (height / 10) * i;
@@ -133,8 +182,8 @@ export default function AdvancedTrading() {
     }
 
     // Price scale on right
-    ctx.fillStyle = '#8892b0';
-    ctx.font = '10px monospace';
+    ctx.fillStyle = "#8892b0";
+    ctx.font = "10px monospace";
     const basePrice = parseFloat(btcPrice);
     for (let i = 0; i <= 10; i++) {
       const y = (height / 10) * i;
@@ -146,7 +195,7 @@ export default function AdvancedTrading() {
     const candles: Candle[] = [];
     const numCandles = 50;
     let price = basePrice;
-    
+
     for (let i = 0; i < numCandles; i++) {
       const volatility = 0.02;
       const change = (Math.random() - 0.5) * volatility * price;
@@ -154,46 +203,74 @@ export default function AdvancedTrading() {
       const close = price + change;
       const high = Math.max(open, close) + Math.random() * 10;
       const low = Math.min(open, close) - Math.random() * 10;
-      
-      candles.push({ open, high, low, close, volume: Math.random() * 1000 + 500 });
+
+      candles.push({
+        open,
+        high,
+        low,
+        close,
+        volume: Math.random() * 1000 + 500,
+      });
       price = close;
     }
 
     // Draw candlesticks
-    const candleWidth = width / numCandles * 0.8;
-    const priceRange = Math.max(...candles.map(c => c.high)) - Math.min(...candles.map(c => c.low));
+    const candleWidth = (width / numCandles) * 0.8;
+    const priceRange =
+      Math.max(...candles.map((c) => c.high)) -
+      Math.min(...candles.map((c) => c.low));
     const chartHeight = height * 0.7; // Leave space for volume
 
     candles.forEach((candle, i) => {
       const x = (width / numCandles) * i + candleWidth / 4;
-      const bodyTop = chartHeight - ((candle.open - Math.min(...candles.map(c => c.low))) / priceRange) * chartHeight;
-      const bodyBottom = chartHeight - ((candle.close - Math.min(...candles.map(c => c.low))) / priceRange) * chartHeight;
-      const wickTop = chartHeight - ((candle.high - Math.min(...candles.map(c => c.low))) / priceRange) * chartHeight;
-      const wickBottom = chartHeight - ((candle.low - Math.min(...candles.map(c => c.low))) / priceRange) * chartHeight;
-      
+      const bodyTop =
+        chartHeight -
+        ((candle.open - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+      const bodyBottom =
+        chartHeight -
+        ((candle.close - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+      const wickTop =
+        chartHeight -
+        ((candle.high - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+      const wickBottom =
+        chartHeight -
+        ((candle.low - Math.min(...candles.map((c) => c.low))) / priceRange) *
+          chartHeight;
+
       const isGreen = candle.close > candle.open;
-      ctx.fillStyle = isGreen ? '#26a69a' : '#ef5350';
-      ctx.strokeStyle = isGreen ? '#26a69a' : '#ef5350';
-      
+      ctx.fillStyle = isGreen ? "#26a69a" : "#ef5350";
+      ctx.strokeStyle = isGreen ? "#26a69a" : "#ef5350";
+
       // Draw wick
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(x + candleWidth / 2, wickTop);
       ctx.lineTo(x + candleWidth / 2, wickBottom);
       ctx.stroke();
-      
+
       // Draw body
-      ctx.fillRect(x, Math.min(bodyTop, bodyBottom), candleWidth, Math.abs(bodyTop - bodyBottom));
-      
+      ctx.fillRect(
+        x,
+        Math.min(bodyTop, bodyBottom),
+        candleWidth,
+        Math.abs(bodyTop - bodyBottom),
+      );
+
       // Draw volume bars
       const volumeHeight = (candle.volume / 1500) * (height - chartHeight);
-      ctx.fillStyle = isGreen ? '#26a69a40' : '#ef535040';
+      ctx.fillStyle = isGreen ? "#26a69a40" : "#ef535040";
       ctx.fillRect(x, chartHeight, candleWidth, volumeHeight);
     });
 
     // Current price line
-    const currentPriceY = chartHeight - ((basePrice - Math.min(...candles.map(c => c.low))) / priceRange) * chartHeight;
-    ctx.strokeStyle = '#ffd700';
+    const currentPriceY =
+      chartHeight -
+      ((basePrice - Math.min(...candles.map((c) => c.low))) / priceRange) *
+        chartHeight;
+    ctx.strokeStyle = "#ffd700";
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -203,17 +280,16 @@ export default function AdvancedTrading() {
     ctx.setLineDash([]);
 
     // Price label
-    ctx.fillStyle = '#ffd700';
+    ctx.fillStyle = "#ffd700";
     ctx.fillRect(width - 80, currentPriceY - 10, 75, 20);
-    ctx.fillStyle = '#000';
-    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = "#000";
+    ctx.font = "bold 10px monospace";
     ctx.fillText(basePrice.toFixed(2), width - 75, currentPriceY + 3);
 
     // TradingView watermark
-    ctx.fillStyle = '#ffffff20';
-    ctx.font = '12px Arial';
-    ctx.fillText('Chart by TradingView', 10, height - 20);
-
+    ctx.fillStyle = "#ffffff20";
+    ctx.font = "12px Arial";
+    ctx.fillText("Chart by TradingView", 10, height - 20);
   }, [btcPrice, activeTimeframe]);
 
   const handleTrade = (direction: "Buy Up" | "Buy Down") => {
@@ -230,7 +306,7 @@ export default function AdvancedTrading() {
     placeTrade.mutate({
       direction,
       amount,
-      duration: 180 // 3 minutes default
+      duration: 180, // 3 minutes default
     });
   };
 
@@ -242,7 +318,7 @@ export default function AdvancedTrading() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation('/customer')}
+            onClick={() => setLocation("/customer")}
             className="text-white hover:bg-gray-700"
           >
             <Home className="w-4 h-4" />
@@ -256,7 +332,7 @@ export default function AdvancedTrading() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation('/spot-orders')}
+            onClick={() => setLocation("/spot-orders")}
             className="text-white hover:bg-gray-700 text-sm"
           >
             Spot Orders &gt;
@@ -268,7 +344,9 @@ export default function AdvancedTrading() {
       <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-2xl font-bold text-red-400 font-mono">{parseFloat(btcPrice).toFixed(4)}</div>
+            <div className="text-2xl font-bold text-red-400 font-mono">
+              {parseFloat(btcPrice).toFixed(4)}
+            </div>
             <div className="text-sm text-red-400">{btcChange}%</div>
           </div>
           <div className="text-center text-xs text-gray-400">
@@ -291,8 +369,8 @@ export default function AdvancedTrading() {
               onClick={() => setActiveTimeframe(tf)}
               className={`px-4 py-2 text-sm rounded transition-colors ${
                 activeTimeframe === tf
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700"
               }`}
             >
               {tf}
@@ -306,7 +384,9 @@ export default function AdvancedTrading() {
         <canvas
           ref={canvasRef}
           className="w-full h-full rounded-lg"
-          style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1e37 100%)' }}
+          style={{
+            background: "linear-gradient(180deg, #0a0e27 0%, #1a1e37 100%)",
+          }}
         />
       </div>
 
@@ -319,13 +399,20 @@ export default function AdvancedTrading() {
           <div>Price</div>
           <div>Quantity</div>
         </div>
-        
+
         {/* Dynamic Trade Rows */}
         <div className="max-h-32 overflow-y-auto">
           {tradeHistory.map((trade, index) => (
-            <div key={index} className="grid grid-cols-4 gap-4 px-4 py-1 text-sm text-white">
+            <div
+              key={index}
+              className="grid grid-cols-4 gap-4 px-4 py-1 text-sm text-white"
+            >
               <div>{trade.time}</div>
-              <div className={trade.direction === "Buy" ? "text-green-400" : "text-red-400"}>
+              <div
+                className={
+                  trade.direction === "Buy" ? "text-green-400" : "text-red-400"
+                }
+              >
                 {trade.direction}
               </div>
               <div className="font-mono">{trade.price}</div>

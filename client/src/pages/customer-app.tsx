@@ -11,7 +11,15 @@ import { SpotOrders } from "@/components/customer/spot-orders";
 import { CryptoTrading } from "@/components/customer/crypto-trading";
 import { CustomerBettingOrders } from "@/components/customer/betting-orders";
 import { AssetsPage } from "@/components/customer/assets-page";
-import { Home, TrendingUp, CreditCard, User, FileText, Settings, LogOut } from "lucide-react";
+import {
+  Home,
+  TrendingUp,
+  CreditCard,
+  User,
+  FileText,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { useLocation } from "wouter";
 
 const sections = [
@@ -32,7 +40,7 @@ export default function CustomerApp() {
     // If a currency is selected, show the trading page
     if (selectedCurrency) {
       return (
-        <CryptoTrading 
+        <CryptoTrading
           currency={selectedCurrency}
           onBack={() => setSelectedCurrency(null)}
         />
@@ -41,25 +49,17 @@ export default function CustomerApp() {
 
     switch (activeSection) {
       case "home":
-        return (
-          <CryptoMarketplace 
-            onSelectCurrency={setSelectedCurrency}
-          />
-        );
+        return <CryptoMarketplace onSelectCurrency={setSelectedCurrency} />;
       case "market":
         return <SpotOrders />;
       case "orders":
         return <CustomerBettingOrders />;
       case "assets":
-        return (
-          <AssetsPage />
-        );
+        return <AssetsPage />;
       case "profile":
         return <Profile />;
       default:
-        return (
-          <CryptoHome onSelectCurrency={setSelectedCurrency} />
-        );
+        return <CryptoHome onSelectCurrency={setSelectedCurrency} />;
     }
   };
 
@@ -71,18 +71,22 @@ export default function CustomerApp() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               {user?.profileImage ? (
-                <img 
-                  src={user.profileImage} 
-                  alt="Profile" 
+                <img
+                  src={user.profileImage}
+                  alt="Profile"
                   className="w-8 h-8 rounded-full object-cover mr-3"
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-3">
-                  {user?.username?.charAt(0).toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {user?.username?.charAt(0).toUpperCase() ||
+                    user?.name?.charAt(0)?.toUpperCase() ||
+                    "U"}
                 </div>
               )}
               <div>
-                <div className="text-sm font-medium text-gray-900">{user?.name || user?.username}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {user?.name || user?.username}
+                </div>
                 <div className="text-xs text-gray-500">Welcome back</div>
               </div>
             </div>
@@ -96,11 +100,7 @@ export default function CustomerApp() {
                   <Settings className="w-4 h-4" />
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => logout()}
-              >
+              <Button variant="ghost" size="sm" onClick={() => logout()}>
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
@@ -111,9 +111,7 @@ export default function CustomerApp() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto pb-[90px] sm:pb-[100px] md:pb-[80px]">
         <div className="w-full h-full">
-          <div className="pb-6 sm:pb-8 md:pb-10">
-            {renderSection()}
-          </div>
+          <div className="pb-6 sm:pb-8 md:pb-10">{renderSection()}</div>
         </div>
       </main>
 
@@ -137,7 +135,9 @@ export default function CustomerApp() {
                   }`}
                 >
                   <Icon className="w-6 h-6 sm:w-7 sm:h-7 mb-1" />
-                  <span className="text-xs sm:text-sm font-medium">{section.label}</span>
+                  <span className="text-xs sm:text-sm font-medium">
+                    {section.label}
+                  </span>
                 </button>
               );
             })}
