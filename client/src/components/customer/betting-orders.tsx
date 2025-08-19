@@ -351,76 +351,91 @@ export function CustomerBettingOrders() {
               return (
                 <Card key={order.id} className="bg-white border border-gray-200">
                   <CardContent className="p-4">
-                    {/* Table Layout without borders */}
-                    <div className="flex">
-                      {/* Left side: Data table */}
-                      <div className="flex-1">
-                        <table className="w-full">
-                          <tbody>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4 w-24">Currency</td>
-                              <td className="font-medium text-sm py-1">{order.asset.includes("/") ? order.asset : `${order.asset}/USDT`}</td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Order No.</td>
-                              <td className="font-medium text-xs py-1">{orderNumber}</td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Order Amount</td>
-                              <td className="font-medium text-sm py-1">{order.amount}</td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Profit Amount</td>
-                              <td className={`font-medium text-sm py-1 ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
-                                {isProfit ? '+' : ''}{profit.toFixed(0)}
-                              </td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Buy Direction</td>
-                              <td className={`font-medium text-sm py-1 ${
-                                user?.direction === "Actual" ? 
-                                  (order.direction === "Buy Up" ? 'text-green-500' : 'text-red-500') :
-                                  (user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500')
-                              }`}>
-                                {user?.direction === "Actual" ? (order.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down"}
-                              </td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Scale</td>
-                              <td className="font-medium text-sm py-1">{getPayoutPercentage(order.duration)}</td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Billing Time</td>
-                              <td className="font-medium text-sm py-1">{order.duration}s</td>
-                            </tr>
-                            <tr className="h-8">
-                              <td className="text-xs text-gray-500 py-1 pr-4">Order Time</td>
-                              <td className="font-medium text-sm py-1">
-                                {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                    {/* Header with currency and timestamp */}
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900">
+                          {order.asset.includes("/") ? order.asset : `${order.asset}/USDT`}
+                        </h3>
                       </div>
-                      
-                      {/* Right side: Actions */}
-                      <div className="flex flex-col items-end justify-start space-y-2 ml-4">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-blue-600 text-xs h-auto p-1"
-                          onClick={() => copyOrderDetails(order)}
-                        >
-                          Copy
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-400 hover:text-gray-600 h-6 w-6 p-0"
-                          onClick={() => openDetailView(order)}
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                        </Button>
+                      <div className="text-right text-sm text-gray-600">
+                        {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+                      </div>
+                    </div>
+
+                    {/* Settlement Timing - Centered */}
+                    <div className="text-center mb-4">
+                      <div className="text-sm text-gray-600 mb-1">Settlement Timing</div>
+                      <div className="text-lg font-bold text-gray-900">
+                        {order.status === 'active' ? 
+                          `${Math.max(0, Math.floor((new Date(order.expiresAt).getTime() - new Date().getTime()) / 1000))} s` : 
+                          `${order.duration} s`
+                        }
+                      </div>
+                    </div>
+
+                    {/* Main content grid - 4 columns matching screenshot */}
+                    <div className="grid grid-cols-4 gap-4 text-sm">
+                      {/* Column 1: Investment Amount & Buy Price */}
+                      <div className="space-y-3">
+                        <div>
+                          <div className="text-gray-500 text-xs mb-1">Investment Amount</div>
+                          <div className="font-medium">{order.amount}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500 text-xs mb-1">Buy Price</div>
+                          <div className="font-medium">{order.entryPrice}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500 text-xs mb-1">Closing Price</div>
+                          <div className="font-medium">{order.exitPrice || order.entryPrice}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500 text-xs mb-1">Profit</div>
+                          <div className={`font-medium ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
+                            {isProfit ? '+' : ''}{profit.toFixed(0)}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Column 2: Direction */}
+                      <div className="flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-gray-500 text-xs mb-1">Direction</div>
+                          <div className={`font-medium text-lg ${
+                            user?.direction === "Actual" ? 
+                              (order.direction === "Buy Up" ? 'text-green-500' : 'text-red-500') :
+                              (user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500')
+                          }`}>
+                            {order.direction === "Buy Up" ? "Up" : "Down"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Column 3: Scale */}
+                      <div className="flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-gray-500 text-xs mb-1">Scale</div>
+                          <div className="font-medium">
+                            {order.duration === 60 ? '20.00%' : 
+                             order.duration === 120 ? '30.00%' : '50.00%'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Column 4: Investment Time */}
+                      <div className="text-right">
+                        <div className="text-gray-500 text-xs mb-1">Investment Time</div>
+                        <div className="font-medium text-xs">{order.duration}s</div>
+                        <div className="font-medium text-xs mt-2">
+                          {parseFloat(order.entryPrice).toFixed(4)}
+                        </div>
+                        <div className="font-medium text-xs">
+                          {order.exitPrice ? parseFloat(order.exitPrice).toFixed(4) : '0.0000'}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          ——————
+                        </div>
                       </div>
                     </div>
                   </CardContent>
