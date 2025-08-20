@@ -890,16 +890,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/messages", authenticateUser, requireAdmin, async (req, res) => {
     try {
       const { recipientId, title, content } = req.body;
+      console.log("Message request body:", req.body);
+      console.log("Recipient ID type:", typeof recipientId, recipientId);
+      
       const adminUserId = getSessionUserId(req);
       if (!adminUserId) {
         return res.status(401).json({ message: "Admin user not found" });
       }
       
+      // Ensure recipientId is a number
+      const toUserId = typeof recipientId === 'string' ? parseInt(recipientId) : recipientId;
+      if (!toUserId || isNaN(toUserId)) {
+        return res.status(400).json({ message: "Invalid recipient ID" });
+      }
+      
+      if (!title || !content) {
+        return res.status(400).json({ message: "Title and content are required" });
+      }
+      
       const message = await storage.createMessage({
         fromUserId: adminUserId,
-        toUserId: recipientId,
-        title,
-        content,
+        toUserId: toUserId,
+        title: title,
+        content: content,
         type: "General"
       });
       res.json(message);
