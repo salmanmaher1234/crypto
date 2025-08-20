@@ -200,9 +200,12 @@ export function SpotOrders({
   // Trading mutation
   const placeTrade = useMutation({
     mutationFn: async (data: {
+      asset: string;
       direction: string;
       amount: number;
       duration: number;
+      entryPrice: string;
+      profitLoss: number;
     }) => {
       const res = await apiRequest("POST", "/api/betting-orders", data);
       return res.json();
