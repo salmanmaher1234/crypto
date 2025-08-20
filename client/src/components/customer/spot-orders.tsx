@@ -265,10 +265,17 @@ export function SpotOrders({
       else if (selectedDuration === "180") profitLoss = amount * -0.5; // 50% loss
     }
 
+    const currentPrice = cryptoPrices[`${selectedCrypto}/USDT`]?.price || 
+                        cryptoPrices["BTC/USDT"]?.price || 
+                        "115044.00";
+
     placeTrade.mutate({
+      asset: `${selectedCrypto}/USDT`,
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
       amount: parseFloat(quantity),
       duration: duration.seconds, // Send actual seconds: 60, 120, or 180
+      entryPrice: currentPrice,
+      profitLoss: profitLoss,
     });
 
     setShowTradePopup(false);
