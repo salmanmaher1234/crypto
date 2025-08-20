@@ -272,14 +272,20 @@ export function SpotOrders({
                         cryptoPrices["BTC/USDT"]?.price || 
                         "115044.00";
 
-    placeTrade.mutate({
+    const orderData = {
       asset: `${selectedCrypto}/USDT`,
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
       amount: parseFloat(quantity),
       duration: duration.seconds, // Send actual seconds: 60, 120, or 180
       entryPrice: currentPrice,
       profitLoss: profitLoss,
-    });
+    };
+
+    console.log("Frontend sending order data:", orderData);
+    console.log("Selected crypto:", selectedCrypto);
+    console.log("Asset being sent:", orderData.asset);
+
+    placeTrade.mutate(orderData);
 
     setShowTradePopup(false);
   };
