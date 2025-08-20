@@ -305,6 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("==== BETTING ORDER START ====");
       console.log("User ID from session:", req.session.userId);
       console.log("Order data:", req.body);
+      console.log("Asset field specifically:", req.body.asset);
       
       // Basic validation with detailed logging
       console.log("Request body fields:", {
@@ -372,9 +373,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create order data that matches storage expectations
+      const assetFromRequest = req.body.asset;
+      console.log("Asset from request body:", assetFromRequest, typeof assetFromRequest);
+      const finalAsset = assetFromRequest || "BTC/USDT";
+      console.log("Final asset to use:", finalAsset);
+      
       const orderData = {
         userId: req.session.userId,
-        asset: req.body.asset || "BTC/USDT", // Use the asset from request, fallback to BTC/USDT
+        asset: finalAsset,
         amount: orderAmount.toString(),
         direction: finalDirection,
         duration: parseInt(req.body.duration),
