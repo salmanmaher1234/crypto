@@ -85,10 +85,10 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
     }
 
     createOrderMutation.mutate({
-      currency,
+      asset: currency,
       amount: orderAmount,
       direction: direction === "up" ? "Buy Up" : "Buy Down",
-      duration: selectedTime,
+      duration: parseInt(selectedTime.replace('S', '')),
       entryPrice: parseFloat(currentPrice),
     });
   };

@@ -372,7 +372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create order data that matches storage expectations
       const orderData = {
         userId: req.session.userId,
-        asset: "BTC/USDT",
+        asset: req.body.asset || "BTC/USDT", // Use the asset from request, fallback to BTC/USDT
         amount: orderAmount.toString(),
         direction: finalDirection,
         duration: parseInt(req.body.duration),

@@ -66,13 +66,13 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
 
   const handleCurrencyChange = (newCurrency: string) => {
     setSelectedCurrency(newCurrency);
-    // Extract the base currency (e.g., BTC from BTC/USDT) 
-    const baseCurrency = newCurrency.split('/')[0];
     // We could trigger an onCurrencyChange callback here if needed
   };
 
-  const currentPrice = (cryptoPrices as any)?.[currency]?.price || "115365.9629";
-  const priceChange = (cryptoPrices as any)?.[currency]?.change || "-2.43";
+  // Extract base currency from selectedCurrency for price lookup
+  const baseCurrency = selectedCurrency.split('/')[0];
+  const currentPrice = (cryptoPrices as any)?.[baseCurrency + '/USDT']?.price || "115365.9629";
+  const priceChange = (cryptoPrices as any)?.[baseCurrency + '/USDT']?.change || "-2.43";
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -126,10 +126,10 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
     }
 
     createOrderMutation.mutate({
-      currency,
+      asset: selectedCurrency,
       amount: orderAmount,
       direction: direction === "up" ? "Buy Up" : "Buy Down",
-      duration: selectedTime,
+      duration: parseInt(selectedTime.replace('S', '')),
       entryPrice: parseFloat(currentPrice),
     });
   };
@@ -160,7 +160,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       if (window.TradingView) {
         new window.TradingView.widget({
           autosize: true,
-          symbol: `BINANCE:${currency.replace('/USDT', 'USDT')}`,
+          symbol: `BINANCE:${baseCurrency}USDT`,
           interval: "1",
           theme: "dark",
           style: "1",
@@ -172,7 +172,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
         });
       }
     }
-  }, [currency]);
+  }, [selectedCurrency, baseCurrency]);
 
   // Mock trading data that matches the image exactly
   const tradingData = [
