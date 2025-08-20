@@ -92,8 +92,8 @@ export function SpotOrders({
   const handleCurrencyChange = (newCurrency: string) => {
     const baseCurrency = newCurrency.split('/')[0];
     setSelectedCrypto(baseCurrency);
-    // Navigate to the selected currency page
-    setLocation(`/customer?tab=market&crypto=${baseCurrency.toLowerCase()}`);
+    // Don't navigate, just update the currency in place
+    // This allows the popup to show the updated currency
   };
 
   const handleHomeClick = () => {
@@ -624,12 +624,16 @@ export function SpotOrders({
               <div className="flex justify-between items-start">
                 <div>
                   <div className="text-sm text-gray-400">Product Name</div>
-                  <div className="text-lg font-bold text-white">BTC/USDT</div>
+                  <div className="text-lg font-bold text-white">{selectedCrypto}/USDT</div>
                   <div className="text-sm text-gray-400 mt-1">Direction</div>
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-gray-400">Current price</div>
-                  <div className="text-lg font-bold text-white">{btcPrice}</div>
+                  <div className="text-lg font-bold text-white">{
+                    cryptoPrices[`${selectedCrypto}/USDT`]?.price || 
+                    cryptoPrices["BTC/USDT"]?.price || 
+                    "115044.00"
+                  }</div>
                 </div>
               </div>
             </div>
