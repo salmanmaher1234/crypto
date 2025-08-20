@@ -22,6 +22,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { BankAccount } from "@shared/schema";
+import { UserMessages } from "./user-messages";
 
 export function Profile() {
   const { user, logout } = useAuth();
@@ -485,33 +486,7 @@ export function Profile() {
 
   // User Message Page (Empty)
   if (currentView === 'userMessage') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
-          <div className="flex items-center">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setCurrentView('main')}
-              className="p-1 mr-2"
-            >
-              <Home className="w-5 h-5 text-gray-600" />
-            </Button>
-          </div>
-          <h1 className="text-lg font-medium text-gray-900">User Message</h1>
-          <div className="w-8"></div>
-        </div>
-
-        {/* Empty Content */}
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="text-center text-gray-500">
-            <div className="text-lg mb-2">No Messages</div>
-            <div className="text-sm">You have no messages at this time.</div>
-          </div>
-        </div>
-      </div>
-    );
+    return <UserMessages onBack={() => setCurrentView('main')} />;
   }
 
   // Help Center Page (Empty)

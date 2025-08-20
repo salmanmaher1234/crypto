@@ -969,7 +969,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Message routes
   app.get("/api/messages", authenticateUser, async (req, res) => {
     try {
-      const userId = getSessionUserId(req);
+      const userId = await getSessionUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -977,6 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messages = await storage.getMessagesByUserId(userId);
       res.json(messages);
     } catch (error) {
+      console.error("Get messages error:", error);
       res.status(500).json({ message: "Failed to get messages" });
     }
   });
