@@ -660,15 +660,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orderId = `ORD${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
       
       // Manually validate required fields (only check what frontend actually sends)
-      const { amount: orderAmount, direction, actualDirection, duration } = req.body;
+      const { amount: orderAmount, direction, actualDirection, duration, asset, entryPrice: frontendEntryPrice } = req.body;
       if (!orderAmount || !direction || !duration) {
         console.log("Missing required fields:", { amount: orderAmount, direction, duration });
         return res.status(400).json({ message: "Missing required fields: amount, direction, duration" });
       }
       
-      // Set default values for fields not sent by frontend
-      const asset = "BTC/USDT";
-      let entryPrice = "115000.00"; // Default fallback
+      console.log("Asset from frontend:", asset);
+      console.log("EntryPrice from frontend:", frontendEntryPrice);
+      
+      // Use asset from frontend or fallback to BTC/USDT
+      const finalAsset = asset || "BTC/USDT";
+      let entryPrice = frontendEntryPrice || "115000.00"; // Use frontend price or fallback
       
       // Get current crypto price for entryPrice
       try {
@@ -697,7 +700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Prepare complete order data with all required fields
       const orderData = {
         userId: (req as any).userId,
-        asset,
+        asset: finalAsset, // Use asset from frontend (JUV/USDT, CHZ/USDT, etc.)
         amount: orderAmountNumber.toString(),
         direction: effectiveDirection, // Use effective direction based on backend setting
         duration: parseInt(duration),
