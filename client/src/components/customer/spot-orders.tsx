@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, TrendingUp, TrendingDown, X, Menu, ChevronDown } from "lucide-react";
+import {
+  ArrowLeft,
+  Home,
+  TrendingUp,
+  TrendingDown,
+  X,
+  Menu,
+  ChevronDown,
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
@@ -49,7 +57,7 @@ export function SpotOrders({
 }: SpotOrdersProps) {
   const [, setLocation] = useLocation();
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
-  const [quantity, setQuantity] = useState("9000");
+  const [quantity, setQuantity] = useState("0");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showTradePopup, setShowTradePopup] = useState(false);
   const [tradeDirection, setTradeDirection] = useState<"up" | "down">("up");
@@ -90,21 +98,21 @@ export function SpotOrders({
   };
 
   const handleCurrencyChange = (newCurrency: string) => {
-    const baseCurrency = newCurrency.split('/')[0];
+    const baseCurrency = newCurrency.split("/")[0];
     setSelectedCrypto(baseCurrency);
     // Don't navigate, just update the currency in place
     // This allows the popup to show the updated currency
   };
 
   const handleHomeClick = () => {
-    setLocation('/customer');
+    setLocation("/customer");
   };
 
   const handleSpotOrdersClick = () => {
     if (onNavigateToOrders) {
       onNavigateToOrders();
     } else {
-      setLocation('/customer?tab=orders');
+      setLocation("/customer?tab=orders");
     }
   };
 
@@ -268,9 +276,10 @@ export function SpotOrders({
       else if (selectedDuration === "180") profitLoss = amount * -0.5; // 50% loss
     }
 
-    const currentPrice = cryptoPrices[`${selectedCrypto}/USDT`]?.price || 
-                        cryptoPrices["BTC/USDT"]?.price || 
-                        "115044.00";
+    const currentPrice =
+      cryptoPrices[`${selectedCrypto}/USDT`]?.price ||
+      cryptoPrices["BTC/USDT"]?.price ||
+      "115044.00";
 
     const orderData = {
       asset: `${selectedCrypto}/USDT`,
@@ -488,20 +497,26 @@ export function SpotOrders({
                 {cryptoOptions.map((crypto) => {
                   const price = cryptoPrices[crypto.symbol]?.price || "0.00";
                   const change = cryptoPrices[crypto.symbol]?.change || "0.00";
-                  const isPositive = !change.toString().startsWith('-');
-                  
+                  const isPositive = !change.toString().startsWith("-");
+
                   return (
                     <DropdownMenuItem
                       key={crypto.symbol}
                       className="text-white hover:bg-gray-800 cursor-pointer flex justify-between items-center px-3 py-2 focus:bg-gray-800 border-none"
                       onClick={() => handleCurrencyChange(crypto.symbol)}
                     >
-                      <span className="text-sm font-medium text-white">{crypto.symbol}</span>
+                      <span className="text-sm font-medium text-white">
+                        {crypto.symbol}
+                      </span>
                       <div className="text-right">
-                        <div className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                        <div
+                          className={`text-sm font-medium ${isPositive ? "text-green-400" : "text-red-400"}`}
+                        >
                           {formatPrice(price)}
                         </div>
-                        <div className={`text-xs ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                        <div
+                          className={`text-xs ${isPositive ? "text-green-400" : "text-red-400"}`}
+                        >
                           {change}%
                         </div>
                       </div>
@@ -640,16 +655,18 @@ export function SpotOrders({
               <div className="flex justify-between items-start">
                 <div>
                   <div className="text-sm text-gray-400">Product Name</div>
-                  <div className="text-lg font-bold text-white">{selectedCrypto}/USDT</div>
+                  <div className="text-lg font-bold text-white">
+                    {selectedCrypto}/USDT
+                  </div>
                   <div className="text-sm text-gray-400 mt-1">Direction</div>
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-gray-400">Current price</div>
-                  <div className="text-lg font-bold text-white">{
-                    cryptoPrices[`${selectedCrypto}/USDT`]?.price || 
-                    cryptoPrices["BTC/USDT"]?.price || 
-                    "115044.00"
-                  }</div>
+                  <div className="text-lg font-bold text-white">
+                    {cryptoPrices[`${selectedCrypto}/USDT`]?.price ||
+                      cryptoPrices["BTC/USDT"]?.price ||
+                      "115044.00"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -704,11 +721,7 @@ export function SpotOrders({
               </div>
 
               {/* Hidden field to capture selected cryptocurrency */}
-              <input
-                type="hidden"
-                value={`${selectedCrypto}/USDT`}
-                readOnly
-              />
+              <input type="hidden" value={`${selectedCrypto}/USDT`} readOnly />
 
               {/* Amount Input */}
               <input

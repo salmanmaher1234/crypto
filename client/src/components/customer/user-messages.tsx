@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Home, Mail, MailOpen } from "lucide-react";
+import { Home, Mail, MailOpen, X } from "lucide-react";
 import { useMessages } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+import type { Message } from "@shared/schema";
 
 interface UserMessagesProps {
   onBack: () => void;
@@ -10,6 +13,18 @@ interface UserMessagesProps {
 
 export function UserMessages({ onBack }: UserMessagesProps) {
   const { data: messages, isLoading } = useMessages();
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleMessageClick = (message: Message) => {
+    setSelectedMessage(message);
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedMessage(null);
+  };
 
   if (isLoading) {
     return (
@@ -82,7 +97,11 @@ export function UserMessages({ onBack }: UserMessagesProps) {
         ) : (
           <div className="space-y-3">
             {messages.map((message) => (
-              <Card key={message.id} className="border-l-4 border-l-blue-500">
+              <Card 
+                key={message.id} 
+                className="border-l-4 border-l-blue-500 cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => handleMessageClick(message)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -99,7 +118,7 @@ export function UserMessages({ onBack }: UserMessagesProps) {
                       {new Date(message.createdAt).toLocaleDateString()}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-600 leading-relaxed">
+                  <div className="text-sm text-gray-600 leading-relaxed line-clamp-2">
                     {message.content}
                   </div>
                   {message.type && message.type !== 'General' && (
@@ -115,6 +134,71 @@ export function UserMessages({ onBack }: UserMessagesProps) {
           </div>
         )}
       </div>
+
+      {/* Message Details Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-lg font-semibold text-gray-900">
+                Message Details
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeDialog}
+                className="p-1"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </DialogHeader>
+          
+          {selectedMessage && (
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center space-x-2 mb-2">
+                  {selectedMessage.isRead ? (
+                    <MailOpen className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <Mail className="w-4 h-4 text-blue-500" />
+                  )}
+                  <span className="font-medium text-base text-gray-900">
+                    {selectedMessage.title}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-500 mb-3">
+                  {new Date(selectedMessage.createdAt).toLocaleDateString()} at{' '}
+                  {new Date(selectedMessage.createdAt).toLocaleTimeString()}
+                </div>
+                {selectedMessage.type && selectedMessage.type !== 'General' && (
+                  <div className="mb-3">
+                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                      {selectedMessage.type}
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="border-t pt-4">
+                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {selectedMessage.content}
+                </div>
+              </div>
+              
+              <div className="flex justify-end pt-4 border-t">
+                <Button
+                  variant="default"
+                  onClick={closeDialog}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
