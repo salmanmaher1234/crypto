@@ -125,18 +125,18 @@ export function Reports() {
               <Table>
                 <TableHeader>
                   <TableRow className="text-xs">
-                    <TableHead className="w-12 text-xs">ID</TableHead>
-                    <TableHead className="w-20 text-xs">General Agent</TableHead>
-                    <TableHead className="w-20 text-xs">Invite Code</TableHead>
-                    <TableHead className="w-28 text-xs">Member Number/Account Number</TableHead>
-                    <TableHead className="w-16 text-xs">state</TableHead>
-                    <TableHead className="w-24 text-xs">Withdrawal amount/Approval amount</TableHead>
-                    <TableHead className="w-16 text-xs">Withdrawal Type</TableHead>
-                    <TableHead className="w-20 text-xs">Withdrawal Address</TableHead>
-                    <TableHead className="w-28 text-xs">Application time/Approval time</TableHead>
-                    <TableHead className="w-20 text-xs">Approval personnel</TableHead>
-                    <TableHead className="w-20 text-xs">Approval Notes</TableHead>
-                    <TableHead className="w-12 text-xs">operate</TableHead>
+                    <TableHead className="w-12 text-xs text-gray-300">ID</TableHead>
+                    <TableHead className="w-20 text-xs text-gray-300">General Agent</TableHead>
+                    <TableHead className="w-20 text-xs text-gray-300">Invite Code</TableHead>
+                    <TableHead className="w-28 text-xs text-gray-300">Member Number/Account Number</TableHead>
+                    <TableHead className="w-16 text-xs text-gray-300">state</TableHead>
+                    <TableHead className="w-24 text-xs text-gray-300">Withdrawal amount/Approval amount</TableHead>
+                    <TableHead className="w-16 text-xs text-gray-300">Withdrawal Type</TableHead>
+                    <TableHead className="w-20 text-xs text-gray-300">Withdrawal Address</TableHead>
+                    <TableHead className="w-28 text-xs text-gray-300">Application time/Approval time</TableHead>
+                    <TableHead className="w-20 text-xs text-gray-300">Approval personnel</TableHead>
+                    <TableHead className="w-20 text-xs text-gray-300">Approval Notes</TableHead>
+                    <TableHead className="w-12 text-xs text-gray-300">operate</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -162,12 +162,12 @@ export function Reports() {
                     };
                     
                     return (
-                      <TableRow key={transaction.id} className="text-xs">
-                        <TableCell className="text-xs">{transaction.id}</TableCell>
-                        <TableCell className="text-xs">8</TableCell>
-                        <TableCell className="text-xs">{getUserInviteCode(userId)}</TableCell>
+                      <TableRow key={transaction.id} className="text-xs border-gray-700">
+                        <TableCell className="text-xs text-gray-300">{transaction.id}</TableCell>
+                        <TableCell className="text-xs text-gray-300">8</TableCell>
+                        <TableCell className="text-xs text-gray-300">{getUserInviteCode(userId)}</TableCell>
                         <TableCell className="text-xs">
-                          <div className="text-blue-600 underline cursor-pointer">
+                          <div className="text-blue-400 underline cursor-pointer">
                             {getUserDisplayName(userId)}
                           </div>
                         </TableCell>
@@ -184,7 +184,7 @@ export function Reports() {
                              transaction.status === "pending" ? "Pending" : "Rejected"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-xs">
+                        <TableCell className="text-xs text-gray-300">
                           {transaction.status === "completed" 
                             ? `${parseFloat(transaction.amount).toFixed(0)} / ${parseFloat(transaction.amount).toFixed(0)}`
                             : transaction.status === "rejected"
@@ -231,21 +231,21 @@ export function Reports() {
                             📄
                           </Button>
                         </TableCell>
-                        <TableCell className="text-xs">
+                        <TableCell className="text-xs text-gray-300">
                           <div>
                             <div>{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(transaction.createdAt).toLocaleTimeString('en-GB', {hour12: false})}</div>
                             {transaction.status === "completed" && (
-                              <div className="text-green-600">{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(new Date(transaction.createdAt).getTime() + 3600000).toLocaleTimeString('en-GB', {hour12: false})}</div>
+                              <div className="text-green-400">{new Date(transaction.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')} {new Date(new Date(transaction.createdAt).getTime() + 3600000).toLocaleTimeString('en-GB', {hour12: false})}</div>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs">
+                        <TableCell className="text-xs text-gray-300">
                           {transaction.status === "completed" ? "admin" : 
                            transaction.status === "pending" ? "" : "admin"}
                         </TableCell>
-                        <TableCell className="text-xs">
+                        <TableCell className="text-xs text-gray-300">
                           {transaction.status === "rejected" && transaction.description ? 
-                            <span className="text-red-600">{transaction.description.replace("Withdrawal rejected: ", "")}</span> : 
+                            <span className="text-red-400">{transaction.description.replace("Withdrawal rejected: ", "")}</span> : 
                             ""
                           }
                         </TableCell>
@@ -253,7 +253,7 @@ export function Reports() {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-5 px-1 text-xs"
+                            className="h-5 px-1 text-xs text-gray-300 hover:text-white"
                             onClick={() => {
                               // Show complete withdrawal history for this customer
                               const withdrawalHistory = transactions
