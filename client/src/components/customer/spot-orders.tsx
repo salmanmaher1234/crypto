@@ -93,7 +93,7 @@ export function SpotOrders({
     const baseCurrency = newCurrency.split('/')[0];
     setSelectedCrypto(baseCurrency);
     // Navigate to the selected currency page
-    setLocation(`/crypto/${baseCurrency.toLowerCase()}`);
+    setLocation(`/customer?tab=market&crypto=${baseCurrency.toLowerCase()}`);
   };
 
   const handleHomeClick = () => {
