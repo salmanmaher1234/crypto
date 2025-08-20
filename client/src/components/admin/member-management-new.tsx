@@ -420,14 +420,14 @@ export function MemberManagement() {
                       <Switch
                         checked={user.isBanned || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { isBanned: checked })}
-                        className="scale-75"
+                        className="scale-75 data-[state=checked]:bg-red-600 data-[state=unchecked]:bg-gray-600"
                       />
                     </TableCell>
                     <TableCell className="text-center w-[80px]">
                       <Switch
                         checked={user.withdrawalProhibited || false}
                         onCheckedChange={(checked) => handleQuickUpdate(user, { withdrawalProhibited: checked })}
-                        className="scale-75"
+                        className="scale-75 data-[state=checked]:bg-orange-600 data-[state=unchecked]:bg-gray-600"
                       />
                     </TableCell>
                     <TableCell className="w-[110px]">
@@ -454,7 +454,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                              className="h-6 px-2 text-xs bg-blue-900 text-blue-200 border-blue-600 hover:bg-blue-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Key className="w-3 h-3 mr-1" />
@@ -532,7 +532,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                              className="h-6 px-2 text-xs bg-green-900 text-green-200 border-green-600 hover:bg-green-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <CheckCircle className="w-3 h-3 mr-1" />
@@ -604,7 +604,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                              className="h-6 px-2 text-xs bg-orange-900 text-orange-200 border-orange-600 hover:bg-orange-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Plus className="w-3 h-3 mr-1" />
@@ -646,7 +646,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              className="h-6 px-2 text-xs bg-red-900 text-red-200 border-red-600 hover:bg-red-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Minus className="w-3 h-3 mr-1" />
@@ -690,7 +690,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100"
+                              className="h-6 px-2 text-xs bg-blue-900 text-blue-200 border-blue-600 hover:bg-blue-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Lock className="w-3 h-3 mr-1" />
@@ -736,7 +736,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                              className="h-6 px-2 text-xs bg-green-900 text-green-200 border-green-600 hover:bg-green-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Unlock className="w-3 h-3 mr-1" />
@@ -779,7 +779,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100"
+                              className="h-6 px-2 text-xs bg-yellow-900 text-yellow-200 border-yellow-600 hover:bg-yellow-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Send className="w-3 h-3 mr-1" />
@@ -826,7 +826,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100"
+                              className="h-6 px-2 text-xs bg-purple-900 text-purple-200 border-purple-600 hover:bg-purple-800"
                               onClick={() => {
                                 setSelectedUser(user);
                                 setCreditScore(user.reputation?.toString() || "100");
@@ -883,7 +883,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              className="h-6 px-2 text-xs bg-red-900 text-red-200 border-red-600 hover:bg-red-800"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Trash2 className="w-3 h-3 mr-1" />
