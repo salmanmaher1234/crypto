@@ -504,7 +504,7 @@ export function SpotOrders({
           </DropdownMenu>
         </div>
         <div className="text-center">
-          <div className="text-white font-bold">BTC/USDT</div>
+          <div className="text-white font-bold">{selectedCrypto}/USDT</div>
         </div>
         <div className="text-right">
           <Button
