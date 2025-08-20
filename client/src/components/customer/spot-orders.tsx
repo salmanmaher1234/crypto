@@ -92,6 +92,20 @@ export function SpotOrders({
   const handleCurrencyChange = (newCurrency: string) => {
     const baseCurrency = newCurrency.split('/')[0];
     setSelectedCrypto(baseCurrency);
+    // Navigate to the selected currency page
+    setLocation(`/customer?tab=market&crypto=${baseCurrency.toLowerCase()}`);
+  };
+
+  const handleHomeClick = () => {
+    setLocation('/customer');
+  };
+
+  const handleSpotOrdersClick = () => {
+    if (onNavigateToOrders) {
+      onNavigateToOrders();
+    } else {
+      setLocation('/customer?tab=orders');
+    }
   };
 
   const tradeDurations = [
@@ -457,6 +471,14 @@ export function SpotOrders({
                 <div className="px-3 py-2 text-xs text-red-500 font-medium border-b border-gray-800 bg-gray-900">
                   Spot
                 </div>
+                {/* Home Icon Option */}
+                <DropdownMenuItem
+                  className="text-white hover:bg-gray-800 cursor-pointer flex items-center px-3 py-2 focus:bg-gray-800 border-none"
+                  onClick={handleHomeClick}
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  <span className="text-sm font-medium text-white">Home</span>
+                </DropdownMenuItem>
                 {cryptoOptions.map((crypto) => {
                   const price = cryptoPrices[crypto.symbol]?.price || "0.00";
                   const change = cryptoPrices[crypto.symbol]?.change || "0.00";
@@ -491,7 +513,7 @@ export function SpotOrders({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation("/spot-orders")}
+            onClick={handleSpotOrdersClick}
             className="text-white hover:bg-gray-700 text-sm"
           >
             Spot Orders &gt;

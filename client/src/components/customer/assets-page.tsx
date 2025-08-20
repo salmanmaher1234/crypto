@@ -114,7 +114,7 @@ export function AssetsPage() {
 
         {/* Tabs Section */}
         <div className="bg-white rounded-t-3xl px-4 py-4">
-          <div className="flex justify-center space-x-16">
+          <div className="flex justify-center space-x-8 sm:space-x-16">
             {/* Recharge Tab */}
             <Button
               variant="ghost"
@@ -130,7 +130,7 @@ export function AssetsPage() {
                   activeTab === "recharge" ? "text-blue-600" : "text-gray-600"
                 }`} />
               </div>
-              <span className="text-xs">Recharge</span>
+              <span className="text-xs text-center">Recharge</span>
             </Button>
 
             {/* Withdrawal Tab */}
@@ -148,7 +148,7 @@ export function AssetsPage() {
                   activeTab === "withdrawal" ? "text-red-600" : "text-gray-600"
                 }`} />
               </div>
-              <span className="text-xs">Withdrawal of Currency</span>
+              <span className="text-xs text-center">Withdrawal</span>
             </Button>
           </div>
         </div>
@@ -161,23 +161,23 @@ export function AssetsPage() {
           className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => setLocation('/funding-information')}
         >
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             {/* Left Section - Currency and Available Balance */}
             <div className="flex-1">
               <div className="text-lg font-medium text-gray-900 mb-2">{selectedCurrency}</div>
-              <div className="text-2xl font-bold text-blue-600">{convertAmount(availableBalance)}</div>
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">{convertAmount(availableBalance)}</div>
               <div className="text-xs text-gray-500">Available Balance</div>
             </div>
             
             {/* Center Section - Frozen */}
-            <div className="flex-1 text-center">
-              <div className="text-2xl font-bold text-blue-600 mt-8">{convertAmount(frozenBalance)}</div>
+            <div className="flex-1 text-left sm:text-center">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 sm:mt-8">{convertAmount(frozenBalance)}</div>
               <div className="text-xs text-gray-500">Frozen</div>
             </div>
             
             {/* Right Section - Total Balance */}
-            <div className="flex-1 text-right">
-              <div className="text-2xl font-bold text-blue-600 mt-8">{convertAmount(totalBalance)}</div>
+            <div className="flex-1 text-left sm:text-right">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 sm:mt-8">{convertAmount(totalBalance)}</div>
               <div className="text-xs text-gray-500">Balance</div>
             </div>
           </div>
