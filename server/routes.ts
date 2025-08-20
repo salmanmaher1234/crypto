@@ -311,9 +311,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         amount: req.body.amount,
         direction: req.body.direction,
         duration: req.body.duration,
+        asset: req.body.asset,
         hasAmount: !!req.body.amount,
         hasDirection: !!req.body.direction,
-        hasDuration: !!req.body.duration
+        hasDuration: !!req.body.duration,
+        hasAsset: !!req.body.asset
       });
       
       if (!req.body.amount || !req.body.direction || !req.body.duration) {
