@@ -697,6 +697,13 @@ export function SpotOrders({
                 </div>
               </div>
 
+              {/* Hidden field to capture selected cryptocurrency */}
+              <input
+                type="hidden"
+                value={`${selectedCrypto}/USDT`}
+                readOnly
+              />
+
               {/* Amount Input */}
               <input
                 type="number"
