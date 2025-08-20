@@ -893,8 +893,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Message request body:", req.body);
       console.log("Recipient ID type:", typeof recipientId, recipientId);
       
-      const adminUserId = getSessionUserId(req);
-      if (!adminUserId) {
+      const adminUserId = await getSessionUserId(req);
+      console.log("Admin user ID:", adminUserId, typeof adminUserId);
+      if (!adminUserId || typeof adminUserId !== 'number') {
         return res.status(401).json({ message: "Admin user not found" });
       }
       
@@ -907,6 +908,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!title || !content) {
         return res.status(400).json({ message: "Title and content are required" });
       }
+      
+      console.log("Creating message with data:", {
+        fromUserId: adminUserId,
+        toUserId: toUserId,
+        title: title,
+        content: content,
+        type: "General"
+      });
       
       const message = await storage.createMessage({
         fromUserId: adminUserId,
