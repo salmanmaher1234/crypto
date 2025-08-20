@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useRoute, Link } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, TrendingUp, TrendingDown, X } from "lucide-react";
+import { ArrowLeft, Home, TrendingUp, TrendingDown, X, Menu } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
@@ -12,6 +12,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // TradingView Chart Component
 function TradingViewChart({ cryptoSymbol, timeframe }: { cryptoSymbol: string, timeframe: string }) {
@@ -151,6 +157,7 @@ interface CryptoPrices {
 
 export function CryptoSingle() {
   const [match, params] = useRoute("/crypto/:cryptoId");
+  const [, setLocation] = useLocation();
   const cryptoId = params?.cryptoId?.toUpperCase() || null;
   const [activeTimeframe, setActiveTimeframe] = useState("5M");
   const [quantity, setQuantity] = useState("9000");
@@ -164,6 +171,43 @@ export function CryptoSingle() {
   const queryClient = useQueryClient();
   
   const crypto = cryptoId ? cryptoData[cryptoId] : null;
+
+  // Available cryptocurrency options for the dropdown
+  const cryptoOptions = [
+    { symbol: "BTC/USDT", name: "Bitcoin" },
+    { symbol: "ETH/USDT", name: "Ethereum" },
+    { symbol: "DOGE/USDT", name: "Dogecoin" },
+    { symbol: "CHZ/USDT", name: "Chiliz" },
+    { symbol: "PSG/USDT", name: "Paris Saint-Germain" },
+    { symbol: "ATM/USDT", name: "Atletico Madrid" },
+    { symbol: "JUV/USDT", name: "Juventus" },
+    { symbol: "KSM/USDT", name: "Kusama" },
+    { symbol: "LTC/USDT", name: "Litecoin" },
+    { symbol: "EOS/USDT", name: "EOS" },
+    { symbol: "BTS/USDT", name: "BitShares" },
+    { symbol: "LINK/USDT", name: "Chainlink" },
+  ];
+
+  const formatPrice = (price: string | number) => {
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    if (numPrice < 1) {
+      return numPrice.toFixed(4);
+    } else if (numPrice < 100) {
+      return numPrice.toFixed(2);
+    } else {
+      return numPrice.toFixed(0);
+    }
+  };
+
+  const handleCurrencyChange = (newCurrency: string) => {
+    const baseCurrency = newCurrency.split('/')[0];
+    // Navigate to the selected currency page
+    setLocation(`/crypto/${baseCurrency.toLowerCase()}`);
+  };
+
+  const handleSpotOrdersClick = () => {
+    setLocation('/customer?tab=orders');
+  };
 
   const tradeDurations = [
     { value: "60", label: "60S", seconds: 60 },
@@ -296,24 +340,63 @@ export function CryptoSingle() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header - Exact Blocnix Style */}
-      <div className="bg-gray-900 border-b border-gray-800">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <Link href="/customer">
-            <Button variant="ghost" className="text-gray-400 hover:text-white p-2">
-              <Home className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div className="text-center">
-            <h1 className="text-lg font-bold text-white">{crypto.symbol}</h1>
-          </div>
-          <div className="text-right">
-            <Link href="/customer/orders?tab=position">
-              <Button variant="ghost" className="text-gray-400 hover:text-white text-sm">
-                Spot Orders
+      {/* Top Header */}
+      <div className="bg-gray-900 px-4 py-2 flex items-center justify-between border-b border-gray-700">
+        <div className="flex items-center space-x-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-gray-700 flex items-center space-x-1 px-2 py-1 h-auto font-medium text-sm"
+              >
+                <span>{crypto.symbol}</span>
+                <Menu className="w-3 h-3" />
               </Button>
-            </Link>
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-black border-gray-700">
+              <div className="bg-black text-white max-h-96 overflow-y-auto">
+                <div className="px-3 py-2 text-xs text-red-500 font-medium border-b border-gray-800 bg-gray-900">
+                  Spot
+                </div>
+                {cryptoOptions.map((crypto) => {
+                  const price = cryptoPrices[crypto.symbol]?.price || "0.00";
+                  const change = cryptoPrices[crypto.symbol]?.change || "0.00";
+                  const isPositive = !change.toString().startsWith('-');
+                  
+                  return (
+                    <DropdownMenuItem
+                      key={crypto.symbol}
+                      className="text-white hover:bg-gray-800 cursor-pointer flex justify-between items-center px-3 py-2 focus:bg-gray-800 border-none"
+                      onClick={() => handleCurrencyChange(crypto.symbol)}
+                    >
+                      <span className="text-sm font-medium text-white">{crypto.symbol}</span>
+                      <div className="text-right">
+                        <div className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatPrice(price)}
+                        </div>
+                        <div className={`text-xs ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                          {change}%
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="text-center">
+          <div className="text-white font-bold">{crypto.symbol}</div>
+        </div>
+        <div className="text-right">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSpotOrdersClick}
+            className="text-white hover:bg-gray-700 text-sm"
+          >
+            Spot Orders &gt;
+          </Button>
         </div>
       </div>
 
