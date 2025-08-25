@@ -30,12 +30,12 @@ export function Profile() {
   const [fundsPassword, setFundsPassword] = useState<string[]>(Array(6).fill(''));
   const [bankForm, setBankForm] = useState({
     bindingType: 'Bank Card',
-    currency: 'BDT',
+    currency: 'INR',
     accountNumber: '',
     accountHolderName: '',
     bankName: '',
     branchName: '',
-    bkashNagadRocket: ''
+    ifscCode: ''
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -66,12 +66,12 @@ export function Profile() {
       queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
       setBankForm({
         bindingType: 'Bank Card',
-        currency: 'BDT',
+        currency: 'INR',
         accountNumber: '',
         accountHolderName: '',
         bankName: '',
         branchName: '',
-        bkashNagadRocket: ''
+        ifscCode: ''
       });
     },
     onError: (error: any) => {
@@ -84,7 +84,7 @@ export function Profile() {
   });
 
   const handleCreateBankAccount = () => {
-    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName || !bankForm.branchName || !bankForm.bkashNagadRocket) {
+    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName || !bankForm.ifscCode) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
@@ -181,16 +181,16 @@ export function Profile() {
                     <div className="flex gap-2">
                       <Button
                         type="button"
-                        variant={bankForm.currency === 'BDT' ? 'default' : 'outline'}
-                        onClick={() => setBankForm({ ...bankForm, currency: 'BDT' })}
+                        variant={bankForm.currency === 'INR' ? 'default' : 'outline'}
+                        onClick={() => setBankForm({ ...bankForm, currency: 'INR' })}
                         className="px-4 py-2 rounded"
                         style={{
-                          background: bankForm.currency === 'BDT' ? '#FFA500' : 'transparent',
-                          color: bankForm.currency === 'BDT' ? 'white' : '#666',
+                          background: bankForm.currency === 'INR' ? '#FFA500' : 'transparent',
+                          color: bankForm.currency === 'INR' ? 'white' : '#666',
                           border: '1px solid #ddd'
                         }}
                       >
-                        BDT
+                        INR
                       </Button>
                     </div>
                   </div>
@@ -210,7 +210,7 @@ export function Profile() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Holder Name
+                      Account Holder
                     </label>
                     <Input
                       type="text"
@@ -249,12 +249,12 @@ export function Profile() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Bkash/Nagad/Rocket
+                      IFSC Code
                     </label>
                     <Input
                       type="text"
-                      value={bankForm.bkashNagadRocket}
-                      onChange={(e) => setBankForm({ ...bankForm, bkashNagadRocket: e.target.value })}
+                      value={bankForm.ifscCode}
+                      onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
                       placeholder=""
                       className="w-full border-red-300"
                     />
@@ -331,16 +331,16 @@ export function Profile() {
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant={bankForm.currency === 'BDT' ? 'default' : 'outline'}
-                onClick={() => setBankForm({ ...bankForm, currency: 'BDT' })}
+                variant={bankForm.currency === 'INR' ? 'default' : 'outline'}
+                onClick={() => setBankForm({ ...bankForm, currency: 'INR' })}
                 className="px-4 py-2 rounded"
                 style={{
-                  background: bankForm.currency === 'BDT' ? '#FFA500' : 'transparent',
-                  color: bankForm.currency === 'BDT' ? 'white' : '#666',
+                  background: bankForm.currency === 'INR' ? '#FFA500' : 'transparent',
+                  color: bankForm.currency === 'INR' ? 'white' : '#666',
                   border: '1px solid #ddd'
                 }}
               >
-                BDT
+                INR
               </Button>
             </div>
           </div>
@@ -360,7 +360,7 @@ export function Profile() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Holder Name
+              Account Holder
             </label>
             <Input
               type="text"
@@ -399,12 +399,12 @@ export function Profile() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bkash/Nagad/Rocket
+              IFSC Code
             </label>
             <Input
               type="text"
-              value={bankForm.bkashNagadRocket}
-              onChange={(e) => setBankForm({ ...bankForm, bkashNagadRocket: e.target.value })}
+              value={bankForm.ifscCode}
+              onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
               placeholder=""
               className="w-full border-red-300"
             />

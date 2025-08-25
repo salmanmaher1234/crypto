@@ -88,12 +88,12 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
       color: "blue"
     },
     {
-      symbol: "DOGE/USDT",
-      name: "Dogecoin", 
-      price: cryptoPrices?.["DOGE/USD"]?.price || "0.18",
-      change: cryptoPrices?.["DOGE/USD"]?.change || "-1.3%",
-      isPositive: cryptoPrices?.["DOGE/USD"]?.change ? !cryptoPrices["DOGE/USD"].change.startsWith('-') : false,
-      icon: "Ð",
+      symbol: "SUP/USDT",
+      name: "SuperCoin", 
+      price: cryptoPrices?.["SUP/USD"]?.price || "0.18",
+      change: cryptoPrices?.["SUP/USD"]?.change || "-1.3%",
+      isPositive: cryptoPrices?.["SUP/USD"]?.change ? !cryptoPrices["SUP/USD"].change.startsWith('-') : false,
+      icon: "Ⓢ",
       color: "yellow"
     },
 

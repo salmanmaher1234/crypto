@@ -8,7 +8,7 @@ export function AssetsPage() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"recharge" | "withdrawal">("recharge");
-  const [selectedCurrency, setSelectedCurrency] = useState<"BDT" | "USD">("BDT");
+  const [selectedCurrency, setSelectedCurrency] = useState<"INR" | "USD">("INR");
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -86,14 +86,14 @@ export function AssetsPage() {
                 <div className="absolute top-6 right-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[80px]">
                   <button
                     className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 ${
-                      selectedCurrency === 'BDT' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                      selectedCurrency === 'INR' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
                     }`}
                     onClick={() => {
-                      setSelectedCurrency('BDT');
+                      setSelectedCurrency('INR');
                       setShowCurrencyDropdown(false);
                     }}
                   >
-                    BDT
+                    INR
                   </button>
                   <button
                     className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 ${

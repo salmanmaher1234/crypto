@@ -82,10 +82,10 @@ const cryptoData: { [key: string]: any } = {
     icon: "Ξ",
     color: "#627EEA",
   },
-  "DOGE": {
-    symbol: "DOGE/USDT",
-    name: "Dogecoin", 
-    icon: "Ð",
+  "SUP": {
+    symbol: "SUP/USDT",
+    name: "SuperCoin", 
+    icon: "Ⓢ",
     color: "#C2A633",
   },
   "CHZ": {
@@ -176,7 +176,7 @@ export function CryptoSingle() {
   const cryptoOptions = [
     { symbol: "BTC/USDT", name: "Bitcoin" },
     { symbol: "ETH/USDT", name: "Ethereum" },
-    { symbol: "DOGE/USDT", name: "Dogecoin" },
+    { symbol: "SUP/USDT", name: "SuperCoin" },
     { symbol: "CHZ/USDT", name: "Chiliz" },
     { symbol: "PSG/USDT", name: "Paris Saint-Germain" },
     { symbol: "ATM/USDT", name: "Atletico Madrid" },

@@ -37,12 +37,12 @@ export const bankAccounts = pgTable("bank_accounts", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   bindingType: text("binding_type").notNull().default("Bank Card"), // Bank Card, etc.
-  currency: text("currency").notNull().default("BDT"), // BDT, USD, etc.
+  currency: text("currency").notNull().default("INR"), // INR, USD, etc.
   accountNumber: text("account_number").notNull(),
   accountHolderName: text("account_holder_name").notNull(),
   bankName: text("bank_name").notNull(),
   branchName: text("branch_name").notNull(),
-  bkashNagadRocket: text("bkash_nagad_rocket").notNull(), // Bkash/Nagad/Rocket field
+  ifscCode: text("ifsc_code").notNull(), // IFSC Code for Indian banking
   isDefault: boolean("is_default").notNull().default(false),
 });
 

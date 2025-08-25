@@ -360,7 +360,7 @@ export class DatabaseStorage implements IStorage {
       accountNumber: bankAccounts.accountNumber,
       bankName: bankAccounts.bankName,
       branchName: bankAccounts.branchName,
-      bkashNagadRocket: bankAccounts.bkashNagadRocket,
+      ifscCode: bankAccounts.ifscCode,
       isDefault: bankAccounts.isDefault,
       userId: bankAccounts.userId,
       username: users.username,

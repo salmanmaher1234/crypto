@@ -130,7 +130,7 @@ export default function WithdrawalRequest() {
         {/* Currency Withdrawal Section */}
         <div>
           <div className="text-gray-700 text-sm mb-2">Currency withdrawal ( Currency Account)</div>
-          <div className="text-gray-600 text-sm font-medium mb-4">BDT</div>
+          <div className="text-gray-600 text-sm font-medium mb-4">INR</div>
         </div>
 
         {/* Collection Information */}
