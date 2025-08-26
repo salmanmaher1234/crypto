@@ -1,18 +1,18 @@
--- C BOE Database Schema for PostgreSQL
+-- C BOE Database Schema for MySQL
 -- Updated with latest database structure including Indian banking system
--- Run this in your PostgreSQL database
+-- Run this in your MySQL database
 
--- Note: PostgreSQL doesn't use CREATE DATABASE in schema files
--- Create database manually: CREATE DATABASE cboe;
+CREATE DATABASE IF NOT EXISTS cboe;
+USE cboe;
 
 -- Users table with all latest fields
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    role TEXT CHECK (role IN ('customer', 'admin')) DEFAULT 'customer',
+    role ENUM('customer', 'admin') DEFAULT 'customer',
     balance DECIMAL(15,2) DEFAULT 0.00,
     available_balance DECIMAL(15,2) DEFAULT 0.00,
     frozen_balance DECIMAL(15,2) DEFAULT 0.00,
@@ -40,18 +40,18 @@ CREATE TABLE users (
 
 -- Bank accounts table with Indian banking system
 CREATE TABLE bank_accounts (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    binding_type TEXT NOT NULL DEFAULT 'Bank Card',
-    currency TEXT NOT NULL DEFAULT 'INR',
-    account_number TEXT NOT NULL,
-    account_holder_name TEXT NOT NULL,
-    bank_name TEXT NOT NULL,
-    branch_name TEXT, -- nullable - not required
-    ifsc_code TEXT, -- nullable - not required (IFSC Code for Indian banking)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    binding_type VARCHAR(50) NOT NULL DEFAULT 'Bank Card',
+    currency VARCHAR(10) NOT NULL DEFAULT 'INR',
+    account_number VARCHAR(100) NOT NULL,
+    account_holder_name VARCHAR(255) NOT NULL,
+    bank_name VARCHAR(255) NOT NULL,
+    branch_name VARCHAR(255), -- nullable - not required
+    ifsc_code VARCHAR(20), -- nullable - not required (IFSC Code for Indian banking)
     is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -232,8 +232,8 @@ INSERT INTO betting_orders (
     'completed', 
     'win', 
     200.00,
-    NOW() - INTERVAL '1 hour',
-    NOW() - INTERVAL '30 minutes'
+    DATE_SUB(NOW(), INTERVAL 1 HOUR),
+    DATE_SUB(NOW(), INTERVAL 30 MINUTE)
 );
 
 -- Indexes for better performance

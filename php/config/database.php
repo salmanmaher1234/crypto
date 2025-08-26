@@ -1,29 +1,18 @@
 <?php
-// Database configuration for PostgreSQL
+// Database configuration for MySQL
 class Database {
-    private $host;
-    private $db_name;
-    private $username;
-    private $password;
-    private $port;
+    private $host = 'localhost';
+    private $db_name = 'cboe';
+    private $username = 'root';
+    private $password = '';
     private $conn;
-
-    public function __construct() {
-        // Use environment variables if available, otherwise defaults
-        $this->host = $_ENV['PGHOST'] ?? 'localhost';
-        $this->port = $_ENV['PGPORT'] ?? '5432';
-        $this->db_name = $_ENV['PGDATABASE'] ?? 'cboe';
-        $this->username = $_ENV['PGUSER'] ?? 'postgres';
-        $this->password = $_ENV['PGPASSWORD'] ?? '';
-    }
 
     public function getConnection() {
         $this->conn = null;
         
         try {
-            $dsn = "pgsql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name;
             $this->conn = new PDO(
-                $dsn,
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
                 $this->username,
                 $this->password,
                 array(

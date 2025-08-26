@@ -27,7 +27,7 @@ $stmt->execute();
 
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$user || !password_verify($input['password'], $user['password_hash'])) {
+if (!$user || !password_verify($input['password'], $user['password'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Invalid credentials']);
     exit();
@@ -46,8 +46,10 @@ $_SESSION['username'] = $user['username'];
 $_SESSION['role'] = $user['role'];
 
 // Return user data (without password)
-unset($user['password_hash']);
-unset($user['fund_password_hash']);
+unset($user['password']);
+if (isset($user['fund_password'])) {
+    unset($user['fund_password']);
+}
 
 echo json_encode([
     'user' => $user,
