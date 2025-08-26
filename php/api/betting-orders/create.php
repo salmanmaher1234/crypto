@@ -23,9 +23,9 @@ foreach ($required as $field) {
 }
 
 $amount = floatval($input['amount']);
-if ($amount < 1000) {
+if ($amount < 100) {
     http_response_code(400);
-    echo json_encode(['error' => 'Amount cannot be less than 1000']);
+    echo json_encode(['error' => 'Amount cannot be less than ₹100']);
     exit();
 }
 

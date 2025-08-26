@@ -1,18 +1,18 @@
--- SuperCoin Database Schema for MySQL
--- Updated with latest database structure
--- Run this in your Hostinger MySQL database
+-- C BOE Database Schema for PostgreSQL
+-- Updated with latest database structure including Indian banking system
+-- Run this in your PostgreSQL database
 
-CREATE DATABASE IF NOT EXISTS supercoin;
-USE supercoin;
+-- Note: PostgreSQL doesn't use CREATE DATABASE in schema files
+-- Create database manually: CREATE DATABASE cboe;
 
 -- Users table with all latest fields
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    role ENUM('customer', 'admin') DEFAULT 'customer',
+    role TEXT CHECK (role IN ('customer', 'admin')) DEFAULT 'customer',
     balance DECIMAL(15,2) DEFAULT 0.00,
     available_balance DECIMAL(15,2) DEFAULT 0.00,
     frozen_balance DECIMAL(15,2) DEFAULT 0.00,
@@ -38,17 +38,20 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Bank accounts table
+-- Bank accounts table with Indian banking system
 CREATE TABLE bank_accounts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    account_holder_name VARCHAR(255) NOT NULL,
-    account_number VARCHAR(100) NOT NULL,
-    bank_name VARCHAR(255) NOT NULL,
-    ifsc_code VARCHAR(20) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    binding_type TEXT NOT NULL DEFAULT 'Bank Card',
+    currency TEXT NOT NULL DEFAULT 'INR',
+    account_number TEXT NOT NULL,
+    account_holder_name TEXT NOT NULL,
+    bank_name TEXT NOT NULL,
+    branch_name TEXT, -- nullable - not required
+    ifsc_code TEXT, -- nullable - not required (IFSC Code for Indian banking)
     is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -220,17 +223,17 @@ INSERT INTO betting_orders (
 ) VALUES (
     2, 
     'ORD1737482400001', 
-    'BTC/USDT', 
+    'SUP/USDT', 
     1000.00, 
     'Buy Up', 
     30, 
-    107314.24, 
-    107500.00, 
+    0.85423, 
+    0.87500, 
     'completed', 
     'win', 
     200.00,
-    DATE_SUB(NOW(), INTERVAL 1 HOUR),
-    DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+    NOW() - INTERVAL '1 hour',
+    NOW() - INTERVAL '30 minutes'
 );
 
 -- Indexes for better performance
