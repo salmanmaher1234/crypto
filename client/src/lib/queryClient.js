@@ -1,20 +1,16 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 
-async function throwIfResNotOk(res: Response) {
+async function throwIfResNotOk(res) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
 }
 
-export async function apiRequest(
-  method: string,
-  url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
+export async function apiRequest(method, url, data) {
   try {
     const sessionId = localStorage.getItem('sessionId');
-    const headers: Record<string, string> = {
+    const headers = {
       "Content-Type": "application/json",
     };
     
@@ -22,7 +18,10 @@ export async function apiRequest(
       headers["X-Session-Id"] = sessionId;
     }
 
-    const res = await fetch(url, {
+    // Convert Express.js API routes to PHP routes
+    const phpUrl = url.replace('/api/', '/php/api/');
+
+    const res = await fetch(phpUrl, {
       method,
       headers,
       body: data ? JSON.stringify(data) : undefined,
@@ -40,15 +39,11 @@ export async function apiRequest(
   }
 }
 
-type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
-  on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
+export const getQueryFn = ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     try {
       const sessionId = localStorage.getItem('sessionId');
-      const headers: Record<string, string> = {
+      const headers = {
         "Content-Type": "application/json",
       };
       
@@ -56,7 +51,10 @@ export const getQueryFn: <T>(options: {
         headers["X-Session-Id"] = sessionId;
       }
 
-      const res = await fetch(queryKey[0] as string, {
+      // Convert Express.js API routes to PHP routes
+      const phpUrl = queryKey[0].replace('/api/', '/php/api/');
+
+      const res = await fetch(phpUrl, {
         credentials: "include",
         headers,
       });
