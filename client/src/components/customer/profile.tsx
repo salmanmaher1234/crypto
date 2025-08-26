@@ -84,9 +84,9 @@ export function Profile() {
   });
 
   const handleCreateBankAccount = () => {
-    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName || !bankForm.ifscCode) {
+    if (!bankForm.accountHolderName || !bankForm.accountNumber || !bankForm.bankName) {
       toast({
-        title: "Missing Information",
+        title: "Missing Information", 
         description: "Please fill in all required fields",
         variant: "destructive",
       });
@@ -130,17 +130,29 @@ export function Profile() {
                   <div className="space-y-3">
                     {bankAccounts.map((account) => (
                       <div key={account.id} className="bg-white rounded-lg border border-gray-200 p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900">{account.bankName}</div>
-                            <div className="text-sm text-gray-600 mt-1">{account.accountHolderName}</div>
-                            <div className="text-sm text-gray-500">
-                              ***{account.accountNumber.slice(-4)}
+                        <div className="space-y-2">
+                          <div className="font-medium text-gray-900">{account.bankName}</div>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-gray-500">Account Holder:</span>
+                              <div className="text-gray-800">{account.accountHolderName}</div>
                             </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-xs text-gray-500">{account.branchName}</div>
-                            <div className="text-xs text-gray-400">{account.bkashNagadRocket}</div>
+                            <div>
+                              <span className="text-gray-500">Account Number:</span>
+                              <div className="text-gray-800">***{account.accountNumber.slice(-4)}</div>
+                            </div>
+                            {account.ifscCode && (
+                              <div>
+                                <span className="text-gray-500">IFSC Code:</span>
+                                <div className="text-gray-800">{account.ifscCode}</div>
+                              </div>
+                            )}
+                            {account.branchName && (
+                              <div>
+                                <span className="text-gray-500">Branch:</span>
+                                <div className="text-gray-800">{account.branchName}</div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

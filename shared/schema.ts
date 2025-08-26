@@ -41,8 +41,8 @@ export const bankAccounts = pgTable("bank_accounts", {
   accountNumber: text("account_number").notNull(),
   accountHolderName: text("account_holder_name").notNull(),
   bankName: text("bank_name").notNull(),
-  branchName: text("branch_name").notNull(),
-  ifscCode: text("ifsc_code").notNull(), // IFSC Code for Indian banking
+  branchName: text("branch_name"), // nullable - not required
+  ifscCode: text("ifsc_code"), // nullable - not required (IFSC Code for Indian banking)
   isDefault: boolean("is_default").notNull().default(false),
 });
 

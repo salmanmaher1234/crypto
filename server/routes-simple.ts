@@ -362,8 +362,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("==== BANK ACCOUNT CREATE START ====");
       console.log("Request body:", req.body);
       
-      // Manual validation for new fields
-      const requiredFields = ['accountHolderName', 'accountNumber', 'bankName', 'branchName', 'bkashNagadRocket'];
+      // Manual validation for required fields only
+      const requiredFields = ['accountHolderName', 'accountNumber', 'bankName'];
       for (const field of requiredFields) {
         if (!req.body[field] || req.body[field].trim() === '') {
           console.log(`Missing required field: ${field}`);
@@ -374,12 +374,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const bankAccountData = {
         userId: (req as any).userId,
         bindingType: req.body.bindingType || 'Bank Card',
-        currency: req.body.currency || 'BDT',
+        currency: req.body.currency || 'INR',
         accountHolderName: req.body.accountHolderName,
         accountNumber: req.body.accountNumber,
         bankName: req.body.bankName,
-        branchName: req.body.branchName,
-        bkashNagadRocket: req.body.bkashNagadRocket,
+        branchName: req.body.branchName || null,
+        ifscCode: req.body.ifscCode || null,
         isDefault: false
       };
       

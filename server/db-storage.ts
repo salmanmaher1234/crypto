@@ -425,7 +425,7 @@ export class DatabaseStorage implements IStorage {
         bankName: bankAccounts.bankName,
         accountNumber: bankAccounts.accountNumber,
         branchName: bankAccounts.branchName,
-        bkashNagadRocket: bankAccounts.bkashNagadRocket,
+        ifscCode: bankAccounts.ifscCode,
       })
       .from(users)
       .leftJoin(bankAccounts, eq(users.id, bankAccounts.userId))
