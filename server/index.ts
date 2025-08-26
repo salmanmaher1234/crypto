@@ -1,48 +1,72 @@
-// C BOE Platform - React.js + PHP + MySQL
-// Main development server launcher (TypeScript version)
+import express, { type Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
+import { registerRoutes } from "./routes-simple";
+import { setupVite, serveStatic, log } from "./vite";
 
-import { spawn } from 'child_process';
-import path from 'path';
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-console.log('🚀 C BOE Platform - React.js + PHP + MySQL');
-console.log('📊 Starting development servers...\n');
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-// Start PHP server
-console.log('🔧 Starting PHP Backend (Port 8080)...');
-const phpServer = spawn('php', ['-S', '0.0.0.0:8080', 'index.php'], {
-    cwd: 'php',
-    stdio: 'pipe'
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
+    }
+  });
+
+  next();
 });
 
-phpServer.stdout.on('data', (data) => {
-    console.log(`[PHP] ${data}`);
-});
+(async () => {
+  const server = await registerRoutes(app);
 
-phpServer.stderr.on('data', (data) => {
-    console.log(`[PHP] ${data}`);
-});
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
 
-// Start React dev server after a short delay
-setTimeout(() => {
-    console.log('⚛️  Starting React Frontend (Port 5000)...');
-    const reactServer = spawn('npm', ['run', 'dev'], {
-        cwd: 'client',
-        stdio: 'inherit'
-    });
+    res.status(status).json({ message });
+    throw err;
+  });
 
-    reactServer.on('error', (err) => {
-        console.error('React server error:', err);
-    });
-}, 2000);
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
+  }
 
-// Handle process termination
-process.on('SIGINT', () => {
-    console.log('\n🛑 Stopping servers...');
-    phpServer.kill();
-    process.exit(0);
-});
-
-console.log('✅ PHP Server: http://localhost:8080');
-console.log('✅ React App: http://localhost:5000');
-console.log('\n🎯 Features: SUP Trading, INR Currency, Indian Banking');
-console.log('Press Ctrl+C to stop\n');
+  // ALWAYS serve the app on port 5000
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = 5000;
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();

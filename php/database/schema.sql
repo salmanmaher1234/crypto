@@ -1,9 +1,9 @@
--- C BOE Database Schema for MySQL
--- Updated with latest database structure including Indian banking system
--- Run this in your MySQL database
+-- SuperCoin Database Schema for MySQL
+-- Updated with latest database structure
+-- Run this in your Hostinger MySQL database
 
-CREATE DATABASE IF NOT EXISTS cboe;
-USE cboe;
+CREATE DATABASE IF NOT EXISTS supercoin;
+USE supercoin;
 
 -- Users table with all latest fields
 CREATE TABLE users (
@@ -38,17 +38,14 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Bank accounts table with Indian banking system
+-- Bank accounts table
 CREATE TABLE bank_accounts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    binding_type VARCHAR(50) NOT NULL DEFAULT 'Bank Card',
-    currency VARCHAR(10) NOT NULL DEFAULT 'INR',
-    account_number VARCHAR(100) NOT NULL,
     account_holder_name VARCHAR(255) NOT NULL,
+    account_number VARCHAR(100) NOT NULL,
     bank_name VARCHAR(255) NOT NULL,
-    branch_name VARCHAR(255), -- nullable - not required
-    ifsc_code VARCHAR(20), -- nullable - not required (IFSC Code for Indian banking)
+    ifsc_code VARCHAR(20) NOT NULL,
     is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -223,12 +220,12 @@ INSERT INTO betting_orders (
 ) VALUES (
     2, 
     'ORD1737482400001', 
-    'SUP/USDT', 
+    'BTC/USDT', 
     1000.00, 
     'Buy Up', 
     30, 
-    0.85423, 
-    0.87500, 
+    107314.24, 
+    107500.00, 
     'completed', 
     'win', 
     200.00,

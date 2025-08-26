@@ -1,10 +1,10 @@
 <?php
-// Database configuration for MySQL
+// Database configuration for Hostinger shared hosting
 class Database {
     private $host = 'localhost';
-    private $db_name = 'cboe';
-    private $username = 'root';
-    private $password = '';
+    private $db_name = 'your_database_name';
+    private $username = 'your_username';
+    private $password = 'your_password';
     private $conn;
 
     public function getConnection() {
@@ -15,10 +15,7 @@ class Database {
                 "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
                 $this->username,
                 $this->password,
-                array(
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                )
+                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
             );
         } catch(PDOException $exception) {
             echo "Connection error: " . $exception->getMessage();

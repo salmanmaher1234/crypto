@@ -12,12 +12,12 @@ requireLogin();
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-// Validate required fields (only essential ones)
-$required = ['accountHolderName', 'bankName', 'accountNumber'];
+// Validate required fields
+$required = ['holderName', 'bankName', 'accountNumber', 'ifscCode'];
 foreach ($required as $field) {
     if (!isset($input[$field]) || empty($input[$field])) {
         http_response_code(400);
-        echo json_encode(['error' => ucfirst(str_replace('Name', ' Name', $field)) . ' is required']);
+        echo json_encode(['error' => ucfirst($field) . ' is required']);
         exit();
     }
 }
@@ -28,20 +28,17 @@ $user = getCurrentUser();
 
 // Create bank account
 $query = "INSERT INTO bank_accounts (
-    user_id, account_holder_name, bank_name, account_number, branch_name, ifsc_code, currency, binding_type
+    user_id, holder_name, bank_name, account_number, ifsc_code
 ) VALUES (
-    :user_id, :account_holder_name, :bank_name, :account_number, :branch_name, :ifsc_code, :currency, :binding_type
+    :user_id, :holder_name, :bank_name, :account_number, :ifsc_code
 )";
 
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $user['id']);
-$stmt->bindParam(':account_holder_name', $input['accountHolderName']);
+$stmt->bindParam(':holder_name', $input['holderName']);
 $stmt->bindParam(':bank_name', $input['bankName']);
 $stmt->bindParam(':account_number', $input['accountNumber']);
-$stmt->bindParam(':branch_name', $input['branchName'] ?? null);
-$stmt->bindParam(':ifsc_code', $input['ifscCode'] ?? null);
-$stmt->bindParam(':currency', $input['currency'] ?? 'INR');
-$stmt->bindParam(':binding_type', $input['bindingType'] ?? 'Bank Card');
+$stmt->bindParam(':ifsc_code', $input['ifscCode']);
 
 if ($stmt->execute()) {
     $accountId = $db->lastInsertId();

@@ -1,70 +1,45 @@
-# Overview
+# C BOE - Investment Platform
 
-COBE is a comprehensive cryptocurrency trading platform that provides both customer-facing trading interfaces and administrative management tools. The platform enables users to trade cryptocurrencies, manage digital wallets, place betting orders, and handle withdrawals. It includes administrative features for user management, transaction monitoring, and system configuration. The application supports real-time trading with TradingView integration and provides a complete financial ecosystem for cryptocurrency operations.
+## Overview
+C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
-# User Preferences
-
+## User Preferences
 Preferred communication style: Simple, everyday language.
 
-# System Architecture
+## System Architecture
+### Frontend
+- **Framework**: React with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui
+- **State Management**: TanStack Query
+- **Routing**: Wouter
+- **Build Tool**: Vite
+- **UI/UX Decisions**: Comprehensive shadcn/ui component system, professional Binance/Blocnix-style trading charts with dark theme, responsive design, dynamic image scaling, no currency symbols in display, privacy toggles, card-based layouts, and blue-purple gradient themes for specific pages.
 
-## Frontend Architecture
-The client application is built using React 18 with TypeScript, utilizing Vite as the build tool and development server. The UI is constructed with shadcn/ui components built on top of Radix UI primitives, providing a consistent and accessible design system. Tailwind CSS handles styling with a custom configuration supporting dark mode and CSS variables for theming. The architecture follows a component-based structure with separate directories for customer and admin interfaces.
+### Backend
+- **Framework**: Express.js with TypeScript
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Simple session-based authentication with role-based access control (customer/admin)
+- **API Design**: RESTful API with JSON responses
+- **Key Features**:
+    - **User Management**: Roles (customer/admin), balances, trading preferences, VIP levels/reputation, ban/unban, withdrawal prohibition, credit score management.
+    - **Trading**: Real-time balance tracking, Buy Up/Buy Down options, commission logic (20-60% based on duration), real-time price integration, server-side order completion, admin direction override.
+    - **Financial Transactions**: Recharge system (manual admin intervention), withdrawal requests with admin approval/rejection, bank account management.
+    - **Admin Controls**: Member management, betting order monitoring, wallet oversight, reporting, announcements, dynamic freeze/unfreeze, message sending, notification sounds.
+    - **Data Flow**: Secure authentication, balance validation for trading, financial transaction logging, role-based administrative actions.
 
-## State Management
-React Query (TanStack Query) serves as the primary state management solution for server state, handling API calls, caching, and synchronization. Local component state is managed through React hooks, while form handling is implemented using React Hook Form with Zod validation resolvers.
+### Component Structure
+- **UI Components**: shadcn/ui
+- **Business Components**: Separated by admin/customer roles
+- **Shared Components**: Reusable across sections
 
-## Routing and Navigation
-The application implements client-side routing with React Router, supporting nested routes for admin and customer sections. The routing system includes protected routes with authentication checks and role-based access control.
-
-## Authentication System
-Session-based authentication is implemented with session IDs stored in localStorage. The system supports role-based access (admin, customer) with different permission levels and interface restrictions.
-
-## Backend Architecture
-The backend is designed as a hybrid system supporting both Node.js/Express and PHP implementations. The Node.js version uses Express with TypeScript, while the PHP version provides alternative API endpoints. Both backends are configured to handle the same API routes with consistent response formats.
-
-## Database Layer
-Database operations are managed through Drizzle ORM, providing type-safe database queries and schema management. The system is configured to support both PostgreSQL (via Neon) and SQLite databases, with the ability to switch between them based on deployment requirements.
-
-## Trading Integration
-TradingView widgets are integrated for real-time cryptocurrency charts and market data. The platform supports multiple cryptocurrency pairs with live price feeds and technical analysis tools.
-
-# External Dependencies
-
-## UI and Component Libraries
-- **Radix UI**: Complete set of unstyled, accessible UI primitives including dialogs, dropdowns, tooltips, and form controls
-- **shadcn/ui**: Pre-built components using Radix UI with consistent styling and theming
-- **Framer Motion**: Animation library for smooth transitions and interactive elements
-- **Lucide React**: Icon library providing consistent iconography throughout the application
-
-## State Management and Data Fetching
-- **TanStack React Query**: Server state management, caching, and synchronization
-- **React Hook Form**: Form handling with validation and error management
-- **Hookform/Resolvers**: Integration between React Hook Form and validation libraries
-
-## Styling and Design
-- **Tailwind CSS**: Utility-first CSS framework with custom configuration
-- **next-themes**: Theme switching functionality for dark/light mode support
-- **class-variance-authority**: Type-safe variant API for component styling
-- **clsx**: Utility for constructing className strings conditionally
-
-## Database and ORM
-- **Drizzle ORM**: TypeScript ORM with support for multiple database providers
-- **Drizzle Kit**: Database migration and schema management tools
-- **Neon Database**: Serverless PostgreSQL database service
-- **Better SQLite3**: Local SQLite database support for development
-
-## Trading and Financial Data
-- **TradingView**: Embedded charting widgets for cryptocurrency market data and technical analysis
-- **Real-time Price APIs**: Integration with cryptocurrency exchanges for live market data
-
-## Development and Build Tools
-- **Vite**: Fast build tool and development server with hot module replacement
-- **esbuild**: JavaScript bundler for production builds
-- **TypeScript**: Static type checking and enhanced developer experience
-- **PostCSS**: CSS processing with Tailwind CSS integration
-
-## Session Management
-- **Express Session**: Server-side session management for user authentication
-- **Connect PG Simple**: PostgreSQL session store for Express sessions
-- **Cookie Parser**: Cookie handling middleware for Express applications
+## External Dependencies
+- **@neondatabase/serverless**: PostgreSQL database connectivity
+- **drizzle-orm**: Type-safe ORM for PostgreSQL
+- **@tanstack/react-query**: Server state management for data fetching and caching
+- **wouter**: Lightweight React router
+- **@radix-ui/**: Accessible UI primitives
+- **Vite**: Frontend build tool
+- **TypeScript**: Language for type safety
+- **Tailwind CSS**: Utility-first CSS framework
+- **PostCSS**: CSS processing
+- **CoinGecko API**: Real-time cryptocurrency price data
