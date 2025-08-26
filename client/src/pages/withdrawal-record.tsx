@@ -30,7 +30,7 @@ export default function WithdrawalRecord() {
   // Map API data to match the expected format
   const mapToWithdrawalRecord = (apiRecord: any): WithdrawalRecord => ({
     id: apiRecord.id,
-    currency: "BDT",
+    currency: "INR",
     quantityOfWithdrawal: parseFloat(apiRecord.amount),
     actualQuantity: parseFloat(apiRecord.amount),
     status: apiRecord.status as 'Under review' | 'Success' | 'Failed',

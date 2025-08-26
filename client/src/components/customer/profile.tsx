@@ -842,7 +842,7 @@ export function Profile() {
             <div className="text-lg font-medium">{user.username}</div>
             <div className="text-sm opacity-90">UID:{user.id}00100102J</div>
             <div className="text-sm opacity-90">Credit Score:{user.creditScore || 80}</div>
-            <div className="text-sm opacity-90">Available Balance:{parseFloat(user.availableBalance || user.balance || "0").toFixed(2)} BDT</div>
+            <div className="text-sm opacity-90">Available Balance:{parseFloat(user.availableBalance || user.balance || "0").toFixed(2)} INR</div>
           </div>
         </div>
       </div>

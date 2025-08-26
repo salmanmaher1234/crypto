@@ -74,7 +74,7 @@ export function SpotOrders({
   const cryptoOptions = [
     { symbol: "BTC/USDT", name: "Bitcoin" },
     { symbol: "ETH/USDT", name: "Ethereum" },
-    { symbol: "DOGE/USDT", name: "Dogecoin" },
+    { symbol: "SUP/USDT", name: "SuperCoin" },
     { symbol: "CHZ/USDT", name: "Chiliz" },
     { symbol: "PSG/USDT", name: "Paris Saint-Germain" },
     { symbol: "ATM/USDT", name: "Atletico Madrid" },

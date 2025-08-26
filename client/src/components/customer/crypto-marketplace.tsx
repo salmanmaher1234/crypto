@@ -49,11 +49,11 @@ export function CryptoMarketplace({
       color: "#627EEA",
     },
     {
-      symbol: "DOGE/USDT",
-      name: "Dogecoin",
-      icon: "Ð",
-      price: getCryptoPrice("DOGE/USDT") || "0.2223",
-      change: getCryptoChange("DOGE/USDT") || "-7.96",
+      symbol: "SUP/USDT",
+      name: "SuperCoin",
+      icon: "Ⓢ",
+      price: getCryptoPrice("SUP/USDT") || "0.2223",
+      change: getCryptoChange("SUP/USDT") || "-7.96",
       color: "#C2A633",
     },
     {

@@ -12,8 +12,8 @@ export function AssetsPage() {
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Exchange rates (BDT to USD)
-  const exchangeRate = 110; // 1 USD = 110 BDT
+  // Exchange rates (INR to USD)
+  const exchangeRate = 83; // 1 USD = 83 INR
   
   // Get user balance from backend
   const availableBalance = parseFloat(user?.availableBalance || user?.balance || "0");
@@ -156,7 +156,7 @@ export function AssetsPage() {
 
       {/* Content Section */}
       <div className="bg-gray-50 px-4 py-6">
-        {/* BDT Section - Clickable */}
+        {/* INR Section - Clickable */}
         <div 
           className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => setLocation('/funding-information')}

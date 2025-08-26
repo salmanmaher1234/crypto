@@ -125,7 +125,7 @@ export default function TopUpRecordsPage() {
                 {(withdrawalRequests as any[]).map((request: any, index: number) => (
                   <div key={request.id} className="bg-white border-b border-gray-100 p-4">
                     <div className="flex justify-between items-start mb-1">
-                      <div className="text-sm font-medium text-black">BDT</div>
+                      <div className="text-sm font-medium text-black">INR</div>
                       <div className="text-xs text-gray-500">
                         {formatDate(request.createdAt)}
                       </div>

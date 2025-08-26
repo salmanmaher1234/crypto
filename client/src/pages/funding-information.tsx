@@ -16,70 +16,70 @@ export default function FundingInformation() {
     {
       id: 1,
       type: "Futures Earnings",
-      amount: "+5.00 BDT",
+      amount: "+5.00 INR",
       date: "2025-08-16 14:55:59",
       badgeColor: "bg-green-500"
     },
     {
       id: 2,
       type: "Futures Buy",
-      amount: "-5.00 BDT",
+      amount: "-5.00 INR",
       date: "2025-08-16 14:59:59",
       badgeColor: "bg-red-500"
     },
     {
       id: 3,
       type: "Futures Earnings",
-      amount: "+5400.00 BDT",
+      amount: "+5400.00 INR",
       date: "2025-08-16 17:24:46",
       badgeColor: "bg-green-500"
     },
     {
       id: 4,
       type: "Futures Buy",
-      amount: "-4500.00 BDT",
+      amount: "-4500.00 INR",
       date: "2025-08-16 19:35:46",
       badgeColor: "bg-red-500"
     },
     {
       id: 5,
       type: "Futures Earnings",
-      amount: "+5400.00 BDT",
+      amount: "+5400.00 INR",
       date: "2025-08-16 19:35:15",
       badgeColor: "bg-green-500"
     },
     {
       id: 6,
       type: "Futures Buy",
-      amount: "-4500.00 BDT",
+      amount: "-4500.00 INR",
       date: "2025-08-16 20:34:15",
       badgeColor: "bg-red-500"
     },
     {
       id: 7,
       type: "Futures Earnings",
-      amount: "+12.00 BDT",
+      amount: "+12.00 INR",
       date: "2025-08-17 11:44:17",
       badgeColor: "bg-green-500"
     },
     {
       id: 8,
       type: "Futures Buy",
-      amount: "-10.00 BDT",
+      amount: "-10.00 INR",
       date: "2025-08-17 11:44:17",
       badgeColor: "bg-red-500"
     },
     {
       id: 9,
       type: "Withdrawal of Currency",
-      amount: "-200000.00 BDT",
+      amount: "-200000.00 INR",
       date: "2025-08-17 19:09:35",
       badgeColor: "bg-purple-500"
     },
     {
       id: 10,
       type: "Futures Earnings",
-      amount: "+12.00 BDT",
+      amount: "+12.00 INR",
       date: "2025-08-17 19:07:56",
       badgeColor: "bg-green-500"
     }
@@ -111,7 +111,7 @@ export default function FundingInformation() {
       <div className="bg-white px-4 py-4 border-b border-gray-200">
         <div className="flex justify-between items-center">
           <div>
-            <div className="text-sm text-gray-500">BDT</div>
+            <div className="text-sm text-gray-500">INR</div>
             <div className="text-lg font-bold text-blue-600">{availableBalance.toFixed(6)}</div>
             <div className="text-xs text-gray-500">Available Balance</div>
           </div>
