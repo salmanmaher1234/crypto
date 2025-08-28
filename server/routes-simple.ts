@@ -324,6 +324,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin create bank account for any user
+  app.post("/api/admin/bank-accounts", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      console.log("==== ADMIN BANK ACCOUNT CREATE START ====");
+      console.log("Request body:", req.body);
+      
+      // Manual validation for required fields
+      const requiredFields = ['userId', 'accountHolderName', 'accountNumber', 'bankName'];
+      for (const field of requiredFields) {
+        if (!req.body[field] || req.body[field].toString().trim() === '') {
+          console.log(`Missing required field: ${field}`);
+          return res.status(400).json({ message: `${field} is required` });
+        }
+      }
+      
+      const bankAccountData = {
+        userId: parseInt(req.body.userId),
+        bindingType: req.body.bindingType || 'Bank Card',
+        currency: req.body.currency || 'INR',
+        accountHolderName: req.body.accountHolderName,
+        accountNumber: req.body.accountNumber,
+        bankName: req.body.bankName,
+        branchName: req.body.branchName || null,
+        ifscCode: req.body.ifscCode || null,
+        isDefault: false
+      };
+      
+      console.log("Validated admin bank account data:", bankAccountData);
+      const bankAccount = await storage.createBankAccount(bankAccountData);
+      console.log("Created admin bank account:", bankAccount);
+      
+      res.json(bankAccount);
+    } catch (error) {
+      console.error("Admin bank account creation error:", error);
+      res.status(400).json({ message: "Invalid bank account data" });
+    }
+  });
+
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {

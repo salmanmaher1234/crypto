@@ -295,6 +295,21 @@ export function useCreateBankAccount() {
   });
 }
 
+export function useAdminCreateBankAccount() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (bankAccount: { userId: number; accountHolderName: string; accountNumber: string; bankName: string; branchName?: string; ifscCode?: string; bindingType?: string; currency?: string }) => {
+      const response = await apiRequest("POST", "/api/admin/bank-accounts", bankAccount);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts-with-users"] });
+    },
+  });
+}
+
 export function useUpdateBankAccount() {
   const queryClient = useQueryClient();
   

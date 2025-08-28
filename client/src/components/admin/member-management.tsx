@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsers, useUpdateUser, useCreateTransaction, useCreateMessage } from "@/lib/api";
+import { useUsers, useUpdateUser, useCreateTransaction, useCreateMessage, useBankAccountsWithUsers, useUpdateBankAccount, useAdminCreateBankAccount } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -298,14 +298,38 @@ export function MemberManagement() {
                         </DialogContent>
                       </Dialog>
 
+                      {/* Edit Button */}
+                      <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500"
+                            onClick={() => setSelectedUser(user)}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>Edit User: {user.name}</DialogTitle>
+                          </DialogHeader>
+                          {selectedUser && <ComprehensiveUserEditForm user={selectedUser} onUpdate={handleUpdateUser} onClose={() => setEditDialogOpen(false)} />}
+                        </DialogContent>
+                      </Dialog>
+
                       {/* Other Button */}
                       <Button
                         variant="outline"
                         size="sm"
                         className="bg-purple-500 hover:bg-purple-600 text-white border-purple-500"
                         onClick={() => {
-                          setSelectedUser(user);
-                          setEditDialogOpen(true);
+                          // Additional actions
+                          toast({
+                            title: "Other actions",
+                            description: "Additional functionality can be added here",
+                          });
                         }}
                       >
                         <MoreHorizontal className="w-3 h-3 mr-1" />
@@ -682,5 +706,390 @@ function MessageForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+function ComprehensiveUserEditForm({ 
+  user, 
+  onUpdate, 
+  onClose 
+}: { 
+  user: User; 
+  onUpdate: (updates: Partial<User>) => void;
+  onClose: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    // User basic information
+    name: user.name,
+    email: user.email,
+    username: user.username,
+    
+    // User settings
+    reputation: user.reputation,
+    creditScore: user.creditScore,
+    winLoseSetting: user.winLoseSetting,
+    direction: user.direction,
+    isBanned: user.isBanned,
+    withdrawalProhibited: user.withdrawalProhibited,
+    tasksBan: user.tasksBan || "Allowed",
+    userType: user.userType || "Normal",
+    generalAgent: user.generalAgent || "",
+    remark: user.remark || "",
+    fundPassword: user.fundPassword || "",
+    agentInvitationCode: user.agentInvitationCode || "",
+    invitationCode: user.invitationCode || "",
+  });
+
+  const [bankData, setBankData] = useState({
+    accountHolderName: "",
+    accountNumber: "",
+    bankName: "",
+    branchName: "",
+    ifscCode: "",
+    bindingType: "Bank Card",
+    currency: "INR",
+  });
+
+  const { data: bankAccountsData } = useBankAccountsWithUsers();
+  const updateBankAccount = useUpdateBankAccount();
+  const createBankAccount = useAdminCreateBankAccount();
+  const { toast } = useToast();
+
+  // Find user's bank account
+  const userBankAccount = bankAccountsData?.find((account: any) => account.userId === user.id);
+
+  // Initialize bank data when component mounts or user changes
+  React.useEffect(() => {
+    if (userBankAccount) {
+      setBankData({
+        accountHolderName: userBankAccount.accountHolderName || "",
+        accountNumber: userBankAccount.accountNumber || "",
+        bankName: userBankAccount.bankName || "",
+        branchName: userBankAccount.branchName || "",
+        ifscCode: userBankAccount.ifscCode || "",
+        bindingType: userBankAccount.bindingType || "Bank Card",
+        currency: userBankAccount.currency || "INR",
+      });
+    }
+  }, [userBankAccount]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Update user information
+    onUpdate(formData);
+    
+    // Update or create bank account if data is provided
+    if (bankData.accountHolderName && bankData.accountNumber && bankData.bankName) {
+      if (userBankAccount) {
+        // Update existing bank account
+        updateBankAccount.mutate({ 
+          id: userBankAccount.id, 
+          ...bankData 
+        }, {
+          onSuccess: () => {
+            toast({
+              title: "Bank information updated",
+              description: "Bank account information has been updated successfully",
+            });
+          },
+          onError: () => {
+            toast({
+              title: "Bank update failed",
+              description: "Failed to update bank account information",
+              variant: "destructive",
+            });
+          },
+        });
+      } else {
+        // Create new bank account
+        createBankAccount.mutate({ ...bankData, userId: user.id }, {
+          onSuccess: () => {
+            toast({
+              title: "Bank account created",
+              description: "Bank account has been created successfully",
+            });
+          },
+          onError: () => {
+            toast({
+              title: "Bank creation failed",
+              description: "Failed to create bank account",
+              variant: "destructive",
+            });
+          },
+        });
+      }
+    }
+    
+    onClose();
+  };
+
+  return (
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic User Information */}
+        <div>
+          <h3 className="text-lg font-medium mb-4">Basic Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="userType">User Type</Label>
+              <Select value={formData.userType} onValueChange={(value) => setFormData({ ...formData, userType: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Normal">Normal</SelectItem>
+                  <SelectItem value="VIP">VIP</SelectItem>
+                  <SelectItem value="Agent">Agent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Account Settings */}
+        <div>
+          <h3 className="text-lg font-medium mb-4">Account Settings</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="reputation">Reputation (0-100)</Label>
+              <Input
+                id="reputation"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.reputation}
+                onChange={(e) => setFormData({ ...formData, reputation: parseInt(e.target.value) })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="creditScore">Credit Score (0-100)</Label>
+              <Input
+                id="creditScore"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.creditScore}
+                onChange={(e) => setFormData({ ...formData, creditScore: parseInt(e.target.value) })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="winLose">Win/Lose Setting</Label>
+              <Select value={formData.winLoseSetting} onValueChange={(value) => setFormData({ ...formData, winLoseSetting: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="To Win">To Win</SelectItem>
+                  <SelectItem value="To Lose">To Lose</SelectItem>
+                  <SelectItem value="Random">Random</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="direction">Direction</Label>
+              <Select value={formData.direction} onValueChange={(value) => setFormData({ ...formData, direction: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Buy Up">Buy Up</SelectItem>
+                  <SelectItem value="Buy the Dip">Buy the Dip</SelectItem>
+                  <SelectItem value="Actual">Actual</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="accountStatus">Account Status</Label>
+              <Select value={formData.isBanned ? "Banned" : "Active"} onValueChange={(value) => setFormData({ ...formData, isBanned: value === "Banned" })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Banned">Banned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="withdrawalStatus">Withdrawal Status</Label>
+              <Select value={formData.withdrawalProhibited ? "Prohibited" : "Allowed"} onValueChange={(value) => setFormData({ ...formData, withdrawalProhibited: value === "Prohibited" })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Allowed">Allowed</SelectItem>
+                  <SelectItem value="Prohibited">Prohibited</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="tasksBan">Tasks Ban</Label>
+              <Select value={formData.tasksBan} onValueChange={(value) => setFormData({ ...formData, tasksBan: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Allowed">Allowed</SelectItem>
+                  <SelectItem value="Prohibit">Prohibit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="fundPassword">Fund Password</Label>
+              <Input
+                id="fundPassword"
+                type="password"
+                value={formData.fundPassword}
+                onChange={(e) => setFormData({ ...formData, fundPassword: e.target.value })}
+                placeholder="Enter fund password"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Information */}
+        <div>
+          <h3 className="text-lg font-medium mb-4">Additional Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="generalAgent">General Agent</Label>
+              <Input
+                id="generalAgent"
+                value={formData.generalAgent}
+                onChange={(e) => setFormData({ ...formData, generalAgent: e.target.value })}
+                placeholder="Enter general agent"
+              />
+            </div>
+            <div>
+              <Label htmlFor="agentInvitationCode">Agent Invitation Code</Label>
+              <Input
+                id="agentInvitationCode"
+                value={formData.agentInvitationCode}
+                onChange={(e) => setFormData({ ...formData, agentInvitationCode: e.target.value })}
+                placeholder="Enter agent invitation code"
+              />
+            </div>
+            <div>
+              <Label htmlFor="invitationCode">Invitation Code</Label>
+              <Input
+                id="invitationCode"
+                value={formData.invitationCode}
+                onChange={(e) => setFormData({ ...formData, invitationCode: e.target.value })}
+                placeholder="Enter invitation code"
+              />
+            </div>
+            <div>
+              <Label htmlFor="remark">Remark</Label>
+              <Input
+                id="remark"
+                value={formData.remark}
+                onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
+                placeholder="Enter remark"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bank Information */}
+        <div>
+          <h3 className="text-lg font-medium mb-4">Bank Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="accountHolderName">Account Holder Name</Label>
+              <Input
+                id="accountHolderName"
+                value={bankData.accountHolderName}
+                onChange={(e) => setBankData({ ...bankData, accountHolderName: e.target.value })}
+                placeholder="Enter account holder name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="accountNumber">Account Number</Label>
+              <Input
+                id="accountNumber"
+                value={bankData.accountNumber}
+                onChange={(e) => setBankData({ ...bankData, accountNumber: e.target.value })}
+                placeholder="Enter account number"
+              />
+            </div>
+            <div>
+              <Label htmlFor="bankName">Bank Name</Label>
+              <Input
+                id="bankName"
+                value={bankData.bankName}
+                onChange={(e) => setBankData({ ...bankData, bankName: e.target.value })}
+                placeholder="Enter bank name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="branchName">Branch Name</Label>
+              <Input
+                id="branchName"
+                value={bankData.branchName}
+                onChange={(e) => setBankData({ ...bankData, branchName: e.target.value })}
+                placeholder="Enter branch name (optional)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="ifscCode">IFSC Code</Label>
+              <Input
+                id="ifscCode"
+                value={bankData.ifscCode}
+                onChange={(e) => setBankData({ ...bankData, ifscCode: e.target.value })}
+                placeholder="Enter IFSC code (optional)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="currency">Currency</Label>
+              <Select value={bankData.currency} onValueChange={(value) => setBankData({ ...bankData, currency: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INR">INR</SelectItem>
+                  <SelectItem value="USD">USD</SelectItem>
+                  <SelectItem value="EUR">EUR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4 border-t">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            Save All Changes
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
