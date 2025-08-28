@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useUsers, useUpdateUser, useCreateUser, useCreateTransaction, useTransactions, useUpdateTransaction, useDeleteUser, useCreateMessage } from "@/lib/api";
+import React, { useState, useEffect } from "react";
+import { useUsers, useUpdateUser, useCreateUser, useCreateTransaction, useTransactions, useUpdateTransaction, useDeleteUser, useCreateMessage, useBankAccountsWithUsers, useUpdateBankAccount, useAdminCreateBankAccount } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -448,6 +448,27 @@ export function MemberManagement() {
                     </TableCell>
                     <TableCell className="w-[500px]">
                       <div className="flex flex-wrap gap-1 justify-start">
+                        {/* Edit Button - First for visibility */}
+                        <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-6 px-2 text-xs bg-purple-900 text-purple-200 border-purple-600 hover:bg-purple-800 font-semibold"
+                              onClick={() => setSelectedUser(user)}
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              EDIT
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>Edit User: {user.name}</DialogTitle>
+                            </DialogHeader>
+                            {selectedUser && <ComprehensiveUserEditForm user={selectedUser} onUpdate={handleQuickUpdate} onClose={() => setEditDialogOpen(false)} />}
+                          </DialogContent>
+                        </Dialog>
+
                         {/* Password Management Button */}
                         <Dialog open={passwordDialogOpen && selectedUser?.id === user.id} onOpenChange={setPasswordDialogOpen}>
                           <DialogTrigger asChild>
@@ -928,6 +949,402 @@ export function MemberManagement() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+interface ComprehensiveUserEditFormProps {
+  user: User;
+  onUpdate: (user: User, updates: Partial<User>) => void;
+  onClose: () => void;
+}
+
+function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUserEditFormProps) {
+  const { data: bankAccounts, refetch: refetchBankAccounts } = useBankAccountsWithUsers(user.id);
+  const updateBankAccount = useUpdateBankAccount();
+  const adminCreateBankAccount = useAdminCreateBankAccount();
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState({
+    username: user.username || "",
+    email: user.email || "",
+    name: user.name || "",
+    role: user.role || "customer",
+    availableBalance: user.availableBalance || "0",
+    frozenBalance: user.frozenBalance || "0",
+    reputation: user.reputation || 100,
+    creditScore: user.creditScore || 100,
+    userType: user.userType || "Normal",
+    direction: user.direction || "Actual",
+    isBanned: user.isBanned || false,
+    withdrawalProhibited: user.withdrawalProhibited || false,
+    remark: user.remark || "",
+    generalAgent: user.generalAgent || "",
+    invitationCode: user.invitationCode || "",
+  });
+
+  const [bankAccountData, setBankAccountData] = useState({
+    bankName: "",
+    accountNumber: "",
+    accountHolder: "",
+    routingNumber: "",
+    accountType: "checking" as const,
+  });
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Convert string values to appropriate types
+    const updates = {
+      ...formData,
+      reputation: Number(formData.reputation),
+      creditScore: Number(formData.creditScore),
+    };
+
+    onUpdate(user, updates);
+    toast({ title: "User updated successfully" });
+    onClose();
+  };
+
+  const handleBankAccountUpdate = (accountId: number, updates: any) => {
+    updateBankAccount.mutate(
+      { id: accountId, updates },
+      {
+        onSuccess: () => {
+          toast({ title: "Bank account updated successfully" });
+          refetchBankAccounts();
+        },
+        onError: () => {
+          toast({ title: "Failed to update bank account", variant: "destructive" });
+        },
+      }
+    );
+  };
+
+  const handleCreateBankAccount = () => {
+    adminCreateBankAccount.mutate(
+      { userId: user.id, ...bankAccountData },
+      {
+        onSuccess: () => {
+          toast({ title: "Bank account created successfully" });
+          setBankAccountData({
+            bankName: "",
+            accountNumber: "",
+            accountHolder: "",
+            routingNumber: "",
+            accountType: "checking",
+          });
+          refetchBankAccounts();
+        },
+        onError: () => {
+          toast({ title: "Failed to create bank account", variant: "destructive" });
+        },
+      }
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <form onSubmit={handleFormSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Personal Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Personal Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="role">Role</Label>
+                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Account Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Account Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="userType">User Type</Label>
+                <Select value={formData.userType} onValueChange={(value) => setFormData({ ...formData, userType: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Normal">Normal</SelectItem>
+                    <SelectItem value="VIP">VIP</SelectItem>
+                    <SelectItem value="Agent">Agent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="direction">Direction</Label>
+                <Select value={formData.direction} onValueChange={(value) => setFormData({ ...formData, direction: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Buy Up">Buy Up</SelectItem>
+                    <SelectItem value="Buy Down">Buy Down</SelectItem>
+                    <SelectItem value="Actual">Actual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="banned"
+                  checked={formData.isBanned}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isBanned: checked })}
+                />
+                <Label htmlFor="banned">Account Banned</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="withdrawal-prohibited"
+                  checked={formData.withdrawalProhibited}
+                  onCheckedChange={(checked) => setFormData({ ...formData, withdrawalProhibited: checked })}
+                />
+                <Label htmlFor="withdrawal-prohibited">Withdrawal Prohibited</Label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Financial Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Financial Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="availableBalance">Available Balance</Label>
+                <Input
+                  id="availableBalance"
+                  type="number"
+                  step="0.01"
+                  value={formData.availableBalance}
+                  onChange={(e) => setFormData({ ...formData, availableBalance: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="frozenBalance">Frozen Balance</Label>
+                <Input
+                  id="frozenBalance"
+                  type="number"
+                  step="0.01"
+                  value={formData.frozenBalance}
+                  onChange={(e) => setFormData({ ...formData, frozenBalance: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="creditScore">Credit Score</Label>
+                <Input
+                  id="creditScore"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={formData.creditScore}
+                  onChange={(e) => setFormData({ ...formData, creditScore: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reputation">Reputation</Label>
+                <Input
+                  id="reputation"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.reputation}
+                  onChange={(e) => setFormData({ ...formData, reputation: Number(e.target.value) })}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Additional Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Additional Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="generalAgent">General Agent</Label>
+                <Input
+                  id="generalAgent"
+                  value={formData.generalAgent}
+                  onChange={(e) => setFormData({ ...formData, generalAgent: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="invitationCode">Invitation Code</Label>
+                <Input
+                  id="invitationCode"
+                  value={formData.invitationCode}
+                  onChange={(e) => setFormData({ ...formData, invitationCode: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="remark">Remark</Label>
+                <Textarea
+                  id="remark"
+                  value={formData.remark}
+                  onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
+                  rows={3}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bank Accounts Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Bank Accounts</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Existing Bank Accounts */}
+            {bankAccounts && bankAccounts.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-semibold">Existing Accounts</h4>
+                {bankAccounts.map((account) => (
+                  <div key={account.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Bank Name</Label>
+                        <Input
+                          value={account.bankName}
+                          onChange={(e) => handleBankAccountUpdate(account.id, { bankName: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Account Holder</Label>
+                        <Input
+                          value={account.accountHolder}
+                          onChange={(e) => handleBankAccountUpdate(account.id, { accountHolder: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Account Number</Label>
+                        <Input
+                          value={account.accountNumber}
+                          onChange={(e) => handleBankAccountUpdate(account.id, { accountNumber: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label>Routing Number</Label>
+                        <Input
+                          value={account.routingNumber || ""}
+                          onChange={(e) => handleBankAccountUpdate(account.id, { routingNumber: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add New Bank Account */}
+            <div className="border-t pt-4">
+              <h4 className="font-semibold mb-3">Add New Bank Account</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="bankName">Bank Name</Label>
+                  <Input
+                    id="bankName"
+                    value={bankAccountData.bankName}
+                    onChange={(e) => setBankAccountData({ ...bankAccountData, bankName: e.target.value })}
+                    placeholder="Enter bank name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="accountHolder">Account Holder</Label>
+                  <Input
+                    id="accountHolder"
+                    value={bankAccountData.accountHolder}
+                    onChange={(e) => setBankAccountData({ ...bankAccountData, accountHolder: e.target.value })}
+                    placeholder="Enter account holder name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="accountNumber">Account Number</Label>
+                  <Input
+                    id="accountNumber"
+                    value={bankAccountData.accountNumber}
+                    onChange={(e) => setBankAccountData({ ...bankAccountData, accountNumber: e.target.value })}
+                    placeholder="Enter account number"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="routingNumber">Routing Number</Label>
+                  <Input
+                    id="routingNumber"
+                    value={bankAccountData.routingNumber}
+                    onChange={(e) => setBankAccountData({ ...bankAccountData, routingNumber: e.target.value })}
+                    placeholder="Enter routing number"
+                  />
+                </div>
+              </div>
+              <div className="mt-3">
+                <Button
+                  type="button"
+                  onClick={handleCreateBankAccount}
+                  disabled={!bankAccountData.bankName || !bankAccountData.accountNumber || !bankAccountData.accountHolder}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Add Bank Account
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-3">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            Save Changes
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
