@@ -174,6 +174,27 @@ export function MemberManagement() {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1 min-h-[80px]">
+                      {/* Edit Button - First for visibility */}
+                      <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-green-500 hover:bg-green-600 text-white border-green-500"
+                            onClick={() => setSelectedUser(user)}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>Edit User: {user.name}</DialogTitle>
+                          </DialogHeader>
+                          {selectedUser && <ComprehensiveUserEditForm user={selectedUser} onUpdate={handleUpdateUser} onClose={() => setEditDialogOpen(false)} />}
+                        </DialogContent>
+                      </Dialog>
+
                       {/* Confidential Button */}
                       <Button
                         variant="outline"
@@ -298,26 +319,6 @@ export function MemberManagement() {
                         </DialogContent>
                       </Dialog>
 
-                      {/* Edit Button */}
-                      <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500"
-                            onClick={() => setSelectedUser(user)}
-                          >
-                            <Edit className="w-3 h-3 mr-1" />
-                            Edit
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Edit User: {user.name}</DialogTitle>
-                          </DialogHeader>
-                          {selectedUser && <ComprehensiveUserEditForm user={selectedUser} onUpdate={handleUpdateUser} onClose={() => setEditDialogOpen(false)} />}
-                        </DialogContent>
-                      </Dialog>
 
                       {/* Other Button */}
                       <Button
@@ -822,6 +823,9 @@ function ComprehensiveUserEditForm({
     }
     
     onClose();
+    
+    // Redirect to admin dashboard after successful edit
+    window.location.href = '/admin/dashboard';
   };
 
   return (
