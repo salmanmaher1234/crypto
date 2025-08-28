@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUsers, useUpdateUser, useCreateTransaction } from "@/lib/api";
+import { useUsers, useUpdateUser, useCreateTransaction, useCreateMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Edit, Wallet, Lock, Eye, Plus, Minus, LockOpen, UserPlus, Settings, Ban, CheckCircle, XCircle, AlertTriangle, ChevronLeft, ChevronRight, ShieldCheck, Info, Send, MoreHorizontal, Trash2, CreditCard, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@shared/schema";
 
@@ -25,6 +25,8 @@ export function MemberManagement() {
   const { toast } = useToast();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
   const users = response?.users || [];
   const pagination = response?.pagination || {
@@ -171,15 +173,32 @@ export function MemberManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex space-x-2">
-                      <Dialog open={editDialogOpen && selectedUser?.id === user.id} onOpenChange={setEditDialogOpen}>
+                    <div className="flex flex-wrap gap-1">
+                      {/* Confidential Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          handleUpdateUser({ isBanned: !user.isBanned });
+                        }}
+                      >
+                        <ShieldCheck className="w-3 h-3 mr-1" />
+                        Confidential
+                      </Button>
+
+                      {/* Details Button */}
+                      <Dialog open={detailsDialogOpen && selectedUser?.id === user.id} onOpenChange={setDetailsDialogOpen}>
                         <DialogTrigger asChild>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
+                            className="bg-green-500 hover:bg-green-600 text-white border-green-500"
                             onClick={() => setSelectedUser(user)}
                           >
-                            <Edit className="w-4 h-4" />
+                            <Info className="w-3 h-3 mr-1" />
+                            Details
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -189,6 +208,128 @@ export function MemberManagement() {
                           {selectedUser && <CustomerEditForm user={selectedUser} onUpdate={handleUpdateUser} onBalanceAction={handleBalanceAction} />}
                         </DialogContent>
                       </Dialog>
+
+                      {/* Deposit Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
+                        onClick={() => {
+                          const amount = prompt('Enter deposit amount:');
+                          if (amount && parseFloat(amount) > 0) {
+                            setSelectedUser(user);
+                            handleBalanceAction('deposit', amount);
+                          }
+                        }}
+                      >
+                        <Plus className="w-3 h-3 mr-1" />
+                        Deposit
+                      </Button>
+
+                      {/* Deduction Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-red-500 hover:bg-red-600 text-white border-red-500"
+                        onClick={() => {
+                          const amount = prompt('Enter deduction amount:');
+                          if (amount && parseFloat(amount) > 0) {
+                            setSelectedUser(user);
+                            handleBalanceAction('withdrawal', amount);
+                          }
+                        }}
+                      >
+                        <Minus className="w-3 h-3 mr-1" />
+                        Deduction
+                      </Button>
+
+                      {/* Freeze Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                        onClick={() => {
+                          const amount = prompt('Enter freeze amount:');
+                          if (amount && parseFloat(amount) > 0) {
+                            setSelectedUser(user);
+                            handleBalanceAction('freeze', amount);
+                          }
+                        }}
+                      >
+                        <Lock className="w-3 h-3 mr-1" />
+                        Freeze
+                      </Button>
+
+                      {/* Unfreeze Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white border-green-600"
+                        onClick={() => {
+                          const amount = prompt('Enter unfreeze amount:');
+                          if (amount && parseFloat(amount) > 0) {
+                            setSelectedUser(user);
+                            handleBalanceAction('unfreeze', amount);
+                          }
+                        }}
+                      >
+                        <LockOpen className="w-3 h-3 mr-1" />
+                        Unfreeze
+                      </Button>
+
+                      {/* Send a letter Button */}
+                      <Dialog open={messageDialogOpen && selectedUser?.id === user.id} onOpenChange={setMessageDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
+                            onClick={() => setSelectedUser(user)}
+                          >
+                            <Send className="w-3 h-3 mr-1" />
+                            Send a letter
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Send Message to {user.name}</DialogTitle>
+                          </DialogHeader>
+                          {selectedUser && <MessageForm user={selectedUser} onClose={() => setMessageDialogOpen(false)} />}
+                        </DialogContent>
+                      </Dialog>
+
+                      {/* Other Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-purple-500 hover:bg-purple-600 text-white border-purple-500"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setEditDialogOpen(true);
+                        }}
+                      >
+                        <MoreHorizontal className="w-3 h-3 mr-1" />
+                        Other
+                      </Button>
+
+                      {/* Delete Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-red-600 hover:bg-red-700 text-white border-red-600"
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to delete ${user.name}?`)) {
+                            // Handle delete user
+                            toast({
+                              title: "Delete functionality",
+                              description: "Delete functionality would be implemented here",
+                            });
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Delete
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -459,5 +600,87 @@ function CustomerEditForm({
         </div>
       </div>
     </div>
+  );
+}
+
+function MessageForm({ 
+  user, 
+  onClose 
+}: { 
+  user: User; 
+  onClose: () => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const createMessage = useCreateMessage();
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!title.trim() || !content.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createMessage.mutate({ 
+      recipientId: user.id, 
+      title, 
+      content 
+    }, {
+      onSuccess: () => {
+        toast({
+          title: "Message sent",
+          description: `Message sent to ${user.name} successfully`,
+        });
+        onClose();
+      },
+      onError: () => {
+        toast({
+          title: "Failed to send message",
+          description: "Please try again",
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="title">Message Title</Label>
+        <Input
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter message title"
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="content">Message Content</Label>
+        <textarea
+          id="content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Enter message content"
+          rows={4}
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          required
+        />
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={createMessage.isPending}>
+          {createMessage.isPending ? "Sending..." : "Send Message"}
+        </Button>
+      </div>
+    </form>
   );
 }
