@@ -180,11 +180,11 @@ export function MemberManagement() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="bg-green-500 hover:bg-green-600 text-white border-green-500"
+                            className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600 font-semibold"
                             onClick={() => setSelectedUser(user)}
                           >
-                            <Edit className="w-3 h-3 mr-1" />
-                            Edit
+                            <Edit className="w-4 h-4 mr-1" />
+                            EDIT
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
