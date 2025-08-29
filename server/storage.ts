@@ -363,7 +363,7 @@ export class DatabaseStorage implements IStorage {
       ifscCode: bankAccounts.ifscCode,
       isDefault: bankAccounts.isDefault,
       userId: bankAccounts.userId,
-      username: users.username,
+      userName: users.username,
       email: users.email,
     }).from(bankAccounts)
       .leftJoin(users, eq(bankAccounts.userId, users.id));

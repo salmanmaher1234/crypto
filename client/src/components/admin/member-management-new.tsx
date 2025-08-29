@@ -960,10 +960,13 @@ interface ComprehensiveUserEditFormProps {
 }
 
 function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUserEditFormProps) {
-  const { data: bankAccounts, refetch: refetchBankAccounts } = useBankAccountsWithUsers(user.id);
+  const { data: allBankAccounts, refetch: refetchBankAccounts } = useBankAccountsWithUsers();
   const updateBankAccount = useUpdateBankAccount();
   const adminCreateBankAccount = useAdminCreateBankAccount();
   const { toast } = useToast();
+
+  // Filter bank accounts for the specific user
+  const bankAccounts = allBankAccounts?.filter(account => account.userId === user.id) || [];
 
   const [formData, setFormData] = useState({
     username: user.username || "",
@@ -1249,35 +1252,35 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
             {bankAccounts && bankAccounts.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-semibold">Existing Accounts</h4>
-                {bankAccounts.map((account) => (
-                  <div key={account.id} className="border rounded-lg p-4 space-y-3">
+                {bankAccounts.map((account, index) => (
+                  <div key={account.bankAccountId || `bank-account-${index}`} className="border rounded-lg p-4 space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label>Bank Name</Label>
                         <Input
                           value={account.bankName}
-                          onChange={(e) => handleBankAccountUpdate(account.id, { bankName: e.target.value })}
+                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { bankName: e.target.value })}
                         />
                       </div>
                       <div>
                         <Label>Account Holder</Label>
                         <Input
                           value={account.accountHolderName || account.accountHolder || ""}
-                          onChange={(e) => handleBankAccountUpdate(account.id, { accountHolderName: e.target.value })}
+                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { accountHolderName: e.target.value })}
                         />
                       </div>
                       <div>
                         <Label>Account Number</Label>
                         <Input
                           value={account.accountNumber}
-                          onChange={(e) => handleBankAccountUpdate(account.id, { accountNumber: e.target.value })}
+                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { accountNumber: e.target.value })}
                         />
                       </div>
                       <div>
                         <Label>Routing Number</Label>
                         <Input
                           value={account.ifscCode || account.routingNumber || ""}
-                          onChange={(e) => handleBankAccountUpdate(account.id, { ifscCode: e.target.value })}
+                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { ifscCode: e.target.value })}
                         />
                       </div>
                     </div>
