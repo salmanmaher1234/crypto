@@ -994,6 +994,9 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
     accountType: "checking" as const,
   });
 
+  // Local state to track bank account changes before saving
+  const [bankAccountChanges, setBankAccountChanges] = useState<Record<number, any>>({});
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -1004,24 +1007,54 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
       creditScore: Number(formData.creditScore),
     };
 
-    onUpdate(user, updates);
-    toast({ title: "User updated successfully" });
-    onClose();
+    // Save bank account changes if any
+    const bankAccountUpdatePromises = Object.entries(bankAccountChanges).map(([accountId, changes]) => {
+      return new Promise((resolve, reject) => {
+        updateBankAccount.mutate(
+          { id: parseInt(accountId), ...changes },
+          {
+            onSuccess: resolve,
+            onError: reject,
+          }
+        );
+      });
+    });
+
+    // Save user updates and bank account changes
+    Promise.all([...bankAccountUpdatePromises]).then(() => {
+      onUpdate(user, updates);
+      setBankAccountChanges({}); // Clear pending changes
+      refetchBankAccounts();
+      toast({ title: "User and bank accounts updated successfully" });
+      onClose();
+    }).catch(() => {
+      toast({ title: "Error updating some information", variant: "destructive" });
+    });
   };
 
-  const handleBankAccountUpdate = (accountId: number, updates: any) => {
-    updateBankAccount.mutate(
-      { id: accountId, ...updates },
-      {
-        onSuccess: () => {
-          toast({ title: "Bank account updated successfully" });
-          refetchBankAccounts();
-        },
-        onError: () => {
-          toast({ title: "Failed to update bank account", variant: "destructive" });
-        },
+  const handleBankAccountChange = (accountId: number, field: string, value: string) => {
+    setBankAccountChanges(prev => ({
+      ...prev,
+      [accountId]: {
+        ...prev[accountId],
+        [field]: value
       }
-    );
+    }));
+  };
+
+  const getBankAccountValue = (account: any, field: string) => {
+    // Return the pending change value if it exists, otherwise the original value
+    if (bankAccountChanges[account.bankAccountId] && bankAccountChanges[account.bankAccountId][field] !== undefined) {
+      return bankAccountChanges[account.bankAccountId][field];
+    }
+    
+    switch (field) {
+      case 'bankName': return account.bankName || "";
+      case 'accountHolderName': return account.accountHolderName || account.accountHolder || "";
+      case 'accountNumber': return account.accountNumber || "";
+      case 'ifscCode': return account.ifscCode || account.routingNumber || "";
+      default: return "";
+    }
   };
 
   const handleCreateBankAccount = () => {
@@ -1258,29 +1291,29 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                       <div>
                         <Label>Bank Name</Label>
                         <Input
-                          value={account.bankName}
-                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { bankName: e.target.value })}
+                          value={getBankAccountValue(account, 'bankName')}
+                          onChange={(e) => handleBankAccountChange(account.bankAccountId, 'bankName', e.target.value)}
                         />
                       </div>
                       <div>
                         <Label>Account Holder</Label>
                         <Input
-                          value={account.accountHolderName || account.accountHolder || ""}
-                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { accountHolderName: e.target.value })}
+                          value={getBankAccountValue(account, 'accountHolderName')}
+                          onChange={(e) => handleBankAccountChange(account.bankAccountId, 'accountHolderName', e.target.value)}
                         />
                       </div>
                       <div>
                         <Label>Account Number</Label>
                         <Input
-                          value={account.accountNumber}
-                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { accountNumber: e.target.value })}
+                          value={getBankAccountValue(account, 'accountNumber')}
+                          onChange={(e) => handleBankAccountChange(account.bankAccountId, 'accountNumber', e.target.value)}
                         />
                       </div>
                       <div>
                         <Label>Routing Number</Label>
                         <Input
-                          value={account.ifscCode || account.routingNumber || ""}
-                          onChange={(e) => handleBankAccountUpdate(account.bankAccountId, { ifscCode: e.target.value })}
+                          value={getBankAccountValue(account, 'ifscCode')}
+                          onChange={(e) => handleBankAccountChange(account.bankAccountId, 'ifscCode', e.target.value)}
                         />
                       </div>
                     </div>
