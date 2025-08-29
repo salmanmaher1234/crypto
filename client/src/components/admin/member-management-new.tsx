@@ -1008,7 +1008,7 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
 
   const handleBankAccountUpdate = (accountId: number, updates: any) => {
     updateBankAccount.mutate(
-      { id: accountId, updates },
+      { id: accountId, ...updates },
       {
         onSuccess: () => {
           toast({ title: "Bank account updated successfully" });
@@ -1023,7 +1023,13 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
 
   const handleCreateBankAccount = () => {
     adminCreateBankAccount.mutate(
-      { userId: user.id, ...bankAccountData },
+      { 
+        userId: user.id, 
+        accountHolderName: bankAccountData.accountHolder,
+        bankName: bankAccountData.bankName,
+        accountNumber: bankAccountData.accountNumber,
+        ifscCode: bankAccountData.routingNumber
+      },
       {
         onSuccess: () => {
           toast({ title: "Bank account created successfully" });
@@ -1256,8 +1262,8 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                       <div>
                         <Label>Account Holder</Label>
                         <Input
-                          value={account.accountHolder}
-                          onChange={(e) => handleBankAccountUpdate(account.id, { accountHolder: e.target.value })}
+                          value={account.accountHolderName || account.accountHolder || ""}
+                          onChange={(e) => handleBankAccountUpdate(account.id, { accountHolderName: e.target.value })}
                         />
                       </div>
                       <div>
@@ -1270,8 +1276,8 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                       <div>
                         <Label>Routing Number</Label>
                         <Input
-                          value={account.routingNumber || ""}
-                          onChange={(e) => handleBankAccountUpdate(account.id, { routingNumber: e.target.value })}
+                          value={account.ifscCode || account.routingNumber || ""}
+                          onChange={(e) => handleBankAccountUpdate(account.id, { ifscCode: e.target.value })}
                         />
                       </div>
                     </div>

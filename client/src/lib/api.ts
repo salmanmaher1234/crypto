@@ -275,9 +275,14 @@ export function useBankAccounts() {
   });
 }
 
-export function useBankAccountsWithUsers() {
+export function useBankAccountsWithUsers(userId?: number) {
   return useQuery<any[]>({
-    queryKey: ["/api/bank-accounts-with-users"],
+    queryKey: ["/api/bank-accounts-with-users", userId],
+    queryFn: async () => {
+      const url = userId ? `/api/bank-accounts-with-users?userId=${userId}` : "/api/bank-accounts-with-users";
+      const response = await apiRequest("GET", url);
+      return response.json();
+    },
   });
 }
 
