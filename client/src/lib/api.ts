@@ -329,6 +329,21 @@ export function useUpdateBankAccount() {
   });
 }
 
+export function useAdminUpdateBankAccount() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: { id: number; accountHolderName?: string; bankName?: string; accountNumber?: string; ifscCode?: string }) => {
+      const response = await apiRequest("PATCH", `/api/admin/bank-accounts/${id}`, updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts-with-users"] });
+    },
+  });
+}
+
 export function useDeleteBankAccount() {
   const queryClient = useQueryClient();
   

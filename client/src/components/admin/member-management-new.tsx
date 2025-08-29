@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useUsers, useUpdateUser, useCreateUser, useCreateTransaction, useTransactions, useUpdateTransaction, useDeleteUser, useCreateMessage, useBankAccountsWithUsers, useUpdateBankAccount, useAdminCreateBankAccount } from "@/lib/api";
+import { useUsers, useUpdateUser, useCreateUser, useCreateTransaction, useTransactions, useUpdateTransaction, useDeleteUser, useCreateMessage, useBankAccountsWithUsers, useAdminUpdateBankAccount, useAdminCreateBankAccount } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -961,7 +961,7 @@ interface ComprehensiveUserEditFormProps {
 
 function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUserEditFormProps) {
   const { data: allBankAccounts, refetch: refetchBankAccounts } = useBankAccountsWithUsers();
-  const updateBankAccount = useUpdateBankAccount();
+  const updateBankAccount = useAdminUpdateBankAccount();
   const adminCreateBankAccount = useAdminCreateBankAccount();
   const { toast } = useToast();
 

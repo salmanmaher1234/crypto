@@ -362,6 +362,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin update bank account for any user
+  app.patch("/api/admin/bank-accounts/:id", authenticateUser, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid bank account ID" });
+      }
+      
+      // Admin can update any bank account, no ownership check needed
+      const existingAccount = await storage.getBankAccount(id);
+      if (!existingAccount) {
+        return res.status(404).json({ message: "Bank account not found" });
+      }
+      
+      const validatedData = insertBankAccountSchema.partial().parse(req.body);
+      const updatedAccount = await storage.updateBankAccount(id, validatedData);
+      
+      if (!updatedAccount) {
+        return res.status(404).json({ message: "Bank account not found" });
+      }
+      
+      res.json(updatedAccount);
+    } catch (error) {
+      console.error("Admin bank account update error:", error);
+      res.status(400).json({ message: "Invalid bank account data" });
+    }
+  });
+
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
