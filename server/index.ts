@@ -6,31 +6,9 @@ import { testConnection } from "./db";
 
 const app = express();
 
-// 🔹 STRONG HTTPS to HTTP redirect
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const isHttps = req.secure || req.headers['x-forwarded-proto'] === 'https';
-  
-  if (isHttps) {
-    const host = req.headers.host || '127.0.0.1';
-    const url = req.url || '/';
-    log(`Redirecting HTTPS to HTTP: ${host}${url}`);
-    return res.redirect(302, `http://${host}${url}`);
-  }
-  
-  res.setHeader('Strict-Transport-Security', 'max-age=0');
-  next();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-// Remove security headers
-app.use((_req: Request, res: Response, next: NextFunction) => {
-  res.removeHeader('Strict-Transport-Security');
-  res.setHeader('Strict-Transport-Security', 'max-age=0');
-  next();
-});
 
 app.use((req, res, next) => {
   const start = Date.now();
