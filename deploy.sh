@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# SuperCoin Hostinger Deployment Script
-echo "🚀 Starting SuperCoin deployment preparation..."
+# SuperCoin Hostinger Deployment Script (LEGACY: Node.js/Express/PostgreSQL)
+echo "🚀 Starting SuperCoin deployment preparation (LEGACY Node.js/Express/PostgreSQL)..."
 
 # Step 1: Clean previous builds
 echo "🧹 Cleaning previous builds..."
@@ -90,4 +90,4 @@ echo "3. Configure .env file with your database credentials"
 echo "4. Set up Node.js application in Hostinger control panel"
 echo "5. Install dependencies and start the application"
 echo ""
-echo "📖 See HOSTINGER_DEPLOYMENT.md for detailed instructions"
+echo "📖 See HOSTINGER_DEPLOYMENT.md for legacy instructions"

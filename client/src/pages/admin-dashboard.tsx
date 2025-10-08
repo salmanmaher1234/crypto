@@ -49,7 +49,7 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <div className="w-48 sm:w-56 lg:w-64 bg-gray-800 shadow-2xl border-r border-gray-700">
         <div className="p-6 border-b border-gray-700">
-          <h1 className="text-lg sm:text-xl font-bold text-white">C BOE Admin</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-white">Supercion Admin</h1>
           <p className="text-xs sm:text-sm text-gray-300">Management Dashboard</p>
         </div>
         

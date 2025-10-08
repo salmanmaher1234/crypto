@@ -1,4 +1,9 @@
-# SuperCoin - Hostinger Deployment Guide
+# SuperCoin - Hostinger Deployment Guide (LEGACY: Node.js/Express/PostgreSQL)
+
+> **Note:** This guide is for legacy Node.js/Express/PostgreSQL deployment.  
+> For new deployments, use PHP + MySQL as described in `HOSTINGER_PHP_DEPLOYMENT.md`.
+
+## Legacy Node.js/Express/PostgreSQL Deployment Guide
 
 ## Prerequisites
 

@@ -1,20 +1,22 @@
 <?php
-// Database configuration and connection
+// Database configuration and connection (MySQL Version)
 class Database {
     private static $instance = null;
     private $connection;
-    private $host = 'ep-solitary-butterfly-ae7p9tzs.c-2.us-east-2.aws.neon.tech';
-    private $database = 'neondb';
-    private $username = 'neondb_owner';
-    private $password = 'npg_OZ42sVpkPlyI';
-    private $port = 5432;
+    private $host = 'localhost';
+    private $database = 'supercoin';
+    private $username = 'root';
+    private $password = '';
+    private $port = 3306;
+    private $charset = 'utf8mb4';
     
     private function __construct() {
         try {
-            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->database};sslmode=require";
+            $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->database};charset={$this->charset}";
             $this->connection = new PDO($dsn, $this->username, $this->password);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         } catch (PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
         }
@@ -55,10 +57,19 @@ class Database {
     public function insert($table, $data) {
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
-        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders}) RETURNING *";
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
         
-        $stmt = $this->query($sql, $data);
-        return $stmt->fetch();
+        $this->query($sql, $data);
+        
+        // For MySQL, get the last inserted ID
+        $lastInsertId = $this->connection->lastInsertId();
+        
+        // If we have an ID, return the inserted record
+        if ($lastInsertId) {
+            return $this->fetchOne("SELECT * FROM {$table} WHERE id = ?", [$lastInsertId]);
+        }
+        
+        return null;
     }
     
     public function update($table, $data, $where) {
@@ -69,15 +80,33 @@ class Database {
         $setClause = implode(', ', $setClause);
         
         $whereClause = [];
+        $whereParams = [];
         foreach ($where as $key => $value) {
             $whereClause[] = "{$key} = :where_{$key}";
-            $data["where_{$key}"] = $value;
+            $whereParams["where_{$key}"] = $value;
         }
         $whereClause = implode(' AND ', $whereClause);
         
-        $sql = "UPDATE {$table} SET {$setClause} WHERE {$whereClause} RETURNING *";
-        $stmt = $this->query($sql, $data);
-        return $stmt->fetch();
+        // Merge data and where parameters
+        $params = array_merge($data, $whereParams);
+        
+        $sql = "UPDATE {$table} SET {$setClause} WHERE {$whereClause}";
+        $this->query($sql, $params);
+        
+        // Return the updated record
+        if (!empty($where)) {
+            $whereConditions = [];
+            $whereValues = [];
+            foreach ($where as $key => $value) {
+                $whereConditions[] = "{$key} = ?";
+                $whereValues[] = $value;
+            }
+            $whereSql = implode(' AND ', $whereConditions);
+            
+            return $this->fetchOne("SELECT * FROM {$table} WHERE {$whereSql}", $whereValues);
+        }
+        
+        return null;
     }
     
     public function delete($table, $where) {
@@ -102,6 +131,11 @@ class Database {
     
     public function rollback() {
         return $this->connection->rollback();
+    }
+    
+    // MySQL specific helper methods
+    public function getLastInsertId() {
+        return $this->connection->lastInsertId();
     }
 }
 

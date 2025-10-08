@@ -1,4 +1,9 @@
-# SuperCoin Hostinger Deployment Commands
+# SuperCoin Hostinger Deployment Commands (LEGACY: Node.js/Express/PostgreSQL)
+
+> **Note:** This guide is for legacy Node.js/Express/PostgreSQL deployment.  
+> For new deployments, use PHP + MySQL as described in `HOSTINGER_PHP_DEPLOYMENT.md`.
+
+## Legacy Node.js/Express/PostgreSQL Deployment Commands
 
 This guide provides step-by-step commands to deploy SuperCoin on Hostinger hosting.
 

@@ -16,7 +16,7 @@ A complete PHP backend for the SuperCoin cryptocurrency investment platform, con
 ## Technical Stack
 
 - **Backend**: PHP 8.0+ with PDO for database operations
-- **Database**: PostgreSQL with Neon Database hosting
+- **Database**: MySQL with Neon Database hosting
 - **Authentication**: Session-based with secure cookie handling
 - **API**: RESTful API endpoints with JSON responses
 - **Frontend**: Compatible with existing React frontend
@@ -36,7 +36,7 @@ A complete PHP backend for the SuperCoin cryptocurrency investment platform, con
 
 3. **Configure database**
    - Update database credentials in `config/database.php`
-   - Ensure PostgreSQL connection is properly configured
+   - Ensure MySQL connection is properly configured
 
 4. **Set up web server**
    - For Apache: Ensure mod_rewrite is enabled
@@ -83,7 +83,7 @@ A complete PHP backend for the SuperCoin cryptocurrency investment platform, con
 
 ## Database Schema
 
-The PHP backend uses the same PostgreSQL database schema as the original TypeScript version:
+The PHP backend uses the same MySQL database schema as the original TypeScript version:
 
 - `users` - User accounts and profiles
 - `bank_accounts` - User banking information
@@ -96,7 +96,7 @@ The PHP backend uses the same PostgreSQL database schema as the original TypeScr
 
 - **Session Management**: Secure session handling with proper expiration
 - **Input Validation**: Comprehensive input validation and sanitization
-- **SQL Injection Protection**: Prepared statements with PDO
+- **SQL Injection Protection**: Prepared statements with PDO (MySQL)
 - **CORS Configuration**: Proper CORS headers for frontend integration
 - **Authentication Middleware**: Route-level authentication and authorization
 - **Password Security**: Secure password handling (can be enhanced with hashing)
@@ -104,11 +104,11 @@ The PHP backend uses the same PostgreSQL database schema as the original TypeScr
 ## Configuration
 
 ### Database Configuration
-Edit `config/database.php` to update database connection settings:
+Edit `config/database.php` to update MySQL database connection settings:
 
 ```php
 private $host = 'your-database-host';
-private $database = 'your-database-name';
+private $db_name = 'your-database-name';
 private $username = 'your-username';
 private $password = 'your-password';
 ```
@@ -118,7 +118,7 @@ For production deployment, consider using environment variables:
 
 ```php
 $this->host = $_ENV['DB_HOST'] ?? 'localhost';
-$this->database = $_ENV['DB_NAME'] ?? 'supercoin';
+$this->db_name = $_ENV['DB_NAME'] ?? 'supercoin';
 $this->username = $_ENV['DB_USER'] ?? 'user';
 $this->password = $_ENV['DB_PASS'] ?? 'password';
 ```

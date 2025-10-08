@@ -1,12 +1,12 @@
 # SuperCoin - Deployment Guide
 
 ## Project Overview
-This is a full-stack cryptocurrency investment platform built with React, Express.js, and PostgreSQL.
+This is a full-stack cryptocurrency investment platform built with React, PHP, and MySQL.
 
 ## Tech Stack
 - **Frontend**: React + TypeScript + Vite
-- **Backend**: Express.js + TypeScript
-- **Database**: PostgreSQL (configured for Neon Database)
+- **Backend**: PHP (API endpoints)
+- **Database**: MySQL (compatible with Hostinger)
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **State Management**: TanStack Query
 
@@ -16,58 +16,45 @@ This is a full-stack cryptocurrency investment platform built with React, Expres
 1. Download all files from this Replit project
 2. The project structure includes:
    - `client/` - React frontend
-   - `server/` - Express backend
-   - `shared/` - Shared TypeScript schemas
+   - `php/` - PHP backend
    - Configuration files (package.json, vite.config.ts, etc.)
 
 ## Server Setup Instructions
 
 ### Prerequisites
-- Node.js 18+ 
-- PostgreSQL database
-- npm or yarn package manager
+- PHP 7.4+ 
+- MySQL database
+- Hostinger shared hosting or similar
+- npm or yarn package manager (for frontend)
 
 ### 1. Environment Setup
-Create a `.env` file in the root directory:
-```env
-# Database
-DATABASE_URL=postgresql://username:password@host:port/database
-
-# Server
-PORT=5000
-NODE_ENV=production
-
-# Session (generate random string)
-SESSION_SECRET=your-super-secret-session-key-here
+Edit `php/config/database.php` with your MySQL credentials:
+```php
+private $host = 'localhost';
+private $db_name = 'your_database_name';
+private $username = 'your_database_user';
+private $password = 'your_database_password';
 ```
 
-### 2. Install Dependencies
+### 2. Install Frontend Dependencies
 ```bash
 npm install
 ```
 
 ### 3. Database Setup
 ```bash
-# Run database migrations (if using Drizzle)
-npm run db:push
-
-# Or manually create tables using the schema in shared/schema.ts
+# Import database schema using phpMyAdmin or MySQL CLI
+# File: php/database/schema.sql
 ```
 
-### 4. Build the Application
+### 4. Build the Frontend
 ```bash
-# Build both frontend and backend
 npm run build
 ```
 
-### 5. Start the Server
-```bash
-# Production mode
-npm start
-
-# Development mode
-npm run dev
-```
+### 5. Deploy Files
+- Upload `php/` folder to `public_html/php/`
+- Upload React build files (`dist/`) to `public_html/`
 
 ## Database Schema
 The application uses the following tables:
@@ -93,42 +80,36 @@ The application uses the following tables:
   - Announcement system
 
 ## Security Notes
-- Session-based authentication
+- Session-based authentication (PHP)
 - Role-based access control
-- Input validation with Zod schemas
+- Input validation
 - Secure password handling
 
 ## Deployment Considerations
-1. **Reverse Proxy**: Use nginx or similar for production
+1. **URL Rewriting**: Use `.htaccess` for API and React routing
 2. **SSL**: Configure HTTPS certificates
-3. **Database**: Use managed PostgreSQL service
+3. **Database**: Use managed MySQL service
 4. **Environment Variables**: Secure configuration management
-5. **Process Manager**: Use PM2 or similar for Node.js process management
+5. **Cron Jobs**: Use PHP cron for order processing
 
-## Sample nginx Configuration
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
+## Sample .htaccess Configuration
+```apache
+RewriteEngine On
 
-    location / {
-        proxy_pass http://localhost:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
+# Handle API routes
+RewriteRule ^api/(.*)$ php/index.php [QSA,L]
+
+# Handle React routing
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule . /index.html [L]
 ```
 
 ## Default Admin Account
 - Username: `admin`
 - Password: `admin123`
-- Email: `admin@cryptoinvest.com`
+- Email: `admin@supercoin.com`
 
 ## Default Customer Account  
 - Username: `sarah`

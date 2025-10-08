@@ -32,7 +32,7 @@ export function LoginModal() {
       <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl border-0">
         <CardHeader className="text-center pb-8">
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            C BOE
+            SuperCoin
           </CardTitle>
           <CardDescription className="text-gray-600 mt-2">Sign in to your investment account</CardDescription>
         </CardHeader>

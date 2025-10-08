@@ -31,14 +31,10 @@ foreach ($expiredOrders as $order) {
     
     $baseProfit = floatval($order['amount']) * $profitRate;
     
-    // Determine final profit based on user's direction setting
-    $finalProfit = $baseProfit;
-    if ($order['user_direction'] === 'Buy Down') {
-        $finalProfit = -$baseProfit; // Negative profit
-    }
+    
     
     // Calculate final amount to return to user (original amount + profit)
-    $returnAmount = floatval($order['amount']) + $finalProfit;
+    $returnAmount = floatval($order['amount']) + $baseProfit;
     
     try {
         $db->beginTransaction();
@@ -52,7 +48,7 @@ foreach ($expiredOrders as $order) {
                            WHERE id = :id";
         
         $stmt = $db->prepare($updateOrderQuery);
-        $stmt->bindParam(':profit', $finalProfit);
+        $stmt->bindParam(':profit', $baseProfit);
         $stmt->bindParam(':exit_price', $order['entry_price']); // For now, use entry price
         $stmt->bindParam(':id', $order['id']);
         $stmt->execute();
@@ -69,7 +65,7 @@ foreach ($expiredOrders as $order) {
         
         $db->commit();
         
-        echo "Processed order {$order['id']} - User: {$order['user_id']} - Profit: {$finalProfit}\n";
+        echo "Processed order {$order['id']} - User: {$order['user_id']} - Profit: {$baseProfit}\n";
         
     } catch (Exception $e) {
         $db->rollback();
