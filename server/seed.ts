@@ -23,8 +23,6 @@ export async function seedDatabase() {
         reputation: 100,
         winLoseSetting: "To Win",
         direction: "Actual",
-        accountStatus: "Active",
-        withdrawalStatus: "Allowed",
         isActive: true,
       }).returning();
       
@@ -43,8 +41,6 @@ export async function seedDatabase() {
         reputation: 85,
         winLoseSetting: "To Win",
         direction: "Actual",
-        accountStatus: "Active",
-        withdrawalStatus: "Allowed",
         isActive: true,
       }).returning();
       
