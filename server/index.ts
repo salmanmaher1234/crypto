@@ -113,15 +113,13 @@ app.get("/api/health", async (_req: Request, res: Response) => {
     serveStatic(app);
   }
 
-  // 🔹 CHANGE PORT to 80 (HTTP standard port)
   const port = 5000;
-  const host = "127.0.0.1";
+  const host = "0.0.0.0";
 
   server.listen(port, host, () => {
     log(`serving on http://${host}:${port}`);
-    log(`Domain: 127.0.0.1`);
     log(`Environment: ${app.get("env")}`);
-    log(`Health check: http://127.0.0.1/api/health`);
-    log(`Main app: http://127.0.0.1/`);
+    log(`Health check: /api/health`);
+    log(`Main app ready`);
   });
 })();
