@@ -276,14 +276,78 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </div>
 
-      {/* Trading Chart Banner */}
-      <Card className="overflow-hidden rounded-lg">
-        <div className="h-[120px] sm:h-[140px] md:h-[180px] lg:h-[220px] xl:h-[280px]">
-          <img 
-            src={bannerTradingImg} 
-            alt="Trading Chart"
-            className="w-full h-full object-cover"
-          />
+      {/* Cryptocurrency Trend Chart Section */}
+      <Card className="overflow-hidden rounded-lg bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 relative">
+        <div className="h-[180px] sm:h-[200px] md:h-[220px] relative">
+          {/* Chart Background with Grid */}
+          <svg className="absolute inset-0 w-full h-full opacity-20">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5" opacity="0.3"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+
+          {/* Cryptocurrency List */}
+          <div className="absolute left-2 sm:left-4 top-4 space-y-2 sm:space-y-3 z-10">
+            {[
+              { name: "Litecoin", trend: "up", change: "+1%" },
+              { name: "Bitcoin", trend: "up", change: "+12.8%" },
+              { name: "Ripple", trend: "down", change: "" },
+              { name: "Ethereum", trend: "", change: "" }
+            ].map((crypto, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <span className={`text-xs sm:text-sm font-medium ${index === 0 ? 'text-gray-400' : index === 1 ? 'text-orange-400' : 'text-blue-400'}`}>
+                  {crypto.name}
+                </span>
+                {crypto.trend === "up" && (
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3 text-green-400" />
+                    <span className="text-xs text-green-400">{crypto.change}</span>
+                  </div>
+                )}
+                {crypto.trend === "down" && (
+                  <TrendingDown className="w-3 h-3 text-red-400" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Chart Line Overlay */}
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 600 200" preserveAspectRatio="none">
+            {/* Candlestick bars */}
+            <rect x="50" y="120" width="8" height="60" fill="#4ade80" opacity="0.6"/>
+            <rect x="80" y="100" width="8" height="80" fill="#4ade80" opacity="0.6"/>
+            <rect x="110" y="90" width="8" height="90" fill="#4ade80" opacity="0.6"/>
+            <rect x="140" y="110" width="8" height="70" fill="#4ade80" opacity="0.6"/>
+            <rect x="170" y="80" width="8" height="100" fill="#4ade80" opacity="0.6"/>
+            <rect x="200" y="95" width="8" height="85" fill="#4ade80" opacity="0.6"/>
+            <rect x="230" y="105" width="8" height="75" fill="#4ade80" opacity="0.6"/>
+            <rect x="260" y="85" width="8" height="95" fill="#4ade80" opacity="0.6"/>
+            <rect x="290" y="75" width="8" height="105" fill="#4ade80" opacity="0.6"/>
+            <rect x="320" y="95" width="8" height="85" fill="#4ade80" opacity="0.6"/>
+            <rect x="350" y="70" width="8" height="110" fill="#4ade80" opacity="0.6"/>
+            <rect x="380" y="90" width="8" height="90" fill="#4ade80" opacity="0.6"/>
+            <rect x="410" y="60" width="8" height="120" fill="#4ade80" opacity="0.6"/>
+            <rect x="440" y="80" width="8" height="100" fill="#4ade80" opacity="0.6"/>
+            <rect x="470" y="50" width="8" height="130" fill="#4ade80" opacity="0.6"/>
+            <rect x="500" y="70" width="8" height="110" fill="#4ade80" opacity="0.6"/>
+
+            {/* Trend Line */}
+            <path 
+              d="M 20 150 Q 150 120, 300 80 T 580 40" 
+              fill="none" 
+              stroke="#22c55e" 
+              strokeWidth="3"
+              opacity="0.8"
+            />
+            
+            {/* Dots on line */}
+            <circle cx="150" cy="120" r="4" fill="#22c55e"/>
+            <circle cx="300" cy="80" r="4" fill="#22c55e"/>
+            <circle cx="450" cy="60" r="4" fill="#22c55e"/>
+          </svg>
         </div>
       </Card>
 
