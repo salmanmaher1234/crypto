@@ -4,6 +4,12 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-09**: Added cryptocurrency trend chart section to customer homepage:
+  - Dark gradient background (slate-800/900) with grid pattern
+  - Displays Litecoin, Bitcoin, Ripple, Ethereum with trend indicators
+  - SVG chart overlay with green candlestick bars and smooth trend line
+  - Responsive design across all screen sizes
+  - Positioned between crypto cards and currency table
 - **2025-10-09**: Complete UI/UX redesign matching provided mockups:
   - Login page: Gradient logo, turquoise "Super Coin" branding, green login button (#7CB342), modern white layout
   - Global color scheme: Bright green primary (#7CB342), purple secondary, turquoise accent (#4FC3C3), orange/red highlights (#FF6B35)
