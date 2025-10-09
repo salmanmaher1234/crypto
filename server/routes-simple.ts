@@ -128,7 +128,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid user data", errors: result.error.errors });
       }
 
-      const { username, email } = result.data;
+      const { username, email, agentInvitationCode } = result.data;
+
+      // Validate invitation code (required for registration)
+      if (!agentInvitationCode) {
+        return res.status(400).json({ message: "Invitation code is required" });
+      }
+
+      // Check if invitation code exists
+      const inviter = await storage.getUserByInvitationCode(agentInvitationCode);
+      if (!inviter) {
+        return res.status(400).json({ message: "Invalid invitation code" });
+      }
 
       // Check if user already exists
       const existingUser = await storage.getUserByUsername(username);

@@ -16,11 +16,12 @@ const registerSchema = z.object({
   username: z.string()
     .min(3, "Username must be at least 3 characters")
     .refine((val) => !val.includes(" "), "Username cannot contain spaces"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Please confirm your password"),
   fundPassword: z.string().min(6, "Fund password must be at least 6 characters"),
   confirmFundPassword: z.string().min(6, "Please confirm your fund password"),
-  agentInvitationCode: z.string().optional(),
+  agentInvitationCode: z.string().min(1, "Invitation code is required"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -50,6 +51,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: "",
+      email: "",
       password: "",
       confirmPassword: "",
       fundPassword: "",
@@ -97,10 +99,10 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       const registerData = {
         username: data.username,
         password: data.password,
-        email: `${data.username}@example.com`, // Generate email from username
+        email: data.email,
         name: data.username,
         fundPassword: data.fundPassword,
-        agentInvitationCode: data.agentInvitationCode || undefined,
+        agentInvitationCode: data.agentInvitationCode,
       };
 
       const response = await fetch("/api/auth/register", {
@@ -163,6 +165,30 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                         {...field}
                         placeholder="username"
                         className="pl-12 h-12 bg-blue-50 border-blue-100"
+                        data-testid="input-username"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Email Field */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="email address"
+                        className="pl-12 h-12 bg-blue-50 border-blue-100"
+                        data-testid="input-email"
                       />
                     </div>
                   </FormControl>

@@ -991,6 +991,7 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
     accountNumber: "",
     accountHolder: "",
     routingNumber: "",
+    branchName: "",
     accountType: "checking" as const,
   });
 
@@ -1053,6 +1054,7 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
       case 'accountHolderName': return account.accountHolderName || account.accountHolder || "";
       case 'accountNumber': return account.accountNumber || "";
       case 'ifscCode': return account.ifscCode || account.routingNumber || "";
+      case 'branchName': return account.branchName || "";
       default: return "";
     }
   };
@@ -1064,7 +1066,8 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
         accountHolderName: bankAccountData.accountHolder,
         bankName: bankAccountData.bankName,
         accountNumber: bankAccountData.accountNumber,
-        ifscCode: bankAccountData.routingNumber
+        ifscCode: bankAccountData.routingNumber,
+        branchName: bankAccountData.branchName
       },
       {
         onSuccess: () => {
@@ -1074,6 +1077,7 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
             accountNumber: "",
             accountHolder: "",
             routingNumber: "",
+            branchName: "",
             accountType: "checking",
           });
           refetchBankAccounts();
@@ -1131,6 +1135,7 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
@@ -1176,7 +1181,7 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                   checked={formData.isBanned}
                   onCheckedChange={(checked) => setFormData({ ...formData, isBanned: checked })}
                 />
-                <Label htmlFor="banned">Account Banned</Label>
+                <Label htmlFor="banned">Task Access Ban (Trading Restricted)</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
@@ -1216,25 +1221,14 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                 />
               </div>
               <div>
-                <Label htmlFor="creditScore">Credit Score</Label>
+                <Label htmlFor="creditScore">Credit Score / Reputation</Label>
                 <Input
                   id="creditScore"
                   type="number"
                   min="0"
                   max="1000"
                   value={formData.creditScore}
-                  onChange={(e) => setFormData({ ...formData, creditScore: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="reputation">Reputation</Label>
-                <Input
-                  id="reputation"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.reputation}
-                  onChange={(e) => setFormData({ ...formData, reputation: Number(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, creditScore: Number(e.target.value), reputation: Number(e.target.value) })}
                 />
               </div>
             </CardContent>
@@ -1310,10 +1304,17 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                         />
                       </div>
                       <div>
-                        <Label>Routing Number</Label>
+                        <Label>IFS Number</Label>
                         <Input
                           value={getBankAccountValue(account, 'ifscCode')}
                           onChange={(e) => handleBankAccountChange(account.bankAccountId, 'ifscCode', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>Branch Name</Label>
+                        <Input
+                          value={getBankAccountValue(account, 'branchName')}
+                          onChange={(e) => handleBankAccountChange(account.bankAccountId, 'branchName', e.target.value)}
                         />
                       </div>
                     </div>
@@ -1354,12 +1355,21 @@ function ComprehensiveUserEditForm({ user, onUpdate, onClose }: ComprehensiveUse
                   />
                 </div>
                 <div>
-                  <Label htmlFor="routingNumber">Routing Number</Label>
+                  <Label htmlFor="routingNumber">IFS Number</Label>
                   <Input
                     id="routingNumber"
                     value={bankAccountData.routingNumber}
                     onChange={(e) => setBankAccountData({ ...bankAccountData, routingNumber: e.target.value })}
-                    placeholder="Enter routing number"
+                    placeholder="Enter IFS number"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="branchName">Branch Name</Label>
+                  <Input
+                    id="branchName"
+                    value={bankAccountData.branchName || ""}
+                    onChange={(e) => setBankAccountData({ ...bankAccountData, branchName: e.target.value })}
+                    placeholder="Enter branch name"
                   />
                 </div>
               </div>

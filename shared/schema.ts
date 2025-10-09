@@ -9,7 +9,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
-  role: text("role").notNull().default("customer"), // customer, admin
+  role: text("role").notNull().default("customer"), // customer, admin, manager
   balance: decimal("balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   availableBalance: decimal("available_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   frozenBalance: decimal("frozen_balance", { precision: 10, scale: 2 }).notNull().default("0.00"),

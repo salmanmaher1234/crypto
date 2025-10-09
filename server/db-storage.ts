@@ -28,9 +28,8 @@ import type {
   InsertSession 
 } from "@shared/schema";
 import { eq, and, desc, lt } from "drizzle-orm";
-import { IStorage } from "./storage";
 
-export class DatabaseStorage implements IStorage {
+export class DatabaseStorage {
   async getUser(id: number): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result[0];
@@ -43,6 +42,11 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async getUserByInvitationCode(invitationCode: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.invitationCode, invitationCode)).limit(1);
     return result[0];
   }
 
