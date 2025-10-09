@@ -38,20 +38,22 @@ export default function OrderRecord() {
     buyPrice: parseFloat(order.entryPrice || order.price || 115000),
     closingPrice: order.status === 'closed' ? parseFloat(order.closingPrice || order.exitPrice || 115500) : undefined,
     profit: order.status === 'closed' ? parseFloat(order.profit || 0) : undefined,
-    investmentTime: new Date(order.createdAt).toLocaleString('en-GB', {
+    investmentTime: new Date(order.createdAt).toLocaleString(undefined, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: false
     }).replace(',', ''),
     settlementTiming: order.status === 'active' ? `${Math.floor((order.duration || 60) / 60)}m ${(order.duration || 60) % 60}s` : 
-      new Date(order.updatedAt || order.createdAt).toLocaleString('en-GB', {
+      new Date(order.updatedAt || order.createdAt).toLocaleString(undefined, {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        hour12: false
       }).replace(',', ''),
     status: order.status === 'closed' ? 'closed' : 'active'
   });

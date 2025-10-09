@@ -316,14 +316,14 @@ export function CryptoSingle() {
     
     if (tradeDirection === "up") {
       // Buy Up - Calculate profit
-      if (selectedDuration === "60") profitLoss = amount * 0.20; // 20% profit
-      else if (selectedDuration === "120") profitLoss = amount * 0.30; // 30% profit  
+      if (selectedDuration === "60") profitLoss = amount * 0.30; // 30% profit
+      else if (selectedDuration === "120") profitLoss = amount * 0.40; // 40% profit  
       else if (selectedDuration === "180") profitLoss = amount * 0.50; // 50% profit
     } else {
-      // Buy Down - Calculate loss (negative)
-      if (selectedDuration === "60") profitLoss = amount * -0.20; // 20% loss
-      else if (selectedDuration === "120") profitLoss = amount * -0.30; // 30% loss
-      else if (selectedDuration === "180") profitLoss = amount * -0.50; // 50% loss
+      // Buy Down - Calculate profit (same as Buy Up when price goes down)
+      if (selectedDuration === "60") profitLoss = amount * 0.30; // 30% profit
+      else if (selectedDuration === "120") profitLoss = amount * 0.40; // 40% profit
+      else if (selectedDuration === "180") profitLoss = amount * 0.50; // 50% profit
     }
 
     const tradeData = {
@@ -538,8 +538,8 @@ export function CryptoSingle() {
                   <div className="text-blue-300 text-sm mb-1">Time</div>
                   <div className="text-lg font-bold mb-1">{duration.label}</div>
                   <div className="text-green-400 text-xs">
-                    Scale: {duration.value === "60" ? "20.00%" : 
-                           duration.value === "120" ? "30.00%" : "50.00%"}
+                    Scale: {duration.value === "60" ? "30.00%" : 
+                           duration.value === "120" ? "40.00%" : "50.00%"}
                   </div>
                 </button>
               ))}
@@ -562,13 +562,13 @@ export function CryptoSingle() {
               />
             </div>
 
-            {/* Order Confirmation Button */}
+            {/* Submit Order Button */}
             <Button
               onClick={handlePlaceTrade}
               disabled={placeTradeMutation.isPending}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 text-lg rounded-lg"
             >
-              {placeTradeMutation.isPending ? "Processing..." : "Order Confirmation"}
+              {placeTradeMutation.isPending ? "Processing..." : "Submit Order"}
             </Button>
           </div>
         </DialogContent>
