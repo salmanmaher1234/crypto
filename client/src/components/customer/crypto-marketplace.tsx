@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RefreshCw, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
@@ -16,6 +16,9 @@ export function CryptoMarketplace({
   const { user } = useAuth();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-slide every 5 seconds for banner
   useEffect(() => {
@@ -26,45 +29,43 @@ export function CryptoMarketplace({
     return () => clearInterval(interval);
   }, []);
 
+  // Update scroll button states based on actual scroll position
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        setCanScrollLeft(scrollLeft > 1); // Small tolerance
+        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1); // Small tolerance
+      }
+    };
+
+    // Use requestAnimationFrame to ensure ref is ready
+    const timeoutId = setTimeout(() => {
+      const scrollElement = scrollRef.current;
+      if (scrollElement) {
+        scrollElement.addEventListener('scroll', checkScroll);
+        window.addEventListener('resize', checkScroll);
+        checkScroll(); // Initial check
+      }
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+      const scrollElement = scrollRef.current;
+      if (scrollElement) {
+        scrollElement.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+      }
+    };
+  }, []);
+
   // Type-safe crypto prices access
   const getCryptoPrice = (symbol: string) =>
     (cryptoPrices as any)?.[symbol]?.price || "0.00";
   const getCryptoChange = (symbol: string) =>
     (cryptoPrices as any)?.[symbol]?.change || "0.00";
 
-  // Top 4 cryptos for cards
-  const topCryptos = [
-    {
-      symbol: "BTC/USDT",
-      price: getCryptoPrice("BTC/USDT") || "122210.07",
-      change: getCryptoChange("BTC/USDT") || "-0.60",
-    },
-    {
-      symbol: "ETH/USDT",
-      price: getCryptoPrice("ETH/USDT") || "4351.11",
-      change: getCryptoChange("ETH/USDT") || "-3.22",
-    },
-    {
-      symbol: "DOGE/USDT",
-      price: getCryptoPrice("DOGE/USDT") || "0.24576",
-      change: getCryptoChange("DOGE/USDT") || "-1.77",
-    },
-    {
-      symbol: "CHZ/USDT",
-      price: getCryptoPrice("CHZ/USDT") || "0.04099",
-      change: getCryptoChange("CHZ/USDT") || "-2.31",
-    },
-  ];
-
-  // Chart cryptos
-  const chartCryptos = [
-    { name: "Litecoin", trend: "up", change: "+12" },
-    { name: "Bitcoin", trend: "up", change: "+12.8%" },
-    { name: "Ripple", trend: "down", change: "" },
-    { name: "Ethereum", trend: "up", change: "" },
-  ];
-
-  // All crypto data for table
+  // All crypto data for both boxes and table
   const cryptoData = [
     {
       symbol: "BTC/USDT",
@@ -116,6 +117,14 @@ export function CryptoMarketplace({
     },
   ];
 
+  // Chart cryptos
+  const chartCryptos = [
+    { name: "Litecoin", trend: "up", change: "+12" },
+    { name: "Bitcoin", trend: "up", change: "+12.8%" },
+    { name: "Ripple", trend: "down", change: "" },
+    { name: "Ethereum", trend: "up", change: "" },
+  ];
+
   const formatPrice = (price: string | number) => {
     const numPrice = typeof price === "string" ? parseFloat(price) : price;
     if (numPrice < 1) {
@@ -139,20 +148,53 @@ export function CryptoMarketplace({
     window.location.reload();
   };
 
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      // Get the first card element to calculate exact width including gap
+      const firstCard = container.querySelector('[data-testid^="card-crypto-"]') as HTMLElement;
+      
+      if (firstCard) {
+        // Get the container's gap value (gap-3 = 12px)
+        const containerStyle = window.getComputedStyle(container);
+        const gap = parseFloat(containerStyle.columnGap || containerStyle.gap) || 0;
+        
+        // Calculate the actual card width including gap
+        const cardWidth = firstCard.offsetWidth;
+        const scrollAmount = cardWidth + gap;
+        
+        // Get current scroll position and max scroll
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        const maxScrollLeft = scrollWidth - clientWidth;
+        
+        // Calculate target scroll position with clamping
+        let targetScroll;
+        if (direction === 'left') {
+          targetScroll = Math.max(0, scrollLeft - scrollAmount);
+        } else {
+          targetScroll = Math.min(maxScrollLeft, scrollLeft + scrollAmount);
+        }
+        
+        // Scroll to exact position
+        container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pb-20">
       {/* Header with profile, title, and balance */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
-          <Avatar className="h-12 w-12">
+          <Avatar className="h-12 w-12" data-testid="avatar-profile">
             <AvatarImage src={user?.profileImage || `/api/placeholder/48/48`} alt={user?.name || 'Profile'} />
             <AvatarFallback className="bg-blue-500 text-white font-bold">
               {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
-          <h1 className="text-xl font-bold">Home</h1>
+          <h1 className="text-xl font-bold" data-testid="text-page-title">Home</h1>
           <div className="flex items-center gap-1">
-            <span className="text-lg font-semibold">
+            <span className="text-lg font-semibold" data-testid="text-balance">
               {user?.availableBalance ? parseFloat(user.availableBalance).toLocaleString() : '0'}
             </span>
             <Button
@@ -161,6 +203,7 @@ export function CryptoMarketplace({
               onClick={handleManualRefresh}
               disabled={isRefreshing}
               className="p-1 h-8 w-8"
+              data-testid="button-refresh"
             >
               <RefreshCw 
                 className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} 
@@ -179,6 +222,7 @@ export function CryptoMarketplace({
           <button 
             onClick={() => setCurrentSlide((prev) => (prev - 1 + 2) % 2)}
             className="text-white/70 hover:text-white z-10"
+            data-testid="button-banner-prev"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -195,6 +239,7 @@ export function CryptoMarketplace({
           <button 
             onClick={() => setCurrentSlide((prev) => (prev + 1) % 2)}
             className="text-white/70 hover:text-white z-10"
+            data-testid="button-banner-next"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -207,6 +252,7 @@ export function CryptoMarketplace({
           <button 
             onClick={() => setCurrentSlide((prev) => (prev - 1 + 2) % 2)}
             className="text-white/70 hover:text-white z-10"
+            data-testid="button-banner-prev-2"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -240,6 +286,7 @@ export function CryptoMarketplace({
           <button 
             onClick={() => setCurrentSlide((prev) => (prev + 1) % 2)}
             className="text-white/70 hover:text-white z-10"
+            data-testid="button-banner-next-2"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -250,34 +297,65 @@ export function CryptoMarketplace({
           <button 
             onClick={() => setCurrentSlide(0)}
             className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 0 ? 'bg-white' : 'bg-white/50'}`}
+            data-testid="button-indicator-0"
           />
           <button 
             onClick={() => setCurrentSlide(1)}
             className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 1 ? 'bg-white' : 'bg-white/50'}`}
+            data-testid="button-indicator-1"
           />
         </div>
       </div>
 
-      {/* 4 Crypto Cards Grid */}
-      <div className="grid grid-cols-2 gap-3 px-4 my-4">
-        {topCryptos.map((crypto) => {
-          const isPositive = parseFloat(crypto.change) >= 0;
-          return (
-            <div
-              key={crypto.symbol}
-              onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
-              className="bg-white border-2 border-[#FF6B35] rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+      {/* Crypto Cards Carousel - Shows 3 at a time */}
+      <div className="relative px-4 my-4">
+        <div 
+          ref={scrollRef}
+          className="flex gap-3 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {cryptoData.map((crypto, index) => {
+            const isPositive = parseFloat(crypto.change) >= 0;
+            return (
+              <div
+                key={crypto.symbol}
+                onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                className="flex-none w-[calc(33.333%-8px)] min-w-[calc(33.333%-8px)] bg-white border-2 border-[#FF6B35] rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow snap-start"
+                data-testid={`card-crypto-${index}`}
+              >
+                <div className="text-sm font-bold text-gray-900 mb-2">{crypto.symbol}</div>
+                <div className={`text-lg font-bold mb-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatPrice(crypto.price)}
+                </div>
+                <div className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatChange(crypto.change)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Carousel Navigation - only show if there are more than 3 items */}
+        {cryptoData.length > 3 && (
+          <>
+            <button
+              onClick={() => scrollCarousel('left')}
+              disabled={!canScrollLeft}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-carousel-prev"
             >
-              <div className="text-sm font-bold text-gray-900 mb-2">{crypto.symbol}</div>
-              <div className={`text-lg font-bold mb-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPrice(crypto.price)}
-              </div>
-              <div className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                {formatChange(crypto.change)}
-              </div>
-            </div>
-          );
-        })}
+              <ChevronLeft className="w-5 h-5 text-gray-800" />
+            </button>
+            <button
+              onClick={() => scrollCarousel('right')}
+              disabled={!canScrollRight}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-carousel-next"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-800" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Chart Section */}
@@ -358,6 +436,7 @@ export function CryptoMarketplace({
                 key={crypto.symbol}
                 onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
                 className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                data-testid={`row-crypto-${index}`}
               >
                 <div className="flex items-center space-x-3 flex-1">
                   <div
