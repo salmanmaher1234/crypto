@@ -33,11 +33,11 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
   // Auto-slide every 5 seconds for banner
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+      setCurrentSlide((prev) => (prev + 1) % 2);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [sliderImages.length]);
+  }, []);
 
   // Auto-refresh balance every 2 minutes (120 seconds)
   useEffect(() => {
@@ -200,10 +200,13 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
 
       {/* Banner Slider */}
       <div className="relative h-[180px] sm:h-[200px] rounded-lg overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-between px-8">
+        {/* Slide 1: What is a Crypto Exchange */}
+        <div 
+          className={`absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-between px-8 transition-opacity duration-500 ${currentSlide === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
           <button 
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + sliderImages.length) % sliderImages.length)}
-            className="text-white/70 hover:text-white"
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + 2) % 2)}
+            className="text-white/70 hover:text-white z-10"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -218,17 +221,68 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
           </div>
           
           <button 
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % sliderImages.length)}
-            className="text-white/70 hover:text-white"
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % 2)}
+            className="text-white/70 hover:text-white z-10"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Slide 2: Payment Card */}
+        <div 
+          className={`absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-red-400 flex items-center justify-between px-4 sm:px-8 transition-opacity duration-500 ${currentSlide === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
+          <button 
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + 2) % 2)}
+            className="text-white/70 hover:text-white z-10"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          
+          <div className="flex-1 flex items-center justify-center gap-4 sm:gap-8">
+            {/* Card Illustration */}
+            <div className="relative">
+              <div className="bg-gradient-to-br from-orange-600 to-red-500 rounded-xl p-4 sm:p-6 w-48 sm:w-64 shadow-2xl">
+                <div className="text-white space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="w-10 h-8 bg-yellow-400 rounded"></div>
+                    <div className="text-2xl">💳</div>
+                  </div>
+                  <div className="text-sm sm:text-lg font-mono tracking-wider">
+                    1307 9113 0592 2711
+                  </div>
+                  <div className="text-xs opacity-80">11/25</div>
+                </div>
+              </div>
+              <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-2xl">
+                💰
+              </div>
+            </div>
+            
+            {/* Shopping Woman Illustration */}
+            <div className="hidden sm:block text-6xl">
+              🛍️
+            </div>
+          </div>
+          
+          <button 
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % 2)}
+            className="text-white/70 hover:text-white z-10"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
         
         {/* Slide indicators */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-          <div className="w-2 h-2 rounded-full bg-white/50"></div>
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+          <button 
+            onClick={() => setCurrentSlide(0)}
+            className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 0 ? 'bg-white' : 'bg-white/50'}`}
+          />
+          <button 
+            onClick={() => setCurrentSlide(1)}
+            className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 1 ? 'bg-white' : 'bg-white/50'}`}
+          />
         </div>
       </div>
 
