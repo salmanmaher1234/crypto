@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 interface AuthResponse {
   user: User;
@@ -9,32 +9,12 @@ interface AuthResponse {
 
 export function useAuth() {
   const queryClient = useQueryClient();
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  // Check for existing session on mount
-  useEffect(() => {
-    const sessionId = localStorage.getItem('sessionId');
-    if (sessionId) {
-      // If we have a sessionId, enable the auth query and fetch once
-      queryClient.setQueryDefaults(["/api/auth/me"], { enabled: true });
-      queryClient.refetchQueries({ queryKey: ["/api/auth/me"] }).then(() => {
-        setIsInitialized(true);
-      }).catch((error) => {
-        console.log("Session validation failed on mount:", error);
-        // Clear invalid session and mark as initialized
-        localStorage.removeItem('sessionId');
-        queryClient.setQueryData(["/api/auth/me"], null);
-        setIsInitialized(true);
-      });
-    } else {
-      setIsInitialized(true);
-    }
-  }, [queryClient]);
+  const sessionId = useMemo(() => localStorage.getItem('sessionId'), []);
 
   // Auto-refresh balance every 30 seconds when user is logged in (reduced frequency)
   useEffect(() => {
-    const sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) return;
+    const storedSessionId = localStorage.getItem('sessionId');
+    if (!storedSessionId) return;
     
     const interval = setInterval(() => {
       // Only invalidate if the user is currently authenticated
@@ -50,13 +30,13 @@ export function useAuth() {
   const { data: authData, isLoading } = useQuery<AuthResponse | null>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const sessionId = localStorage.getItem('sessionId');
+      const storedSessionId = localStorage.getItem('sessionId');
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
       
-      if (sessionId) {
-        headers["X-Session-Id"] = sessionId;
+      if (storedSessionId) {
+        headers["X-Session-Id"] = storedSessionId;
       }
 
       const response = await fetch("/api/auth/me", {
@@ -65,10 +45,9 @@ export function useAuth() {
       });
 
       if (response.status === 401) {
-        // Session is invalid or expired - clear it but don't be too aggressive
+        // Session is invalid or expired - clear it
         console.log("Session unauthorized, clearing localStorage");
         localStorage.removeItem('sessionId');
-        queryClient.setQueryDefaults(["/api/auth/me"], { enabled: false });
         queryClient.setQueryData(["/api/auth/me"], null);
         return null;
       }
@@ -81,12 +60,10 @@ export function useAuth() {
     },
     retry: false,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchInterval: false,
-    refetchIntervalInBackground: false,
-    staleTime: 7 * 24 * 60 * 60 * 1000, // 7 days  
+    refetchOnMount: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 24 * 60 * 60 * 1000, // 30 days
-    enabled: false, // Will be enabled programmatically
+    enabled: !!sessionId, // Enable if sessionId exists
   });
 
   const loginMutation = useMutation({
@@ -114,20 +91,23 @@ export function useAuth() {
       return data;
     },
     onSuccess: (data) => {
-      // Set auth data directly and enable future queries
+      // Set auth data directly
       queryClient.setQueryData(["/api/auth/me"], data);
-      queryClient.setQueryDefaults(["/api/auth/me"], { enabled: true });
+      // Force a re-query to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      // Trigger a page reload to ensure the app re-initializes with the new session
+      window.location.href = '/';
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const sessionId = localStorage.getItem('sessionId');
+      const storedSessionId = localStorage.getItem('sessionId');
       await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(sessionId && { "X-Session-Id": sessionId })
+          ...(storedSessionId && { "X-Session-Id": storedSessionId })
         },
         credentials: "include",
       });
@@ -135,13 +115,15 @@ export function useAuth() {
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/auth/me"], null);
-      queryClient.setQueryDefaults(["/api/auth/me"], { enabled: false });
+      queryClient.clear();
+      // Reload page to clear all state
+      window.location.href = '/';
     },
   });
 
   return {
     user: authData?.user,
-    isLoading: !isInitialized || isLoading,
+    isLoading: isLoading,
     login: loginMutation.mutate,
     logout: logoutMutation.mutate,
     isLoginPending: loginMutation.isPending,
