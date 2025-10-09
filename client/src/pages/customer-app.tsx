@@ -108,7 +108,11 @@ export default function CustomerApp() {
       <header className="bg-white shadow-sm">
         <div className="w-full px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center cursor-pointer" onClick={() => {
+              setActiveSection('profile');
+              setShowFullMarketView(false);
+              setSelectedCurrency(null);
+            }} data-testid="button-user-profile">
               {user?.profileImage ? (
                 <img
                   src={user.profileImage}
@@ -161,15 +165,14 @@ export default function CustomerApp() {
       </header>
 
       {/* Main Content */}
-      <main className={`flex-1 overflow-auto ${showFullMarketView ? '' : 'pb-[90px] sm:pb-[100px] md:pb-[80px]'}`}>
+      <main className="flex-1 overflow-auto pb-[90px] sm:pb-[100px] md:pb-[80px]">
         <div className="w-full h-full">
           <div className={showFullMarketView ? 'h-full' : 'pb-6 sm:pb-8 md:pb-10'}>{renderSection()}</div>
         </div>
       </main>
 
-      {/* Bottom Navigation - Hide when full market view is active */}
-      {!showFullMarketView && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-inset">
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-inset">
         <div className="w-full max-w-screen-xl mx-auto">
           <div className="grid grid-cols-5 py-3 sm:py-4 min-h-[70px] sm:min-h-[80px]">
             {sections.map((section) => {
@@ -205,8 +208,7 @@ export default function CustomerApp() {
             })}
           </div>
         </div>
-        </nav>
-      )}
+      </nav>
     </div>
   );
 }
