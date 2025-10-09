@@ -4,6 +4,13 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-09**: Added two-banner slider to customer homepage (crypto-marketplace.tsx):
+  - Banner 1: Blue/purple gradient "What is a Crypto Exchange" with centered white text
+  - Banner 2: Orange/red gradient payment card illustration (card number: 1307 9113 0592 2711)
+  - Auto-rotation every 5 seconds with smooth fade transitions
+  - Manual navigation via chevron buttons and clickable dot indicators
+  - Responsive design (180px mobile, 200px desktop)
+  - Positioned between top crypto prices header and action buttons
 - **2025-10-09**: Fixed session persistence - users now stay logged in after page refresh:
   - Improved authentication hook to properly check sessionId from localStorage on mount
   - Query automatically validates session with server on page load
