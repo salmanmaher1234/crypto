@@ -466,10 +466,18 @@ export function SpotOrders({
       return;
     }
 
+    const currentPrice = cryptoPrices[`${selectedCrypto}/USDT`]?.price || "0";
+    const duration = 180; // 3 minutes default
+    const commissionRate = 0.5; // 50% for 180s
+    const profitLoss = amount * commissionRate;
+
     placeTrade.mutate({
+      asset: `${selectedCrypto}/USDT`,
       direction,
       amount,
-      duration: 180, // 3 minutes default
+      duration,
+      entryPrice: currentPrice,
+      profitLoss,
     });
   };
 

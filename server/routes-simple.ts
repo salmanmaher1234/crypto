@@ -828,12 +828,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const order = await storage.createBettingOrder(orderData);
       console.log("Created order:", order);
 
-      // Deduct amount from available balance
-      const newBalance = availableBalance - orderAmountNumber;
-      console.log(`BALANCE UPDATE: ${availableBalance} - ${orderAmountNumber} = ${newBalance}`);
+      // Deduct amount from both available balance and total balance
+      const newAvailableBalance = availableBalance - orderAmountNumber;
+      const currentTotalBalance = parseFloat(user.balance || "0");
+      const newTotalBalance = currentTotalBalance - orderAmountNumber;
+      console.log(`BALANCE UPDATE: availableBalance ${availableBalance} - ${orderAmountNumber} = ${newAvailableBalance}, balance ${currentTotalBalance} - ${orderAmountNumber} = ${newTotalBalance}`);
 
       await storage.updateUser(userId, {
-        availableBalance: newBalance.toFixed(2),
+        availableBalance: newAvailableBalance.toFixed(2),
+        balance: newTotalBalance.toFixed(2),
       });
       console.log("Balance updated successfully");
 

@@ -261,7 +261,7 @@ export class DatabaseStorage {
       const currentBalance = parseFloat(user.balance || "0");
       
       const newAvailable = currentAvailable + orderAmount + balanceImpact;
-      const newBalance = currentBalance + balanceImpact;
+      const newBalance = currentBalance + orderAmount + balanceImpact;
 
       let newReputation = user.reputation || 100;
       if (user.direction === "Actual") {
