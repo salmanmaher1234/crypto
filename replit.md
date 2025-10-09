@@ -4,13 +4,19 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-09**: Expanded homepage to display all 13 cryptocurrencies:
+  - Updated crypto carousel to show all 13 currencies (3 visible at a time with left/right navigation)
+  - Updated currency table to display all 13 currencies
+  - Complete list: BTC/USDT, ETH/USDT, DOGE/USDT, CHZ/USDT, BCH/USDT, PSG/USDT, JUV/USDT, ATM/USDT, LTC/USDT, EOS/USDT, TRX/USDT, ETC/USDT, BTS/USDT
+  - Fixed carousel scroll tracking with proper gap calculation and boundary clamping
+  - Backend API now fetches all 13 currencies from CoinGecko with consistent USDT naming
+  - Updated fallback data to include accurate prices for all 13 currencies
 - **2025-10-09**: Complete homepage redesign (crypto-marketplace.tsx) matching screenshot specifications:
   - Header: Profile avatar, "Home" title, balance display with refresh icon
   - Banner slider: 2 slides (Crypto Exchange info, payment card) with auto-rotation and manual controls
-  - 4 crypto cards grid: BTC/USDT, ETH/USDT, DOGE/USDT, CHZ/USDT with orange borders (#FF6B35)
+  - Crypto cards carousel: Orange borders (#FF6B35), 3 visible at a time with navigation controls
   - Chart section: Dark gradient background with Litecoin, Bitcoin, Ripple, Ethereum trend indicators and SVG chart
-  - Currency table: 6 cryptocurrencies with colored icons, real-time prices, and conditional color coding
-  - Conditional styling: Green for positive changes, red for negative changes (applied to all sections)
+  - Currency table: Real-time prices with conditional color coding (green for positive, red for negative)
   - Removed: Old top 3 crypto header, action buttons section
 - **2025-10-09**: Fixed session persistence - users now stay logged in after page refresh:
   - Improved authentication hook to properly check sessionId from localStorage on mount
