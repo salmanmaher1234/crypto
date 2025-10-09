@@ -68,6 +68,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   };
 
+  const requireAdminOrManager = async (req: any, res: any, next: any) => {
+    const userId = await getSessionUserId(req);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await storage.getUser(userId);
+    if (!user || (user.role !== "admin" && user.role !== "manager")) {
+      return res.status(403).json({ message: "Admin or Manager access required" });
+    }
+    (req as any).userId = userId;
+    (req as any).userRole = user.role;
+    (req as any).userInvitationCode = user.invitationCode;
+    next();
+  };
+
   // Auth routes
   // Check username availability endpoint
   app.get("/api/auth/check-username", async (req, res) => {
@@ -202,9 +218,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User management routes
-  app.get("/api/users", authenticateUser, requireAdmin, async (req, res) => {
+  app.get("/api/users", authenticateUser, requireAdminOrManager, async (req, res) => {
     try {
-      const users = await storage.getAllUsers();
+      const userRole = (req as any).userRole;
+      const userInvitationCode = (req as any).userInvitationCode;
+      
+      let users = await storage.getAllUsers();
+      
+      // Filter users based on role
+      if (userRole === "manager") {
+        // Managers only see users who used their invitation code to register
+        users = users.filter(user => user.agentInvitationCode === userInvitationCode);
+      }
+      // Super admins (role === "admin") see all users - no filtering needed
+      
       const usersWithoutPasswords = users.map(({ password, ...user }) => user);
       res.json(usersWithoutPasswords);
     } catch (error) {
