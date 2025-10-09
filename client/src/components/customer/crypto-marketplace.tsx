@@ -65,7 +65,7 @@ export function CryptoMarketplace({
   const getCryptoChange = (symbol: string) =>
     (cryptoPrices as any)?.[symbol]?.change || "0.00";
 
-  // All crypto data for both boxes and table
+  // All 13 crypto currencies for both boxes and table
   const cryptoData = [
     {
       symbol: "BTC/USDT",
@@ -100,6 +100,38 @@ export function CryptoMarketplace({
       color: "#CD212A",
     },
     {
+      symbol: "BCH/USDT",
+      name: "Bitcoin Cash",
+      icon: "₿C",
+      price: getCryptoPrice("BCH/USDT") || "378.50",
+      change: getCryptoChange("BCH/USDT") || "-3.21",
+      color: "#8DC351",
+    },
+    {
+      symbol: "PSG/USDT",
+      name: "Paris Saint-Germain",
+      icon: "PSG",
+      price: getCryptoPrice("PSG/USDT") || "3.45",
+      change: getCryptoChange("PSG/USDT") || "+1.85",
+      color: "#004170",
+    },
+    {
+      symbol: "JUV/USDT",
+      name: "Juventus",
+      icon: "JUV",
+      price: getCryptoPrice("JUV/USDT") || "2.18",
+      change: getCryptoChange("JUV/USDT") || "-0.92",
+      color: "#000000",
+    },
+    {
+      symbol: "ATM/USDT",
+      name: "Atletico Madrid",
+      icon: "ATM",
+      price: getCryptoPrice("ATM/USDT") || "2.67",
+      change: getCryptoChange("ATM/USDT") || "+2.15",
+      color: "#CE3524",
+    },
+    {
       symbol: "LTC/USDT",
       name: "Litecoin",
       icon: "Ł",
@@ -108,12 +140,36 @@ export function CryptoMarketplace({
       color: "#345D9D",
     },
     {
-      symbol: "XRP/USDT",
-      name: "Ripple",
-      icon: "◉",
-      price: getCryptoPrice("XRP/USDT") || "0.7240",
-      change: getCryptoChange("XRP/USDT") || "-1.23",
-      color: "#00AAE4",
+      symbol: "EOS/USDT",
+      name: "EOS",
+      icon: "EOS",
+      price: getCryptoPrice("EOS/USDT") || "0.8234",
+      change: getCryptoChange("EOS/USDT") || "-5.67",
+      color: "#443F54",
+    },
+    {
+      symbol: "TRX/USDT",
+      name: "TRON",
+      icon: "TRX",
+      price: getCryptoPrice("TRX/USDT") || "0.1645",
+      change: getCryptoChange("TRX/USDT") || "+3.42",
+      color: "#EB0029",
+    },
+    {
+      symbol: "ETC/USDT",
+      name: "Ethereum Classic",
+      icon: "ETC",
+      price: getCryptoPrice("ETC/USDT") || "24.78",
+      change: getCryptoChange("ETC/USDT") || "-2.89",
+      color: "#328332",
+    },
+    {
+      symbol: "BTS/USDT",
+      name: "BitShares",
+      icon: "BTS",
+      price: getCryptoPrice("BTS/USDT") || "0.0234",
+      change: getCryptoChange("BTS/USDT") || "+1.25",
+      color: "#35BAEB",
     },
   ];
 

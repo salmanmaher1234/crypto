@@ -1264,17 +1264,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           change: data['bitcoin-cash'].usd_24h_change ? `${data['bitcoin-cash'].usd_24h_change >= 0 ? '+' : ''}${data['bitcoin-cash'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['bitcoin-cash'].usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "PSG/USD": {
+        "PSG/USDT": {
           price: data['paris-saint-germain-fan-token'].usd.toFixed(3),
           change: data['paris-saint-germain-fan-token'].usd_24h_change ? `${data['paris-saint-germain-fan-token'].usd_24h_change >= 0 ? '+' : ''}${data['paris-saint-germain-fan-token'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['paris-saint-germain-fan-token'].usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "JUV/USD": {
+        "JUV/USDT": {
           price: data['juventus-fan-token'].usd.toFixed(3),
           change: data['juventus-fan-token'].usd_24h_change ? `${data['juventus-fan-token'].usd_24h_change >= 0 ? '+' : ''}${data['juventus-fan-token'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['juventus-fan-token'].usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "ATM/USD": {
+        "ATM/USDT": {
           price: data['atletico-madrid'].usd.toFixed(3),
           change: data['atletico-madrid'].usd_24h_change ? `${data['atletico-madrid'].usd_24h_change >= 0 ? '+' : ''}${data['atletico-madrid'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['atletico-madrid'].usd_24h_change >= 0 ? "positive" : "negative"
@@ -1284,22 +1284,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           change: data.litecoin.usd_24h_change ? `${data.litecoin.usd_24h_change >= 0 ? '+' : ''}${data.litecoin.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.litecoin.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "EOS/USD": {
+        "EOS/USDT": {
           price: data.eos.usd.toFixed(4),
           change: data.eos.usd_24h_change ? `${data.eos.usd_24h_change >= 0 ? '+' : ''}${data.eos.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.eos.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "TRX/USD": {
+        "TRX/USDT": {
           price: data.tron.usd.toFixed(4),
           change: data.tron.usd_24h_change ? `${data.tron.usd_24h_change >= 0 ? '+' : ''}${data.tron.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.tron.usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "ETC/USD": {
+        "ETC/USDT": {
           price: data['ethereum-classic'].usd.toFixed(2),
           change: data['ethereum-classic'].usd_24h_change ? `${data['ethereum-classic'].usd_24h_change >= 0 ? '+' : ''}${data['ethereum-classic'].usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data['ethereum-classic'].usd_24h_change >= 0 ? "positive" : "negative"
         },
-        "BTS/USD": {
+        "BTS/USDT": {
           price: data.bitshares.usd.toFixed(4),
           change: data.bitshares.usd_24h_change ? `${data.bitshares.usd_24h_change >= 0 ? '+' : ''}${data.bitshares.usd_24h_change.toFixed(2)}%` : "0.00%",
           changeType: data.bitshares.usd_24h_change >= 0 ? "positive" : "negative"
@@ -1336,44 +1336,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
           change: "0.50%",
           changeType: "positive"
         },
-        "PSG/USD": {
+        "PSG/USDT": {
           price: "1.417",
           change: "-2.01%",
           changeType: "negative"
         },
-        "JUV/USD": {
+        "JUV/USDT": {
           price: "0.901",
           change: "-1.42%",
           changeType: "negative"
         },
-        "ATM/USD": {
+        "ATM/USDT": {
           price: "0.999",
           change: "-1.87%",
           changeType: "negative"
         },
-        "LTC/USD": {
+        "LTC/USDT": {
           price: "85.13",
           change: "-0.28%",
           changeType: "negative"
         },
-        "EOS/USD": {
-          price: "0",
-          change: "0.00%",
-          changeType: "positive"
-        },
-        "TRX/USD": {
-          price: "0.2712",
-          change: "0.15%",
-          changeType: "positive"
-        },
-        "ETC/USD": {
-          price: "16.19",
-          change: "-2.00%",
+        "EOS/USDT": {
+          price: "0.8234",
+          change: "-5.67%",
           changeType: "negative"
         },
-        "BTS/USD": {
-          price: "502.8",
-          change: "0.50%",
+        "TRX/USDT": {
+          price: "0.1645",
+          change: "+3.42%",
+          changeType: "positive"
+        },
+        "ETC/USDT": {
+          price: "24.78",
+          change: "-2.89%",
+          changeType: "negative"
+        },
+        "BTS/USDT": {
+          price: "0.0234",
+          change: "+1.25%",
           changeType: "positive"
         }
       });
