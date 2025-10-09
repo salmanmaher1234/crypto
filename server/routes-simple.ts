@@ -265,10 +265,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      // Create user with reputation defaulting to 100 for new members
+      // Create user with role defaulting to customer
       const user = await storage.createUser({
         ...result.data,
-        reputation: result.data.reputation || 100, // Default VIP Level to 100
         role: result.data.role || "customer"
       });
 
