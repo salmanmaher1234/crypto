@@ -4,6 +4,14 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-09**: Complete UI/UX redesign matching provided mockups:
+  - Login page: Gradient logo, turquoise "Super Coin" branding, green login button (#7CB342), modern white layout
+  - Global color scheme: Bright green primary (#7CB342), purple secondary, turquoise accent (#4FC3C3), orange/red highlights (#FF6B35)
+  - Bottom navigation: Green highlights for active tabs across all customer pages
+  - Home page: Blue/purple gradient banner, orange-bordered crypto cards on light gray background
+  - Trading page: Green Buy Up (#7CB342), orange Buy Down (#FF6B35) buttons
+  - Order page: Green underline tabs (Pending, Closed, Cancelled) with border-[#7CB342]
+  - Assets page: Three functional tabs (Recharges, Withdraws, Funds) with green underline highlights, "No data available" empty states
 - **2025-10-09**: Fixed error message display - API error responses now show clean, user-friendly messages instead of raw JSON (e.g., "You already have a pending withdrawal request" instead of "400: {"message":"You already have..."}"). Updated throwIfResNotOk function to properly parse JSON error responses.
 - **2025-10-09**: Enhanced withdrawal request validation - prevents duplicate pending withdrawals using efficient database query (hasPendingWithdrawalRequest method) that avoids pagination issues.
 - **2025-10-09**: Fixed balance calculation synchronization - both availableBalance and balance are now properly updated when placing and completing bets.
