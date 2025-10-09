@@ -4,6 +4,11 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-09**: Fixed session persistence - users now stay logged in after page refresh:
+  - Improved authentication hook to properly check sessionId from localStorage on mount
+  - Query automatically validates session with server on page load
+  - Invalid/expired sessions are properly cleared
+  - Sessions last 30 days stored in database
 - **2025-10-09**: Added cryptocurrency trend chart section to customer homepage:
   - Dark gradient background (slate-800/900) with grid pattern
   - Displays Litecoin, Bitcoin, Ripple, Ethereum with trend indicators
