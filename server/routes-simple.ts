@@ -738,6 +738,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Check if user has Task Access Ban (trading restricted)
+      if (user.isBanned) {
+        return res.status(403).json({ message: "Trading access restricted. Please contact support." });
+      }
+
       // Generate unique order ID
       const orderId = `ORD${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
 
