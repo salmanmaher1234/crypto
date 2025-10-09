@@ -897,6 +897,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Withdrawal is prohibited for this account. Please contact support." });
       }
 
+      // Check if user already has a pending withdrawal request
+      const hasPendingRequest = await storage.hasPendingWithdrawalRequest(userId);
+      
+      if (hasPendingRequest) {
+        return res.status(400).json({ 
+          message: "You already have a pending withdrawal request. Please wait for it to be processed before submitting a new one." 
+        });
+      }
+
       console.log("Withdrawal request data:", req.body);
 
       const validatedData = insertWithdrawalRequestSchema.parse({

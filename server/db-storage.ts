@@ -382,6 +382,14 @@ export class DatabaseStorage {
     return await db.select().from(withdrawalRequests).where(eq(withdrawalRequests.status, "pending")).orderBy(desc(withdrawalRequests.createdAt));
   }
 
+  async hasPendingWithdrawalRequest(userId: number): Promise<boolean> {
+    const result = await db.select({ id: withdrawalRequests.id })
+      .from(withdrawalRequests)
+      .where(and(eq(withdrawalRequests.userId, userId), eq(withdrawalRequests.status, "pending")))
+      .limit(1);
+    return result.length > 0;
+  }
+
   async getActiveAnnouncements(): Promise<Announcement[]> {
     return await db.select().from(announcements).where(eq(announcements.isActive, true)).orderBy(desc(announcements.createdAt));
   }
