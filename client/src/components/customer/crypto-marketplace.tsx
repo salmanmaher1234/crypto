@@ -1,17 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { RotateCcw, CreditCard, UserCheck, Headphones, ChevronDown, Menu, ChevronLeft, ChevronRight } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RefreshCw, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
-import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
 
 interface CryptoMarketplaceProps {
   onSelectCurrency: (currency: string) => void;
@@ -22,8 +14,8 @@ export function CryptoMarketplace({
 }: CryptoMarketplaceProps) {
   const { data: cryptoPrices } = useCryptoPrices();
   const { user } = useAuth();
-  const [selectedCurrency, setSelectedCurrency] = useState("BTC/USDT");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Auto-slide every 5 seconds for banner
   useEffect(() => {
@@ -40,7 +32,39 @@ export function CryptoMarketplace({
   const getCryptoChange = (symbol: string) =>
     (cryptoPrices as any)?.[symbol]?.change || "0.00";
 
-  // Real crypto data with proper icons and names from the image
+  // Top 4 cryptos for cards
+  const topCryptos = [
+    {
+      symbol: "BTC/USDT",
+      price: getCryptoPrice("BTC/USDT") || "122210.07",
+      change: getCryptoChange("BTC/USDT") || "-0.60",
+    },
+    {
+      symbol: "ETH/USDT",
+      price: getCryptoPrice("ETH/USDT") || "4351.11",
+      change: getCryptoChange("ETH/USDT") || "-3.22",
+    },
+    {
+      symbol: "DOGE/USDT",
+      price: getCryptoPrice("DOGE/USDT") || "0.24576",
+      change: getCryptoChange("DOGE/USDT") || "-1.77",
+    },
+    {
+      symbol: "CHZ/USDT",
+      price: getCryptoPrice("CHZ/USDT") || "0.04099",
+      change: getCryptoChange("CHZ/USDT") || "-2.31",
+    },
+  ];
+
+  // Chart cryptos
+  const chartCryptos = [
+    { name: "Litecoin", trend: "up", change: "+12" },
+    { name: "Bitcoin", trend: "up", change: "+12.8%" },
+    { name: "Ripple", trend: "down", change: "" },
+    { name: "Ethereum", trend: "up", change: "" },
+  ];
+
+  // All crypto data for table
   const cryptoData = [
     {
       symbol: "BTC/USDT",
@@ -59,11 +83,11 @@ export function CryptoMarketplace({
       color: "#627EEA",
     },
     {
-      symbol: "SUP/USDT",
-      name: "SuperCoin",
-      icon: "Ⓢ",
-      price: getCryptoPrice("SUP/USDT") || "0.2223",
-      change: getCryptoChange("SUP/USDT") || "-7.96",
+      symbol: "DOGE/USDT",
+      name: "Dogecoin",
+      icon: "Ð",
+      price: getCryptoPrice("DOGE/USDT") || "0.2223",
+      change: getCryptoChange("DOGE/USDT") || "-7.96",
       color: "#C2A633",
     },
     {
@@ -75,38 +99,6 @@ export function CryptoMarketplace({
       color: "#CD212A",
     },
     {
-      symbol: "PSG/USDT",
-      name: "Paris Saint-Germain",
-      icon: "⚽",
-      price: getCryptoPrice("PSG/USDT") || "1.8354",
-      change: getCryptoChange("PSG/USDT") || "-2.87",
-      color: "#004170",
-    },
-    {
-      symbol: "ATM/USDT",
-      name: "Atletico Madrid",
-      icon: "⚽",
-      price: getCryptoPrice("ATM/USDT") || "1.4263",
-      change: getCryptoChange("ATM/USDT") || "-5.63",
-      color: "#CE3524",
-    },
-    {
-      symbol: "JUV/USDT",
-      name: "Juventus",
-      icon: "⚽",
-      price: getCryptoPrice("JUV/USDT") || "1.3628",
-      change: getCryptoChange("JUV/USDT") || "-4.91",
-      color: "#000000",
-    },
-    {
-      symbol: "KSM/USDT",
-      name: "Kusama",
-      icon: "🔗",
-      price: getCryptoPrice("KSM/USDT") || "14.6653",
-      change: getCryptoChange("KSM/USDT") || "-7.50",
-      color: "#000000",
-    },
-    {
       symbol: "LTC/USDT",
       name: "Litecoin",
       icon: "Ł",
@@ -115,42 +107,23 @@ export function CryptoMarketplace({
       color: "#345D9D",
     },
     {
-      symbol: "EOS/USDT",
-      name: "EOS",
-      icon: "📡",
-      price: getCryptoPrice("EOS/USDT") || "0.7240",
-      change: getCryptoChange("EOS/USDT") || "-1.23",
-      color: "#443F54",
-    },
-    {
-      symbol: "BTS/USDT",
-      name: "BitShares",
-      icon: "💎",
-      price: getCryptoPrice("BTS/USDT") || "10.2999",
-      change: getCryptoChange("BTS/USDT") || "-9.28",
-      color: "#35BAFF",
-    },
-    {
-      symbol: "LINK/USDT",
-      name: "Chainlink",
-      icon: "🔗",
-      price: getCryptoPrice("LINK/USDT") || "24.4868",
-      change: getCryptoChange("LINK/USDT") || "-6.86",
-      color: "#375BD2",
+      symbol: "XRP/USDT",
+      name: "Ripple",
+      icon: "◉",
+      price: getCryptoPrice("XRP/USDT") || "0.7240",
+      change: getCryptoChange("XRP/USDT") || "-1.23",
+      color: "#00AAE4",
     },
   ];
-
-  // Top 3 cryptocurrencies for header display
-  const topCryptos = cryptoData.slice(0, 3);
 
   const formatPrice = (price: string | number) => {
     const numPrice = typeof price === "string" ? parseFloat(price) : price;
     if (numPrice < 1) {
-      return numPrice.toFixed(4);
+      return numPrice.toFixed(5);
     } else if (numPrice < 100) {
       return numPrice.toFixed(2);
     } else {
-      return numPrice.toFixed(0);
+      return numPrice.toFixed(2);
     }
   };
 
@@ -161,34 +134,44 @@ export function CryptoMarketplace({
       : `${numChange.toFixed(2)}%`;
   };
 
+  const handleManualRefresh = () => {
+    setIsRefreshing(true);
+    window.location.reload();
+  };
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Top crypto prices header - clickable */}
+    <div className="min-h-screen bg-white pb-20">
+      {/* Header with profile, title, and balance */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex justify-between space-x-4">
-          {topCryptos.map((crypto) => (
-            <Link 
-              key={crypto.symbol} 
-              href={`/crypto/${crypto.symbol.split('/')[0].toLowerCase()}`}
+        <div className="flex items-center justify-between">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={user?.profileImage || `/api/placeholder/48/48`} alt={user?.name || 'Profile'} />
+            <AvatarFallback className="bg-blue-500 text-white font-bold">
+              {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <h1 className="text-xl font-bold">Home</h1>
+          <div className="flex items-center gap-1">
+            <span className="text-lg font-semibold">
+              {user?.availableBalance ? parseFloat(user.availableBalance).toLocaleString() : '0'}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="p-1 h-8 w-8"
             >
-              <div className="text-center flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
-                <div className="text-xs font-medium text-gray-900">
-                  {crypto.symbol}
-                </div>
-                <div className="text-sm font-bold text-red-600">
-                  {formatPrice(crypto.price)}
-                </div>
-                <div className="text-xs text-red-600">
-                  {formatChange(crypto.change)}
-                </div>
-              </div>
-            </Link>
-          ))}
+              <RefreshCw 
+                className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} 
+              />
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Banner Slider */}
-      <div className="relative h-[180px] sm:h-[200px] overflow-hidden mx-4 my-4 rounded-lg">
+      <div className="relative h-[180px] sm:h-[200px] overflow-hidden rounded-lg mx-4 mt-4">
         {/* Slide 1: What is a Crypto Exchange */}
         <div 
           className={`absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-between px-8 transition-opacity duration-500 ${currentSlide === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
@@ -275,108 +258,137 @@ export function CryptoMarketplace({
         </div>
       </div>
 
-      {/* Action buttons - without padding to match design */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex justify-between">
-          <Link href="/recharge" className="flex-1">
-            <Button
-              variant="ghost"
-              className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none"
+      {/* 4 Crypto Cards Grid */}
+      <div className="grid grid-cols-2 gap-3 px-4 my-4">
+        {topCryptos.map((crypto) => {
+          const isPositive = parseFloat(crypto.change) >= 0;
+          return (
+            <div
+              key={crypto.symbol}
+              onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+              className="bg-white border-2 border-[#FF6B35] rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
             >
-              <RotateCcw className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">Recharge</span>
-            </Button>
-          </Link>
-
-          <Link href="/withdrawal" className="flex-1">
-            <Button
-              variant="ghost"
-              className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none"
-            >
-              <CreditCard className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">Withdrawal</span>
-            </Button>
-          </Link>
-
-          <Link href="/customer-service" className="flex-1">
-            <Button
-              variant="ghost"
-              className="w-full h-16 flex flex-col items-center justify-center space-y-1 bg-transparent border-none rounded-none"
-            >
-              <Headphones className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">Customer Service</span>
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Crypto list */}
-      <div className="bg-white">
-        {cryptoData.map((crypto, index) => (
-          <div
-            key={crypto.symbol}
-            onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
-            className="flex items-center justify-between px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-          >
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                style={{ backgroundColor: crypto.color }}
-              >
-                {crypto.icon}
-              </div>
-              <div className="text-sm font-medium text-gray-900">
-                {crypto.symbol}
-              </div>
-            </div>
-
-            <div className="text-center flex-1">
-              <div className="text-sm font-medium text-red-600">
+              <div className="text-sm font-bold text-gray-900 mb-2">{crypto.symbol}</div>
+              <div className={`text-lg font-bold mb-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
                 {formatPrice(crypto.price)}
               </div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
+              <div className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
                 {formatChange(crypto.change)}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Bottom navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="flex justify-around py-2">
-          <Button
-            variant="ghost"
-            className="flex-1 flex flex-col items-center py-3"
-          >
-            <span className="text-xs text-blue-600 font-medium">Home</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex-1 flex flex-col items-center py-3"
-          >
-            <span className="text-xs text-gray-600">Order</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex-1 flex flex-col items-center py-3"
-          >
-            <span className="text-xs text-gray-600">Market</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex-1 flex flex-col items-center py-3"
-          >
-            <span className="text-xs text-gray-600">Asset</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex-1 flex flex-col items-center py-3"
-          >
-            <span className="text-xs text-gray-600">My</span>
-          </Button>
+      {/* Chart Section */}
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 mx-4 my-4 rounded-lg p-4 relative overflow-hidden">
+        {/* Grid pattern background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
+            backgroundSize: '20px 20px'
+          }}></div>
+        </div>
+
+        {/* Crypto list with trends */}
+        <div className="relative z-10 space-y-2 mb-4">
+          {chartCryptos.map((crypto, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <span className={`font-medium ${index === 0 ? 'text-white' : index === 1 ? 'text-[#FFB84D]' : 'text-gray-400'}`}>
+                {crypto.name}
+              </span>
+              {crypto.change && (
+                <div className="flex items-center gap-1">
+                  {crypto.trend === 'up' ? (
+                    <TrendingUp className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4 text-red-500" />
+                  )}
+                  <span className={`text-sm ${crypto.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                    {crypto.change}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* SVG Chart */}
+        <div className="relative h-24">
+          <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+            {/* Candlestick bars */}
+            <rect x="40" y="70" width="8" height="20" fill="#4ADE80" opacity="0.6"/>
+            <rect x="70" y="60" width="8" height="30" fill="#4ADE80" opacity="0.6"/>
+            <rect x="100" y="50" width="8" height="40" fill="#4ADE80" opacity="0.6"/>
+            <rect x="130" y="55" width="8" height="35" fill="#4ADE80" opacity="0.6"/>
+            <rect x="160" y="45" width="8" height="45" fill="#4ADE80" opacity="0.6"/>
+            <rect x="190" y="40" width="8" height="50" fill="#4ADE80" opacity="0.6"/>
+            <rect x="220" y="50" width="8" height="40" fill="#4ADE80" opacity="0.6"/>
+            <rect x="250" y="45" width="8" height="45" fill="#4ADE80" opacity="0.6"/>
+            <rect x="280" y="35" width="8" height="55" fill="#4ADE80" opacity="0.6"/>
+            <rect x="310" y="30" width="8" height="60" fill="#4ADE80" opacity="0.6"/>
+            <rect x="340" y="25" width="8" height="65" fill="#4ADE80" opacity="0.6"/>
+            <rect x="370" y="20" width="8" height="70" fill="#4ADE80" opacity="0.6"/>
+
+            {/* Trend line */}
+            <path
+              d="M 0 90 Q 100 80, 200 60 T 400 20"
+              stroke="#22C55E"
+              strokeWidth="2"
+              fill="none"
+              opacity="0.8"
+            />
+          </svg>
+        </div>
+      </div>
+
+      {/* Currency Table */}
+      <div className="px-4">
+        <div className="bg-gray-100 rounded-t-lg px-4 py-2 flex justify-between items-center font-semibold text-sm">
+          <span className="flex-1">Currency</span>
+          <span className="flex-1 text-center">Real Price</span>
+          <span className="flex-1 text-right">Rise Fall</span>
+        </div>
+        
+        <div className="bg-white border border-gray-200 rounded-b-lg">
+          {cryptoData.map((crypto, index) => {
+            const isPositive = parseFloat(crypto.change) >= 0;
+            return (
+              <div
+                key={crypto.symbol}
+                onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
+              >
+                <div className="flex items-center space-x-3 flex-1">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                    style={{ backgroundColor: crypto.color }}
+                  >
+                    {crypto.icon}
+                  </div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {crypto.symbol}
+                  </div>
+                </div>
+
+                <div className="flex-1 text-center">
+                  <div className="text-sm font-medium text-gray-900">
+                    {formatPrice(crypto.price)}
+                  </div>
+                </div>
+
+                <div className="flex-1 text-right">
+                  <div className={`inline-block text-xs px-2 py-1 rounded ${
+                    isPositive 
+                      ? 'text-green-600 bg-green-100' 
+                      : 'text-red-600 bg-red-100'
+                  }`}>
+                    {formatChange(crypto.change)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
