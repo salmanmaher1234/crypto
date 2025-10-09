@@ -375,7 +375,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
       <div className="flex-1 bg-gray-900 pb-24"></div>
 
       {/* Bottom Buttons - Fixed position exactly like in the image */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 flex space-x-4 border-t border-gray-800">
+      <div className="fixed bottom-[90px] sm:bottom-[100px] md:bottom-[80px] left-0 right-0 bg-gray-900 p-4 flex space-x-4 border-t border-gray-800 z-40">
         <Button
           onClick={() => handleDirectionSelect("up")}
           className="flex-1 bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-semibold rounded-3xl"

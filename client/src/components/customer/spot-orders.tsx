@@ -624,7 +624,7 @@ export function SpotOrders({
         </div>
 
         {/* Bottom Buy/Sell Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4">
+        <div className="fixed bottom-[90px] sm:bottom-[100px] md:bottom-[80px] left-0 right-0 bg-gray-900 p-4 z-40">
           <div className="flex space-x-4">
             <Button
               onClick={() => handleTradeClick("up")}
