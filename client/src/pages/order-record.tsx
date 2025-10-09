@@ -85,26 +85,35 @@ export default function OrderRecord() {
       </div>
 
       {/* Tab Buttons */}
-      <div className="bg-white px-4 py-3 flex gap-2 border-b border-gray-100">
+      <div className="bg-white px-4 py-3 flex gap-8 border-b border-gray-100">
         <Button
+          variant="ghost"
           onClick={() => setActiveTab('position')}
-          className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-2 py-2 text-sm font-medium transition-colors border-b-2 rounded-none ${
             activeTab === 'position'
-              ? 'bg-yellow-400 text-black hover:bg-yellow-500'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'border-[#7CB342] text-gray-900'
+              : 'border-transparent text-gray-500'
           }`}
         >
-          Position Order
+          Pending
         </Button>
         <Button
+          variant="ghost"
           onClick={() => setActiveTab('closing')}
-          className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-2 py-2 text-sm font-medium transition-colors border-b-2 rounded-none ${
             activeTab === 'closing'
-              ? 'bg-yellow-400 text-black hover:bg-yellow-500'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'border-[#7CB342] text-gray-900'
+              : 'border-transparent text-gray-500'
           }`}
         >
-          Closing Order
+          Closed
+        </Button>
+        <Button
+          variant="ghost"
+          disabled
+          className="px-2 py-2 text-sm font-medium text-gray-400 border-b-2 border-transparent rounded-none cursor-not-allowed"
+        >
+          Cancelled
         </Button>
       </div>
 

@@ -195,7 +195,7 @@ export default function CustomerApp() {
                   }}
                   className={`flex flex-col items-center justify-center py-2 px-1 transition-colors duration-200 ${
                     (activeSection === section.id && !selectedCurrency) || (section.id === 'market' && showFullMarketView)
-                      ? "text-primary bg-primary/5"
+                      ? "text-[#7CB342]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >

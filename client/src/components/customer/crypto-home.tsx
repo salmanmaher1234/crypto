@@ -198,38 +198,39 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
         </div>
       </div>
 
-      {/* Image Slider */}
-      <Card className="overflow-hidden">
-        <div className="relative h-[180px] sm:h-[200px] md:h-[280px] lg:h-[350px] xl:h-[400px]">
-          {sliderImages.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <img 
-                src={image} 
-                alt={`Slide ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
+      {/* Banner Slider */}
+      <div className="relative h-[180px] sm:h-[200px] rounded-lg overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-between px-8">
+          <button 
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + sliderImages.length) % sliderImages.length)}
+            className="text-white/70 hover:text-white"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
           
-          {/* Slide indicators */}
-          <div className="absolute bottom-1 sm:bottom-2 md:bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
-            {sliderImages.map((_, index) => (
-              <button
-                key={index}
-                className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                  index === currentSlide ? 'bg-white' : 'bg-white/50'
-                }`}
-                onClick={() => setCurrentSlide(index)}
-              />
-            ))}
+          <div className="flex-1 text-center">
+            <h2 className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
+              What is a
+            </h2>
+            <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold mt-2">
+              Crypto<br/>Exchange
+            </h2>
           </div>
+          
+          <button 
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % sliderImages.length)}
+            className="text-white/70 hover:text-white"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
         </div>
-      </Card>
+        
+        {/* Slide indicators */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+          <div className="w-2 h-2 rounded-full bg-white/50"></div>
+        </div>
+      </div>
 
       {/* Crypto Slider */}
       <div className="relative">
@@ -243,7 +244,7 @@ export function CryptoHome({ onSelectCurrency, onNavigateToProfile }: CryptoHome
               <div key={index} className="flex-shrink-0 w-1/4 lg:w-1/5 xl:w-1/6">
                 <div className="px-1.5">
                   <Card 
-                    className="cursor-pointer hover:shadow-md transition-shadow border-green-200"
+                    className="cursor-pointer hover:shadow-md transition-shadow border-2 border-[#FF6B35] bg-white"
                     onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
                   >
                     <CardContent className="p-1 sm:p-1.5 lg:p-2">
