@@ -3,6 +3,11 @@
 ## Overview
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
+## Recent Changes
+- **2025-10-09**: Fixed error message display - API error responses now show clean, user-friendly messages instead of raw JSON (e.g., "You already have a pending withdrawal request" instead of "400: {"message":"You already have..."}"). Updated throwIfResNotOk function to properly parse JSON error responses.
+- **2025-10-09**: Enhanced withdrawal request validation - prevents duplicate pending withdrawals using efficient database query (hasPendingWithdrawalRequest method) that avoids pagination issues.
+- **2025-10-09**: Fixed balance calculation synchronization - both availableBalance and balance are now properly updated when placing and completing bets.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
