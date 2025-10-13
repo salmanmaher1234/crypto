@@ -470,7 +470,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-purple-900 text-purple-200 border-purple-600 hover:bg-purple-800 font-semibold"
+                              className="h-6 px-2 text-xs bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100 font-semibold"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Edit className="w-3 h-3 mr-1" />
@@ -491,7 +491,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-blue-900 text-blue-200 border-blue-600 hover:bg-blue-800"
+                              className="h-6 px-2 text-xs bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Key className="w-3 h-3 mr-1" />
@@ -569,7 +569,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-green-900 text-green-200 border-green-600 hover:bg-green-800"
+                              className="h-6 px-2 text-xs bg-green-50 text-green-700 border-green-300 hover:bg-green-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <CheckCircle className="w-3 h-3 mr-1" />
@@ -641,7 +641,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-orange-900 text-orange-200 border-orange-600 hover:bg-orange-800"
+                              className="h-6 px-2 text-xs bg-orange-50 text-orange-700 border-orange-300 hover:bg-orange-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Plus className="w-3 h-3 mr-1" />
@@ -683,7 +683,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-red-900 text-red-200 border-red-600 hover:bg-red-800"
+                              className="h-6 px-2 text-xs bg-red-50 text-red-700 border-red-300 hover:bg-red-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Minus className="w-3 h-3 mr-1" />
@@ -727,7 +727,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-blue-900 text-blue-200 border-blue-600 hover:bg-blue-800"
+                              className="h-6 px-2 text-xs bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Lock className="w-3 h-3 mr-1" />
@@ -773,7 +773,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-green-900 text-green-200 border-green-600 hover:bg-green-800"
+                              className="h-6 px-2 text-xs bg-green-50 text-green-700 border-green-300 hover:bg-green-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Unlock className="w-3 h-3 mr-1" />
@@ -863,7 +863,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-purple-900 text-purple-200 border-purple-600 hover:bg-purple-800"
+                              className="h-6 px-2 text-xs bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100"
                               onClick={() => {
                                 setSelectedUser(user);
                                 setCreditScore(user.reputation?.toString() || "100");
@@ -920,7 +920,7 @@ export function MemberManagement() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-6 px-2 text-xs bg-red-900 text-red-200 border-red-600 hover:bg-red-800"
+                              className="h-6 px-2 text-xs bg-red-50 text-red-700 border-red-300 hover:bg-red-100"
                               onClick={() => setSelectedUser(user)}
                             >
                               <Trash2 className="w-3 h-3 mr-1" />
