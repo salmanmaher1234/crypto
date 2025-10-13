@@ -11,6 +11,24 @@ import { format } from "date-fns";
 import { queryClient } from "@/lib/queryClient";
 // import { useToast } from "@/hooks/use-toast";
 
+// Helper function to ensure UTC timestamp is properly parsed to local time
+const parseUTCTimestamp = (timestamp: Date | string): Date => {
+  // If already a Date object, return as-is
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  
+  // If string doesn't have timezone info (no 'Z' or '+'/'-'), assume UTC
+  const timestampStr = timestamp.toString();
+  if (!timestampStr.includes('Z') && !timestampStr.includes('+') && !timestampStr.includes('-', 10)) {
+    // Append 'Z' to indicate UTC
+    return new Date(timestampStr + 'Z');
+  }
+  
+  // Already has timezone info, parse normally
+  return new Date(timestampStr);
+};
+
 export function CustomerBettingOrders() {
   const { user } = useAuth();
   const { data: allBettingOrders, isLoading, error } = useBettingOrders();
@@ -54,7 +72,7 @@ export function CustomerBettingOrders() {
   // Function to calculate remaining time for position orders
   const getRemainingTime = (order: any) => {
     const now = new Date().getTime();
-    const expiresAt = new Date(order.expiresAt).getTime();
+    const expiresAt = parseUTCTimestamp(order.expiresAt).getTime();
     const remaining = Math.max(0, expiresAt - now);
     
     if (remaining <= 0) return "00:00";
@@ -68,7 +86,7 @@ export function CustomerBettingOrders() {
   // Function to check if order should be moved to closed
   const isOrderExpired = (order: any) => {
     const now = new Date().getTime();
-    const expiresAt = new Date(order.expiresAt).getTime();
+    const expiresAt = parseUTCTimestamp(order.expiresAt).getTime();
     return now >= expiresAt;
   };
 
@@ -122,7 +140,7 @@ export function CustomerBettingOrders() {
     const checkExpiredOrders = () => {
       const now = new Date();
       userBettingOrders.forEach(order => {
-        if (order.status === "active" && order.expiresAt && new Date(order.expiresAt) <= now) {
+        if (order.status === "active" && order.expiresAt && parseUTCTimestamp(order.expiresAt) <= now) {
           // Calculate profit based on direction and random outcome
           const isWin = Math.random() > 0.5; // 50% win rate simulation
           const profitAmount = isWin ? parseFloat(order.amount) * 0.8 : -parseFloat(order.amount);
@@ -150,7 +168,8 @@ export function CustomerBettingOrders() {
                        false;
 
     // Time filtering logic
-    const orderDate = new Date(order.createdAt);
+    // Ensure UTC timestamp is properly converted to local time for filtering
+    const orderDate = parseUTCTimestamp(order.createdAt);
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
@@ -235,8 +254,8 @@ export function CustomerBettingOrders() {
             { label: "Currency", value: selectedOrder.asset.includes("/") ? selectedOrder.asset : `${selectedOrder.asset}/USDT` },
             { label: "Buy Price", value: selectedOrder.entryPrice },
             { label: "Close Price", value: selectedOrder.exitPrice || selectedOrder.entryPrice },
-            { label: "Buy Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') },
-            { label: "Close Time", value: selectedOrder.status === 'completed' ? format(new Date(selectedOrder.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending' },
+            { label: "Buy Time", value: format(parseUTCTimestamp(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') },
+            { label: "Close Time", value: selectedOrder.status === 'completed' ? format(parseUTCTimestamp(selectedOrder.expiresAt), 'yyyy-MM-dd HH:mm:ss') : 'Pending' },
             { label: "Billing Time", value: `${selectedOrder.duration}s` },
             { label: "Order Amount", value: selectedOrder.amount },
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
@@ -244,7 +263,7 @@ export function CustomerBettingOrders() {
             { label: "Scale", value: `${selectedOrder.duration === 60 ? '20' : selectedOrder.duration === 120 ? '30' : '50'}%` },
             { label: "Buy Direction", value: user?.direction === "Actual" ? (selectedOrder.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
-            { label: "Order Time", value: format(new Date(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
+            { label: "Order Time", value: format(parseUTCTimestamp(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
           ].map((item, index) => (
             <div key={index} className="flex justify-between items-center py-3 border-b border-gray-100">
               <span className="text-gray-600 text-sm">{item.label}</span>
@@ -385,7 +404,7 @@ export function CustomerBettingOrders() {
                         </h3>
                       </div>
                       <div className="text-right text-sm text-gray-600">
-                        {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+                        {format(parseUTCTimestamp(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
                       </div>
                     </div>
 
