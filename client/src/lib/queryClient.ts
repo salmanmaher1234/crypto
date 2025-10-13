@@ -96,7 +96,7 @@ export const queryClient = new QueryClient({
       refetchOnMount: true,
       refetchOnReconnect: true,
       refetchIntervalInBackground: true,
-      staleTime: 5 * 1000, // 5 seconds
+      staleTime: 0, // 0 seconds - data is immediately stale, enables real-time updates
       gcTime: 60 * 60 * 1000, // 1 hour
       retry: 1,
     },
