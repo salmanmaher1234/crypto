@@ -4,6 +4,12 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-13**: Optimized real-time balance updates for 1-second refresh:
+  - Admin Member Management: Reduced polling interval from 2 seconds to 1 second
+  - Customer balance display: Reduced refresh interval from 2 minutes to 1 second
+  - Crypto price updates: Reduced refetch interval from 5 seconds to 1 second
+  - All deposit amounts now update within 1 second in both admin and customer views
+  - Cache invalidation triggers immediately after deposit mutations
 - **2025-10-13**: Admin UI redesign - white background theme:
   - Transformed admin interface from dark theme to clean white/light background
   - Updated all backgrounds: bg-gray-900/800/700 → bg-white/gray-50
