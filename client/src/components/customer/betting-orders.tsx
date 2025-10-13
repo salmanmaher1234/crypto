@@ -260,7 +260,7 @@ export function CustomerBettingOrders() {
             { label: "Order Amount", value: selectedOrder.amount },
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
             { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}{profit.toFixed(0)}`, isProfit: true },
-            { label: "Scale", value: `${selectedOrder.duration === 60 ? '20' : selectedOrder.duration === 120 ? '30' : '50'}%` },
+            { label: "Scale", value: `${selectedOrder.duration === 60 ? '30' : selectedOrder.duration === 120 ? '40' : '50'}%` },
             { label: "Buy Direction", value: user?.direction === "Actual" ? (selectedOrder.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
             { label: "Order Time", value: format(parseUTCTimestamp(selectedOrder.createdAt), 'yyyy-MM-dd HH:mm:ss') }
@@ -463,8 +463,8 @@ export function CustomerBettingOrders() {
                         <div className="text-center">
                           <div className="text-gray-500 text-xs mb-1">Scale</div>
                           <div className="font-medium">
-                            {order.duration === 60 ? '20.00%' : 
-                             order.duration === 120 ? '30.00%' : '50.00%'}
+                            {order.duration === 60 ? '30.00%' : 
+                             order.duration === 120 ? '40.00%' : '50.00%'}
                           </div>
                         </div>
                       </div>

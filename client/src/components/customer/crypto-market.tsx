@@ -25,8 +25,8 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
   const [showOrderForm, setShowOrderForm] = useState(false);
 
   const timeOptions = [
-    { label: "60S", value: "60S", rate: "Scale:20.00%" },
-    { label: "120S", value: "120S", rate: "Scale:30.00%" },
+    { label: "60S", value: "60S", rate: "Scale:30.00%" },
+    { label: "120S", value: "120S", rate: "Scale:40.00%" },
     { label: "180S", value: "180S", rate: "Scale:50.00%" }
   ];
 
@@ -99,7 +99,7 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
   };
 
   const expectedEarnings = amount ? 
-    (parseFloat(amount) * (selectedTime === "60S" ? 0.2 : selectedTime === "120S" ? 0.3 : 0.5)).toFixed(2) : "0";
+    (parseFloat(amount) * (selectedTime === "60S" ? 0.3 : selectedTime === "120S" ? 0.4 : 0.5)).toFixed(2) : "0";
 
   // TradingView Widget Effect
   useEffect(() => {
