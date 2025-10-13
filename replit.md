@@ -4,6 +4,15 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-13**: Admin UI redesign - white background theme:
+  - Transformed admin interface from dark theme to clean white/light background
+  - Updated all backgrounds: bg-gray-900/800/700 → bg-white/gray-50
+  - Updated all text colors for proper contrast: text-gray-100/200/300 → text-gray-900/700
+  - Updated all action buttons to light theme: bg-*-900 → bg-*-50 with text-*-700 (purple, blue, green, orange, red variants)
+  - Table headers use bg-gray-50 with text-gray-700 for optimal readability
+  - Implemented pagination in admin members screen (15 records per page) with navigation controls
+  - All interactive elements (switches, selects, inputs) styled for light theme with proper borders and contrast
+  - Grey borders added under admin menu items with icons for visual separation
 - **2025-10-09**: Expanded homepage to display all 13 cryptocurrencies:
   - Updated crypto carousel to show all 13 currencies (3 visible at a time with left/right navigation)
   - Updated currency table to display all 13 currencies
