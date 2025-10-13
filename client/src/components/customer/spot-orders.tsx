@@ -747,7 +747,7 @@ export function SpotOrders({
               disabled={placeTrade.isPending}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 rounded-lg text-lg"
             >
-              {placeTrade.isPending ? "Processing..." : "Order Confirmation"}
+              {placeTrade.isPending ? "Processing..." : "Submit Order"}
             </Button>
           </div>
         </DialogContent>
