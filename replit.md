@@ -4,6 +4,11 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-13**: Trading fixes and balance update improvements:
+  - Updated trading time scales: 60s→30%, 120s→40%, 180s→50% (frontend display and calculations)
+  - Fixed Buy Down to generate profit instead of loss (both Buy Up and Buy Down now increase balance)
+  - Enhanced admin Member Management with forced refetch for immediate balance updates after deposits
+  - All profit calculations now use correct scale percentages matching backend logic
 - **2025-10-13**: Fixed balance update delays and timezone display issues:
   - Fixed React Query staleTime from 5 seconds to 0 for immediate UI updates
   - Changed global refetchInterval from 30 seconds to false (disabled)
