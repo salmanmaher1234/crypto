@@ -40,8 +40,10 @@ export function useUpdateUser() {
       const response = await apiRequest("PATCH", `/api/users/${id}`, updates);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    onSuccess: async () => {
+      // Invalidate and force immediate refetch for real-time updates
+      await queryClient.invalidateQueries({ queryKey: ["/api/users"], refetchType: 'active' });
+      await queryClient.refetchQueries({ queryKey: ["/api/users"] });
     },
   });
 }
