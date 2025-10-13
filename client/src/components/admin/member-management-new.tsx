@@ -69,12 +69,27 @@ export function MemberManagement() {
     creditScore: 100
   });
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+
   // Filter and sort users based on search term, ID descending (newest first)
   const filteredUsers = users?.filter(user => 
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username?.toLowerCase().includes(searchTerm.toLowerCase())
   ).sort((a, b) => b.id - a.id) || [];
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleQuickUpdate = (user: User, updates: Partial<User>) => {
     updateUser.mutate(
@@ -244,16 +259,17 @@ export function MemberManagement() {
   }
 
   return (
-    <div className="h-full bg-gray-900">
-      <Card className="h-full bg-gray-800 border-gray-700">
-        <CardHeader className="p-6">
-          <CardTitle className="text-white">Member Management</CardTitle>
+    <div className="h-full bg-white">
+      <Card className="h-full bg-white border-gray-200">
+        <CardHeader className="p-6 bg-white">
+          <CardTitle className="text-gray-900">Member Management</CardTitle>
           <div className="flex gap-1 justify-between">
             <Input
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              className="max-w-sm bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+              data-testid="input-search-members"
             />
             <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
               <DialogTrigger asChild>
@@ -341,63 +357,63 @@ export function MemberManagement() {
             </Dialog>
           </div>
         </CardHeader>
-        <CardContent className="p-2 bg-gray-800">
+        <CardContent className="p-2 bg-white">
           <div className="overflow-x-auto">
             <Table className="min-w-[1660px] table-fixed">
               <TableHeader>
-                <TableRow className="border-gray-700">
-                  <TableHead className="w-[50px] text-center text-gray-300">ID</TableHead>
-                  <TableHead className="w-[100px] text-gray-300">Username</TableHead>
-                  <TableHead className="w-[180px] text-gray-300">Balance</TableHead>
-                  <TableHead className="w-[80px] text-center text-gray-300">Credit Score</TableHead>
-                  <TableHead className="w-[100px] text-center text-gray-300">General Agent</TableHead>
-                  <TableHead className="w-[100px] text-center text-gray-300">Invitation Code</TableHead>
-                  <TableHead className="w-[80px] text-center text-gray-300">Type</TableHead>
-                  <TableHead className="w-[90px] text-center text-gray-300">Direction</TableHead>
-                  <TableHead className="w-[60px] text-center text-gray-300">Ban</TableHead>
-                  <TableHead className="w-[80px] text-center text-gray-300">Withdraw</TableHead>
-                  <TableHead className="w-[110px] text-center text-gray-300">Registration Time</TableHead>
-                  <TableHead className="w-[100px] text-center text-gray-300">Remark</TableHead>
-                  <TableHead className="w-[500px] text-center text-gray-300">Operate</TableHead>
+                <TableRow className="border-gray-200 bg-gray-50">
+                  <TableHead className="w-[50px] text-center text-gray-700 font-semibold">ID</TableHead>
+                  <TableHead className="w-[100px] text-gray-700 font-semibold">Username</TableHead>
+                  <TableHead className="w-[180px] text-gray-700 font-semibold">Balance</TableHead>
+                  <TableHead className="w-[80px] text-center text-gray-700 font-semibold">Credit Score</TableHead>
+                  <TableHead className="w-[100px] text-center text-gray-700 font-semibold">General Agent</TableHead>
+                  <TableHead className="w-[100px] text-center text-gray-700 font-semibold">Invitation Code</TableHead>
+                  <TableHead className="w-[80px] text-center text-gray-700 font-semibold">Type</TableHead>
+                  <TableHead className="w-[90px] text-center text-gray-700 font-semibold">Direction</TableHead>
+                  <TableHead className="w-[60px] text-center text-gray-700 font-semibold">Ban</TableHead>
+                  <TableHead className="w-[80px] text-center text-gray-700 font-semibold">Withdraw</TableHead>
+                  <TableHead className="w-[110px] text-center text-gray-700 font-semibold">Registration Time</TableHead>
+                  <TableHead className="w-[100px] text-center text-gray-700 font-semibold">Remark</TableHead>
+                  <TableHead className="w-[500px] text-center text-gray-700 font-semibold">Operate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id} className="border-gray-700 hover:bg-gray-750">
-                    <TableCell className="font-mono text-sm text-center w-[50px] text-gray-200">{user.id}</TableCell>
-                    <TableCell className="font-medium w-[100px] truncate text-gray-200">{user.username}</TableCell>
+                {paginatedUsers.map((user) => (
+                  <TableRow key={user.id} className="border-gray-200 hover:bg-gray-50">
+                    <TableCell className="font-mono text-sm text-center w-[50px] text-gray-900">{user.id}</TableCell>
+                    <TableCell className="font-medium w-[100px] truncate text-gray-900">{user.username}</TableCell>
                     <TableCell className="w-[180px]">
                       <div className="space-y-1 text-xs">
-                        <div className="text-gray-200">
+                        <div className="text-gray-900 font-medium">
                           Total: {(parseFloat(user.availableBalance || "0") + parseFloat(user.frozenBalance || "0")).toFixed(2)}
                         </div>
-                        <div className="text-gray-400">
+                        <div className="text-gray-600">
                           Available: {parseFloat(user.availableBalance || "0").toFixed(2)}
                         </div>
-                        <div className="text-gray-400">
+                        <div className="text-gray-600">
                           Frozen: {parseFloat(user.frozenBalance || "0").toFixed(2)}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-center w-[80px]">
-                      <Badge variant="outline" className="text-xs px-1 py-0.5 border-gray-600 text-gray-200">
+                      <Badge variant="outline" className="text-xs px-1 py-0.5 border-gray-300 text-gray-900">
                         {user.creditScore || 100}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-center w-[100px] truncate text-gray-300">{user.generalAgent || "admin"}</TableCell>
-                    <TableCell className="text-xs text-center w-[100px] truncate text-gray-300">{user.invitationCode || "100025"}</TableCell>
+                    <TableCell className="text-xs text-center w-[100px] truncate text-gray-900">{user.generalAgent || "admin"}</TableCell>
+                    <TableCell className="text-xs text-center w-[100px] truncate text-gray-900">{user.invitationCode || "100025"}</TableCell>
                     <TableCell className="w-[80px]">
                       <Select
                         value={user.userType || "Normal"}
                         onValueChange={(value) => handleQuickUpdate(user, { userType: value })}
                       >
-                        <SelectTrigger className="w-full h-7 text-xs bg-gray-700 border-gray-600 text-gray-200">
+                        <SelectTrigger className="w-full h-7 text-xs bg-white border-gray-300 text-gray-900">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-700 border-gray-600">
-                          <SelectItem value="Normal" className="text-gray-200">Normal</SelectItem>
-                          <SelectItem value="VIP" className="text-gray-200">VIP</SelectItem>
-                          <SelectItem value="Agent" className="text-gray-200">Agent</SelectItem>
+                        <SelectContent className="bg-white border-gray-300">
+                          <SelectItem value="Normal" className="text-gray-900">Normal</SelectItem>
+                          <SelectItem value="VIP" className="text-gray-900">VIP</SelectItem>
+                          <SelectItem value="Agent" className="text-gray-900">Agent</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -406,13 +422,13 @@ export function MemberManagement() {
                         value={user.direction || "Actual"}
                         onValueChange={(value) => handleQuickUpdate(user, { direction: value })}
                       >
-                        <SelectTrigger className="w-full h-7 text-xs bg-gray-700 border-gray-600 text-gray-200">
+                        <SelectTrigger className="w-full h-7 text-xs bg-white border-gray-300 text-gray-900">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-700 border-gray-600">
-                          <SelectItem value="Buy Up" className="text-gray-200">Buy Up</SelectItem>
-                          <SelectItem value="Buy Down" className="text-gray-200">Buy Down</SelectItem>
-                          <SelectItem value="Actual" className="text-gray-200">Actual</SelectItem>
+                        <SelectContent className="bg-white border-gray-300">
+                          <SelectItem value="Buy Up" className="text-gray-900">Buy Up</SelectItem>
+                          <SelectItem value="Buy Down" className="text-gray-900">Buy Down</SelectItem>
+                          <SelectItem value="Actual" className="text-gray-900">Actual</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -431,7 +447,7 @@ export function MemberManagement() {
                       />
                     </TableCell>
                     <TableCell className="w-[110px]">
-                      <div className="text-xs text-center text-gray-300">
+                      <div className="text-xs text-center text-gray-900">
                         {user.registrationTime ? 
                           new Date(user.registrationTime).toLocaleDateString('en-GB') : 
                           new Date().toLocaleDateString('en-GB')
@@ -442,7 +458,7 @@ export function MemberManagement() {
                       <Input
                         value={user.remark || ""}
                         onChange={(e) => handleQuickUpdate(user, { remark: e.target.value })}
-                        className="w-full h-7 text-xs bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
+                        className="w-full h-7 text-xs bg-white border-gray-300 text-gray-900 placeholder-gray-400"
                         placeholder="Remark"
                       />
                     </TableCell>
@@ -947,6 +963,66 @@ export function MemberManagement() {
               </TableBody>
             </Table>
           </div>
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span>
+                  Showing {startIndex + 1} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} members
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8"
+                  data-testid="button-prev-page"
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className="h-8 w-8"
+                        data-testid={`button-page-${pageNum}`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8"
+                  data-testid="button-next-page"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

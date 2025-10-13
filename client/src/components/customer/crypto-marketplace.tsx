@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { RefreshCw, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  RefreshCw,
+  TrendingUp,
+  TrendingDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useCryptoPrices } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -43,8 +49,8 @@ export function CryptoMarketplace({
     const timeoutId = setTimeout(() => {
       const scrollElement = scrollRef.current;
       if (scrollElement) {
-        scrollElement.addEventListener('scroll', checkScroll);
-        window.addEventListener('resize', checkScroll);
+        scrollElement.addEventListener("scroll", checkScroll);
+        window.addEventListener("resize", checkScroll);
         checkScroll(); // Initial check
       }
     }, 0);
@@ -53,8 +59,8 @@ export function CryptoMarketplace({
       clearTimeout(timeoutId);
       const scrollElement = scrollRef.current;
       if (scrollElement) {
-        scrollElement.removeEventListener('scroll', checkScroll);
-        window.removeEventListener('resize', checkScroll);
+        scrollElement.removeEventListener("scroll", checkScroll);
+        window.removeEventListener("resize", checkScroll);
       }
     };
   }, []);
@@ -204,35 +210,38 @@ export function CryptoMarketplace({
     window.location.reload();
   };
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
+  const scrollCarousel = (direction: "left" | "right") => {
     if (scrollRef.current) {
       const container = scrollRef.current;
       // Get the first card element to calculate exact width including gap
-      const firstCard = container.querySelector('[data-testid^="card-crypto-"]') as HTMLElement;
-      
+      const firstCard = container.querySelector(
+        '[data-testid^="card-crypto-"]',
+      ) as HTMLElement;
+
       if (firstCard) {
         // Get the container's gap value (gap-3 = 12px)
         const containerStyle = window.getComputedStyle(container);
-        const gap = parseFloat(containerStyle.columnGap || containerStyle.gap) || 0;
-        
+        const gap =
+          parseFloat(containerStyle.columnGap || containerStyle.gap) || 0;
+
         // Calculate the actual card width including gap
         const cardWidth = firstCard.offsetWidth;
         const scrollAmount = cardWidth + gap;
-        
+
         // Get current scroll position and max scroll
         const { scrollLeft, scrollWidth, clientWidth } = container;
         const maxScrollLeft = scrollWidth - clientWidth;
-        
+
         // Calculate target scroll position with clamping
         let targetScroll;
-        if (direction === 'left') {
+        if (direction === "left") {
           targetScroll = Math.max(0, scrollLeft - scrollAmount);
         } else {
           targetScroll = Math.min(maxScrollLeft, scrollLeft + scrollAmount);
         }
-        
+
         // Scroll to exact position
-        container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+        container.scrollTo({ left: targetScroll, behavior: "smooth" });
       }
     }
   };
@@ -240,59 +249,33 @@ export function CryptoMarketplace({
   return (
     <div className="min-h-screen bg-white pb-20">
       {/* Header with profile, title, and balance */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Avatar className="h-12 w-12" data-testid="avatar-profile">
-            <AvatarImage src={user?.profileImage || `/api/placeholder/48/48`} alt={user?.name || 'Profile'} />
-            <AvatarFallback className="bg-blue-500 text-white font-bold">
-              {user?.name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <h1 className="text-xl font-bold" data-testid="text-page-title">Home</h1>
-          <div className="flex items-center gap-1">
-            <span className="text-lg font-semibold" data-testid="text-balance">
-              {user?.availableBalance ? parseFloat(user.availableBalance).toLocaleString() : '0'}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleManualRefresh}
-              disabled={isRefreshing}
-              className="p-1 h-8 w-8"
-              data-testid="button-refresh"
-            >
-              <RefreshCw 
-                className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} 
-              />
-            </Button>
-          </div>
-        </div>
-      </div>
 
       {/* Banner Slider */}
-      <div className="relative h-[180px] sm:h-[200px] overflow-hidden rounded-lg mx-4 mt-4">
+      <div className="relative h-[180px] sm:h-[200px] overflow-hidden rounded-lg ">
         {/* Slide 1: What is a Crypto Exchange */}
-        <div 
-          className={`absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-between px-8 transition-opacity duration-500 ${currentSlide === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        <div
+          className={`absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-between px-8 transition-opacity duration-500 ${currentSlide === 0 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
-          <button 
+          <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + 2) % 2)}
             className="text-white/70 hover:text-white z-10"
             data-testid="button-banner-prev"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          
+
           <div className="flex-1 text-center">
             <h2 className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
               What is a
             </h2>
             <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold mt-2">
-              Crypto<br/>Exchange
+              Crypto
+              <br />
+              Exchange
             </h2>
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % 2)}
             className="text-white/70 hover:text-white z-10"
             data-testid="button-banner-next"
@@ -302,17 +285,17 @@ export function CryptoMarketplace({
         </div>
 
         {/* Slide 2: Payment Card */}
-        <div 
-          className={`absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-red-400 flex items-center justify-between px-4 sm:px-8 transition-opacity duration-500 ${currentSlide === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-red-400 flex items-center justify-between px-4 sm:px-8 transition-opacity duration-500 ${currentSlide === 1 ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
-          <button 
+          <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + 2) % 2)}
             className="text-white/70 hover:text-white z-10"
             data-testid="button-banner-prev-2"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          
+
           <div className="flex-1 flex items-center justify-center gap-4 sm:gap-8">
             {/* Card Illustration */}
             <div className="relative">
@@ -332,14 +315,12 @@ export function CryptoMarketplace({
                 💰
               </div>
             </div>
-            
+
             {/* Shopping Woman Illustration */}
-            <div className="hidden sm:block text-6xl">
-              🛍️
-            </div>
+            <div className="hidden sm:block text-6xl">🛍️</div>
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % 2)}
             className="text-white/70 hover:text-white z-10"
             data-testid="button-banner-next-2"
@@ -347,43 +328,49 @@ export function CryptoMarketplace({
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
-        
+
         {/* Slide indicators */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-          <button 
+          <button
             onClick={() => setCurrentSlide(0)}
-            className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 0 ? 'bg-white' : 'bg-white/50'}`}
+            className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 0 ? "bg-white" : "bg-white/50"}`}
             data-testid="button-indicator-0"
           />
-          <button 
+          <button
             onClick={() => setCurrentSlide(1)}
-            className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 1 ? 'bg-white' : 'bg-white/50'}`}
+            className={`w-2 h-2 rounded-full transition-colors ${currentSlide === 1 ? "bg-white" : "bg-white/50"}`}
             data-testid="button-indicator-1"
           />
         </div>
       </div>
 
       {/* Crypto Cards Carousel - Shows 3 at a time */}
-      <div className="relative px-4 my-4">
-        <div 
+      <div className="relative my-1">
+        <div
           ref={scrollRef}
           className="flex gap-3 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {cryptoData.map((crypto, index) => {
             const isPositive = parseFloat(crypto.change) >= 0;
             return (
               <div
                 key={crypto.symbol}
-                onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                onClick={() => onSelectCurrency(crypto.symbol.split("/")[0])}
                 className="flex-none w-[calc(33.333%-8px)] min-w-[calc(33.333%-8px)] bg-white border-2 border-[#FF6B35] rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow snap-start"
                 data-testid={`card-crypto-${index}`}
               >
-                <div className="text-sm font-bold text-gray-900 mb-2">{crypto.symbol}</div>
-                <div className={`text-lg font-bold mb-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                <div className="text-sm font-bold text-gray-900 mb-2">
+                  {crypto.symbol}
+                </div>
+                <div
+                  className={`text-lg font-bold mb-1 ${isPositive ? "text-green-600" : "text-red-600"}`}
+                >
                   {formatPrice(crypto.price)}
                 </div>
-                <div className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                <div
+                  className={`text-xs ${isPositive ? "text-green-600" : "text-red-600"}`}
+                >
                   {formatChange(crypto.change)}
                 </div>
               </div>
@@ -395,7 +382,7 @@ export function CryptoMarketplace({
         {cryptoData.length > 3 && (
           <>
             <button
-              onClick={() => scrollCarousel('left')}
+              onClick={() => scrollCarousel("left")}
               disabled={!canScrollLeft}
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-carousel-prev"
@@ -403,7 +390,7 @@ export function CryptoMarketplace({
               <ChevronLeft className="w-5 h-5 text-gray-800" />
             </button>
             <button
-              onClick={() => scrollCarousel('right')}
+              onClick={() => scrollCarousel("right")}
               disabled={!canScrollRight}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-carousel-next"
@@ -415,30 +402,37 @@ export function CryptoMarketplace({
       </div>
 
       {/* Chart Section */}
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 mx-4 my-4 rounded-lg p-4 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg p-4 relative overflow-hidden">
         {/* Grid pattern background */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
-            backgroundSize: '20px 20px'
-          }}></div>
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
+              backgroundSize: "20px 20px",
+            }}
+          ></div>
         </div>
 
         {/* Crypto list with trends */}
         <div className="relative z-10 space-y-2 mb-4">
           {chartCryptos.map((crypto, index) => (
             <div key={index} className="flex items-center justify-between">
-              <span className={`font-medium ${index === 0 ? 'text-white' : index === 1 ? 'text-[#FFB84D]' : 'text-gray-400'}`}>
+              <span
+                className={`font-medium ${index === 0 ? "text-white" : index === 1 ? "text-[#FFB84D]" : "text-gray-400"}`}
+              >
                 {crypto.name}
               </span>
               {crypto.change && (
                 <div className="flex items-center gap-1">
-                  {crypto.trend === 'up' ? (
+                  {crypto.trend === "up" ? (
                     <TrendingUp className="w-4 h-4 text-green-500" />
                   ) : (
                     <TrendingDown className="w-4 h-4 text-red-500" />
                   )}
-                  <span className={`text-sm ${crypto.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                  <span
+                    className={`text-sm ${crypto.trend === "up" ? "text-green-500" : "text-red-500"}`}
+                  >
                     {crypto.change}
                   </span>
                 </div>
@@ -449,20 +443,108 @@ export function CryptoMarketplace({
 
         {/* SVG Chart */}
         <div className="relative h-24">
-          <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 400 100"
+            preserveAspectRatio="none"
+          >
             {/* Candlestick bars */}
-            <rect x="40" y="70" width="8" height="20" fill="#4ADE80" opacity="0.6"/>
-            <rect x="70" y="60" width="8" height="30" fill="#4ADE80" opacity="0.6"/>
-            <rect x="100" y="50" width="8" height="40" fill="#4ADE80" opacity="0.6"/>
-            <rect x="130" y="55" width="8" height="35" fill="#4ADE80" opacity="0.6"/>
-            <rect x="160" y="45" width="8" height="45" fill="#4ADE80" opacity="0.6"/>
-            <rect x="190" y="40" width="8" height="50" fill="#4ADE80" opacity="0.6"/>
-            <rect x="220" y="50" width="8" height="40" fill="#4ADE80" opacity="0.6"/>
-            <rect x="250" y="45" width="8" height="45" fill="#4ADE80" opacity="0.6"/>
-            <rect x="280" y="35" width="8" height="55" fill="#4ADE80" opacity="0.6"/>
-            <rect x="310" y="30" width="8" height="60" fill="#4ADE80" opacity="0.6"/>
-            <rect x="340" y="25" width="8" height="65" fill="#4ADE80" opacity="0.6"/>
-            <rect x="370" y="20" width="8" height="70" fill="#4ADE80" opacity="0.6"/>
+            <rect
+              x="40"
+              y="70"
+              width="8"
+              height="20"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="70"
+              y="60"
+              width="8"
+              height="30"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="100"
+              y="50"
+              width="8"
+              height="40"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="130"
+              y="55"
+              width="8"
+              height="35"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="160"
+              y="45"
+              width="8"
+              height="45"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="190"
+              y="40"
+              width="8"
+              height="50"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="220"
+              y="50"
+              width="8"
+              height="40"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="250"
+              y="45"
+              width="8"
+              height="45"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="280"
+              y="35"
+              width="8"
+              height="55"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="310"
+              y="30"
+              width="8"
+              height="60"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="340"
+              y="25"
+              width="8"
+              height="65"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
+            <rect
+              x="370"
+              y="20"
+              width="8"
+              height="70"
+              fill="#4ADE80"
+              opacity="0.6"
+            />
 
             {/* Trend line */}
             <path
@@ -483,14 +565,14 @@ export function CryptoMarketplace({
           <span className="flex-1 text-center">Real Price</span>
           <span className="flex-1 text-right">Rise Fall</span>
         </div>
-        
+
         <div className="bg-white border border-gray-200 rounded-b-lg">
           {cryptoData.map((crypto, index) => {
             const isPositive = parseFloat(crypto.change) >= 0;
             return (
               <div
                 key={crypto.symbol}
-                onClick={() => onSelectCurrency(crypto.symbol.split('/')[0])}
+                onClick={() => onSelectCurrency(crypto.symbol.split("/")[0])}
                 className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer"
                 data-testid={`row-crypto-${index}`}
               >
@@ -513,11 +595,13 @@ export function CryptoMarketplace({
                 </div>
 
                 <div className="flex-1 text-right">
-                  <div className={`inline-block text-xs px-2 py-1 rounded ${
-                    isPositive 
-                      ? 'text-green-600 bg-green-100' 
-                      : 'text-red-600 bg-red-100'
-                  }`}>
+                  <div
+                    className={`inline-block text-xs px-2 py-1 rounded ${
+                      isPositive
+                        ? "text-green-600 bg-green-100"
+                        : "text-red-600 bg-red-100"
+                    }`}
+                  >
                     {formatChange(crypto.change)}
                   </div>
                 </div>
