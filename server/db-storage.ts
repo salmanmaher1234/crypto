@@ -243,8 +243,8 @@ export class DatabaseStorage {
           balanceImpact = baseProfitAmount;
           result = "win";
         } else if (order.direction === "Buy Down") {
-          balanceImpact = -baseProfitAmount;
-          result = "loss";
+          balanceImpact = baseProfitAmount;
+          result = "win";
         } else {
           balanceImpact = baseProfitAmount;
           result = "win";
@@ -253,8 +253,8 @@ export class DatabaseStorage {
         balanceImpact = baseProfitAmount;
         result = "win";
       } else if (user.direction === "Buy Down") {
-        balanceImpact = -baseProfitAmount;
-        result = "loss";
+        balanceImpact = baseProfitAmount;
+        result = "win";
       }
 
       const currentAvailable = parseFloat(user.availableBalance || user.balance || "0");
