@@ -49,13 +49,13 @@ export function CryptoHome({
     return () => clearInterval(interval);
   }, [sliderImages.length]);
 
-  // Auto-refresh balance every 2 minutes (120 seconds)
+  // Auto-refresh balance every 1 second for real-time updates
   useEffect(() => {
     const balanceRefreshInterval = setInterval(() => {
       if (user) {
         queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       }
-    }, 120000); // 2 minutes
+    }, 1000); // 1 second for real-time balance updates
 
     return () => clearInterval(balanceRefreshInterval);
   }, [user, queryClient]);

@@ -27,13 +27,13 @@ export function MemberManagement() {
   const createMessage = useCreateMessage();
   const { toast } = useToast();
 
-  // Auto-refresh user data every 2 seconds for real-time updates
+  // Auto-refresh user data every 1 second for real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
-    }, 2000);
+    }, 1000); // Update every 1 second for real-time balance updates
     return () => clearInterval(interval);
   }, []);
 

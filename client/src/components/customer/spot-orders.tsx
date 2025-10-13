@@ -183,7 +183,7 @@ export function SpotOrders({
   // Get real-time crypto prices
   const { data: cryptoPrices = {} } = useQuery<CryptoPrices>({
     queryKey: ["/api/crypto-prices"],
-    refetchInterval: 5000,
+    refetchInterval: 1000, // Update every 1 second for real-time prices
   });
 
   // Get price data for selected crypto or default to BTC
