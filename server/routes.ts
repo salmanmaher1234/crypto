@@ -18,7 +18,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.session?.userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const user = await storage.getUser(req.session.userId);
+    const user = await storage.getUser(req.session.userId!);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
@@ -105,7 +105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bank account routes
   app.get("/api/bank-accounts", authenticateUser, async (req, res) => {
     try {
-      const bankAccounts = await storage.getBankAccountsByUserId(req.session.userId);
+      const bankAccounts = await storage.getBankAccountsByUserId(req.session.userId!);
       res.json(bankAccounts);
     } catch (error) {
       res.status(500).json({ message: "Failed to get bank accounts" });
@@ -129,13 +129,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Transaction routes
   app.get("/api/transactions", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.session.userId!);
       let transactions;
       
       if (user?.role === "admin") {
         transactions = await storage.getAllTransactions();
       } else {
-        transactions = await storage.getTransactionsByUserId(req.session.userId);
+        transactions = await storage.getTransactionsByUserId(req.session.userId!);
       }
       
       res.json(transactions);
@@ -194,13 +194,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Withdrawal request routes
   app.get("/api/withdrawal-requests", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.session.userId!);
       let requests;
       
       if (user?.role === "admin") {
         requests = await storage.getPendingWithdrawalRequests();
       } else {
-        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId);
+        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId!);
       }
       
       res.json(requests);
@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Check if user has sufficient balance
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -235,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update user balance (deduct withdrawal amount)
       const newBalance = (availableBalance - withdrawalAmount).toString();
-      await storage.updateUser(req.session.userId, { 
+      await storage.updateUser(req.session.userId!, { 
         availableBalance: newBalance,
         balance: newBalance
       });
@@ -277,13 +277,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Betting order routes
   app.get("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.session.userId!);
       let orders;
       
       if (user?.role === "admin") {
         orders = await storage.getAllBettingOrders();
       } else {
-        orders = await storage.getBettingOrdersByUserId(req.session.userId);
+        orders = await storage.getBettingOrdersByUserId(req.session.userId!);
       }
       
       res.json(orders);
@@ -304,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/betting-orders", authenticateUser, async (req, res) => {
     try {
       console.log("==== BETTING ORDER START ====");
-      console.log("User ID from session:", req.session.userId);
+      console.log("User ID from session:", req.session.userId!);
       console.log("Order data:", req.body);
       console.log("Asset field specifically:", req.body.asset);
       
@@ -333,7 +333,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get user to check their backend direction setting
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -397,7 +397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newBalance = availableBalance - orderAmount;
       console.log(`BALANCE UPDATE: ${availableBalance} - ${orderAmount} = ${newBalance}`);
       
-      await storage.updateUser(req.session.userId, {
+      await storage.updateUser(req.session.userId!, {
         availableBalance: newBalance.toFixed(2),
       });
       
@@ -432,13 +432,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Withdrawal request routes
   app.get("/api/withdrawal-requests", authenticateUser, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser(req.session.userId!);
       let requests;
       
       if (user?.role === "admin") {
         requests = await storage.getPendingWithdrawalRequests();
       } else {
-        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId);
+        requests = await storage.getWithdrawalRequestsByUserId(req.session.userId!);
       }
       
       res.json(requests);
@@ -563,7 +563,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       "LINK/USDT": { basePrice: 24.4868, baseChange: -6.86 }
     };
 
-    const result = {};
+    const result: Record<string, any> = {};
     
     for (const [symbol, data] of Object.entries(baseData)) {
       const priceVariation = data.basePrice * variation;
