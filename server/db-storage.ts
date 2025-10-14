@@ -500,3 +500,5 @@ export class DatabaseStorage {
     }
   }
 }
+
+export const storage = new DatabaseStorage();

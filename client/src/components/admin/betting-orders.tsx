@@ -274,9 +274,9 @@ export function BettingOrders() {
                           </div>
                         ) : (
                           <div className="text-sm text-gray-400">
-                            {order.status === "completed" && order.profit && (
+                            {order.status === "completed" && order.profitLoss && (
                               <div>
-                                Profit: {parseFloat(order.profit).toFixed(2)}
+                                Profit: {parseFloat(order.profitLoss).toFixed(2)}
                               </div>
                             )}
                           </div>

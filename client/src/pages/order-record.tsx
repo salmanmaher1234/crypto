@@ -37,7 +37,7 @@ export default function OrderRecord() {
     scale: parseFloat(order.leverage || 20),
     buyPrice: parseFloat(order.entryPrice || order.price || 115000),
     closingPrice: order.status === 'closed' ? parseFloat(order.closingPrice || order.exitPrice || 115500) : undefined,
-    profit: order.status === 'closed' ? parseFloat(order.profit || 0) : undefined,
+    profit: order.status === 'closed' ? parseFloat(order.profitLoss || 0) : undefined,
     investmentTime: new Date(order.createdAt).toLocaleString(undefined, {
       year: 'numeric',
       month: '2-digit',

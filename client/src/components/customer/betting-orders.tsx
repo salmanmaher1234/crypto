@@ -122,8 +122,8 @@ export function CustomerBettingOrders() {
       return orderAmount * profitRate;
     }
     
-    if (order.status === "completed" && order.profit) {
-      return Math.abs(parseFloat(order.profit));
+    if (order.status === "completed" && order.profitLoss) {
+      return Math.abs(parseFloat(order.profitLoss));
     }
     
     return orderAmount * profitRate;
