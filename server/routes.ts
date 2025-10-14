@@ -1,8 +1,9 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./db-storage";
 import { insertUserSchema, insertBankAccountSchema, insertTransactionSchema, insertBettingOrderSchema, insertWithdrawalRequestSchema, insertAnnouncementSchema } from "@shared/schema";
 import { z } from "zod";
+import "./types";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication middleware
