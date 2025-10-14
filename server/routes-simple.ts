@@ -727,6 +727,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orders = await storage.getBettingOrdersByUserId(userId);
       }
 
+      // Disable HTTP caching to ensure fresh data
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
       res.json(orders);
     } catch (error) {
       res.status(500).json({ message: "Failed to get betting orders" });
@@ -746,6 +751,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orders = userOrders.filter(order => order.status === "active");
       }
 
+      // Disable HTTP caching to ensure fresh data
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
       res.json(orders);
     } catch (error) {
       res.status(500).json({ message: "Failed to get active orders" });

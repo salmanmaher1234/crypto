@@ -9,6 +9,7 @@ C BOE is a full-stack cryptocurrency investment platform providing customer and 
   - Fixed settlement time accuracy: Reduced order expiration check interval from 10 seconds to 1 second for faster and more accurate order completion
   - Fixed settlement timing to start exactly from selected time: Countdown now calculated from displayStartTime (when order first appears) + duration, eliminating all network latency display issues
   - Orders now show exact selected duration in countdown (60s shows 01:00, 120s shows 02:00, 180s shows 03:00) from the moment they are placed
+  - Fixed HTTP caching issue: Disabled ETags/304 responses for betting orders API to ensure real-time order status updates
   - Pending orders automatically move to Closed orders when settlement timing completes
   - Security: Backend validates client-provided expiresAt is within acceptable range and rejects manipulated timestamps
 - **2025-10-14**: Market page complete UI redesign with fixes:
