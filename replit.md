@@ -4,6 +4,12 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-14**: Fixed navigation routes in Profile component:
+  - Fixed Personal Information button to use internal view system instead of non-existent /personal-information route
+  - Fixed My Wallet button to use collection view instead of non-existent /funding-information route
+  - Fixed Recharge page navigation to return to /customer instead of non-existent /profile route
+  - Added Personal Information view displaying user details (username, name, email, phone, role, VIP level, credit score)
+  - All Profile menu items now properly use internal view system matching Security Settings and Platform Wallet patterns
 - **2025-10-14**: Successfully migrated from MySQL to PostgreSQL database:
   - Imported 326 users (including admin account)
   - Imported 291 active sessions, 241 betting orders, 137 transactions
