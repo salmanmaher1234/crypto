@@ -94,7 +94,7 @@ export function AssetsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
+                className={`py-3 px-2 text-sm font-medium transition-colors relative ${
                   activeTab === tab.id
                     ? "text-gray-900"
                     : "text-gray-500"
@@ -103,7 +103,7 @@ export function AssetsPage() {
               >
                 {tab.label}
                 {activeTab === tab.id && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7C3AED]" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7cb342]" />
                 )}
               </button>
             ))}

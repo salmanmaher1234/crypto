@@ -4,6 +4,13 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-14**: Profile page complete UI redesign:
+  - Clean white background design with profile header featuring green-bordered avatar with V1 badge
+  - User info: Username, Real Balance, Frozen Amount, Credit Score with copy and visibility toggle buttons
+  - Action buttons: Green Recharge button (#7CB342) and Purple Withdraw button (#7C3AED)
+  - Menu items with colored icon backgrounds: Personal Information (blue), My Wallet (yellow), Security Settings (green), Platform Wallet (pink), Site Announcement (yellow), Site Message (orange), About Company (cyan)
+  - Green Logout button at bottom matching brand colors
+  - All functionality preserved: Navigation, bank account management, authentication, messages remain unchanged
 - **2025-10-14**: Assets page complete UI redesign:
   - Removed Asset Information section (blue gradient with balance displays)
   - Simplified to clean header with "Asset" title and "Today" time filter dropdown
