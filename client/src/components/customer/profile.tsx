@@ -29,7 +29,7 @@ import { useLocation } from "wouter";
 export function Profile() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
-  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage' | 'capitalCode' | 'addBank'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'settings' | 'collection' | 'authentication' | 'userMessage' | 'helpCenter' | 'loginPassword' | 'switchLanguage' | 'capitalCode' | 'addBank' | 'personalInformation'>('main');
   const [fundsPassword, setFundsPassword] = useState<string[]>(Array(6).fill(''));
   const [showBalance, setShowBalance] = useState(true);
   const [bankForm, setBankForm] = useState({
@@ -106,6 +106,70 @@ export function Profile() {
     }
     createBankAccount.mutate(bankForm);
   };
+
+  // Personal Information Page
+  if (currentView === 'personalInformation') {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-16 sm:pb-20 md:pb-24">
+        {/* Header */}
+        <div className="bg-white px-4 py-4 flex items-center justify-between border-b border-gray-200">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setCurrentView('main')}
+              className="p-1 mr-2"
+              data-testid="button-back"
+            >
+              <Home className="w-5 h-5 text-gray-600" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-medium text-gray-900">Personal Information</h1>
+          <div className="w-8"></div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 pb-24">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+            <div className="border-b border-gray-200 pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">Username</label>
+              <div className="text-base text-gray-900">{user.username}</div>
+            </div>
+
+            <div className="border-b border-gray-200 pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">Full Name</label>
+              <div className="text-base text-gray-900">{user.name || 'Not set'}</div>
+            </div>
+
+            <div className="border-b border-gray-200 pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">Email</label>
+              <div className="text-base text-gray-900">{user.email || 'Not set'}</div>
+            </div>
+
+            <div className="border-b border-gray-200 pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">Phone Number</label>
+              <div className="text-base text-gray-900">{user.phoneNumber || 'Not set'}</div>
+            </div>
+
+            <div className="border-b border-gray-200 pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">Role</label>
+              <div className="text-base text-gray-900 capitalize">{user.role}</div>
+            </div>
+
+            <div className="border-b border-gray-200 pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">VIP Level</label>
+              <div className="text-base text-gray-900">V{user.vipLevel}</div>
+            </div>
+
+            <div className="pb-4">
+              <label className="block text-sm font-medium text-gray-500 mb-1">Credit Score</label>
+              <div className="text-base text-gray-900">{user.creditScore}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Collection Information Page
   if (currentView === 'collection') {
@@ -507,7 +571,7 @@ export function Profile() {
       <div className="p-4 space-y-3">
         {/* Personal Information */}
         <button
-          onClick={() => setLocation('/personal-information')}
+          onClick={() => setCurrentView('personalInformation')}
           className="w-full bg-white flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
           data-testid="button-personal-info"
         >
@@ -522,7 +586,7 @@ export function Profile() {
 
         {/* My Wallet */}
         <button
-          onClick={() => setLocation('/funding-information')}
+          onClick={() => setCurrentView('collection')}
           className="w-full bg-white flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
           data-testid="button-my-wallet"
         >
