@@ -85,7 +85,7 @@ export default function OrderRecord() {
       </div>
 
       {/* Tab Buttons */}
-      <div className="bg-white px-4 py-3 flex gap-8 border-b border-gray-100">
+      <div className="bg-white px-4 py-3 flex gap-8 border-b border-gray-10">
         <Button
           variant="ghost"
           onClick={() => setActiveTab('position')}

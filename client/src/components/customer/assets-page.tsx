@@ -65,7 +65,7 @@ export function AssetsPage() {
   return (
     <div className="h-screen w-screen bg-gray-50 flex flex-col pb-16 sm:pb-20 md:pb-24">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="shadow-sm">
         <div className="w-full px-4 py-3">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold text-gray-900">
