@@ -141,6 +141,7 @@ export function SpotOrders({
       duration: number;
       entryPrice: string;
       profitLoss: number;
+      expiresAt: string;
     }) => {
       const res = await apiRequest("POST", "/api/betting-orders", data);
       return res.json();
@@ -185,6 +186,9 @@ export function SpotOrders({
     else if (selectedDuration === "120") profitLoss = amount * 0.4;
     else if (selectedDuration === "180") profitLoss = amount * 0.5;
 
+    // Calculate expiresAt immediately on frontend to avoid timing delays
+    const expiresAt = new Date(Date.now() + duration.seconds * 1000).toISOString();
+
     const orderData = {
       asset: `${selectedCrypto}/USDT`,
       direction: tradeDirection === "up" ? "Buy Up" : "Buy Down",
@@ -192,6 +196,7 @@ export function SpotOrders({
       duration: duration.seconds,
       entryPrice: currentPrice,
       profitLoss: profitLoss,
+      expiresAt: expiresAt,
     };
 
     placeTrade.mutate(orderData);

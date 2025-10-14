@@ -7,7 +7,9 @@ C BOE is a full-stack cryptocurrency investment platform providing customer and 
 - **2025-10-14**: Trading improvements and UI updates:
   - Changed "Confirm" button to "Submit Order" in trade popup
   - Fixed settlement time accuracy: Reduced order expiration check interval from 10 seconds to 1 second for faster and more accurate order completion
-  - Orders now settle within 1 second of their selected duration (60s, 120s, 180s) instead of 2-3 seconds late
+  - Fixed settlement timing to start exactly from selected time: expiresAt now calculated on frontend immediately when placing order, with backend validation (within 5 seconds) to prevent tampering while eliminating network latency delays
+  - Orders now settle within 1 second of their selected duration (60s, 120s, 180s) and countdown starts precisely from selected time (e.g., 02:00 for 120s, not 02:03)
+  - Security: Backend validates client-provided expiresAt is within acceptable range and rejects manipulated timestamps
 - **2025-10-14**: Market page complete UI redesign with fixes:
   - Clean white background with professional trading interface design
   - Header: BTC/USDT with grid menu icon for currency selection dropdown, "Spot Orders >" navigation button on right

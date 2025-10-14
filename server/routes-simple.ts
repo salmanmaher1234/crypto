@@ -812,6 +812,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Direction: ${effectiveDirection} (backend: ${user.direction}, customer: ${actualDirection || direction})`);
 
       // Prepare complete order data with all required fields
+      // Validate and use expiresAt from frontend if it's within acceptable range
+      const serverExpiresAt = new Date(Date.now() + parseInt(duration) * 1000);
+      const frontendExpiresAt = req.body.expiresAt;
+      
+      let finalExpiresAt = serverExpiresAt;
+      
+      if (frontendExpiresAt) {
+        const clientTime = new Date(frontendExpiresAt);
+        const timeDiff = Math.abs(clientTime.getTime() - serverExpiresAt.getTime());
+        
+        // Only use client expiresAt if it's within 5 seconds of expected time
+        // This allows for network latency while preventing manipulation
+        if (timeDiff <= 5000 && clientTime > new Date()) {
+          finalExpiresAt = clientTime;
+        } else {
+          console.warn(`Invalid expiresAt from client: ${frontendExpiresAt}, using server time`);
+        }
+      }
+
       const orderData = {
         userId: userId,
         asset: finalAsset, // Use asset from frontend (JUV/USDT, CHZ/USDT, etc.)
@@ -820,7 +839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         duration: parseInt(duration),
         entryPrice,
         orderId,
-        expiresAt: new Date(Date.now() + parseInt(duration) * 1000),
+        expiresAt: finalExpiresAt,
       };
 
       console.log("Order data:", orderData);
