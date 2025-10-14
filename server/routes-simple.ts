@@ -1383,7 +1383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start periodic order expiration checker
   setInterval(async () => {
     await storage.checkExpiredOrders();
-  }, 10000); // Check every 10 seconds
+  }, 1000); // Check every 1 second for faster settlement
 
   // Also run immediately to catch any orders that expired during server restart
   setTimeout(async () => {

@@ -517,14 +517,14 @@ export function SpotOrders({
               />
             </div>
 
-            {/* Confirm Button */}
+            {/* Submit Order Button */}
             <Button
               onClick={handlePlaceTrade}
               disabled={placeTrade.isPending || !quantity || parseFloat(quantity) <= 0}
               className="w-full bg-[#7CB342] hover:bg-[#6DA33A] text-white font-semibold py-3 rounded-lg"
               data-testid="button-confirm-trade"
             >
-              {placeTrade.isPending ? "Placing..." : "Confirm"}
+              {placeTrade.isPending ? "Placing..." : "Submit Order"}
             </Button>
           </div>
         </DialogContent>
