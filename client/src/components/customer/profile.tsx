@@ -487,7 +487,7 @@ export function Profile() {
         {/* Action Buttons */}
         <div className="flex gap-3 mt-4">
           <Button
-            onClick={() => setLocation('/top-up-records?tab=top-up')}
+            onClick={() => setLocation('/recharge')}
             className="flex-1 h-12 text-white font-medium rounded-lg bg-[#7CB342] hover:bg-[#6DA33A]"
             data-testid="button-recharge"
           >
