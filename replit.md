@@ -4,6 +4,13 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-14**: Successfully migrated from MySQL to PostgreSQL database:
+  - Imported 326 users (including admin account)
+  - Imported 291 active sessions, 241 betting orders, 137 transactions
+  - Imported 21 bank accounts, 22 messages, 4 announcements
+  - Updated schema with created_at/updated_at columns for all tables
+  - Admin login: username=admin, password=admin123
+  - Minor edge cases remain: 3 users with formatting issues, withdrawal requests pending foreign key resolution
 - **2025-10-14**: Removed KSM/USDT and SUP/USDT cryptocurrencies from the platform:
   - Removed from backend crypto prices API (server/routes.ts)
   - Removed from home page crypto display (crypto-home.tsx)

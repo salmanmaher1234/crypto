@@ -31,6 +31,8 @@ export const users = pgTable("users", {
   signatureData: text("signature_data"),
   signatureName: text("signature_name"),
   isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const bankAccounts = pgTable("bank_accounts", {
@@ -109,6 +111,7 @@ export const messages = pgTable("messages", {
   type: text("type").notNull().default("General"), // General, Important, Support, System
   isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const sessions = pgTable("sessions", {
