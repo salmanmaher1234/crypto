@@ -96,6 +96,14 @@ export function SpotOrders({
     setSelectedCrypto(baseCurrency);
   };
 
+  const handleSpotOrdersClick = () => {
+    if (onNavigateToOrders) {
+      onNavigateToOrders();
+    } else {
+      setLocation("/customer?tab=orders");
+    }
+  };
+
   const tradeDurations = [
     { value: "60", label: "60S", seconds: 60, profit: "30%" },
     { value: "120", label: "120S", seconds: 120, profit: "40%" },
@@ -242,7 +250,7 @@ export function SpotOrders({
   const selectedCryptoName = cryptoOptions.find(c => c.symbol === `${selectedCrypto}/USDT`)?.name || "Bitcoin";
 
   return (
-    <div className="h-screen w-screen bg-white flex flex-col overflow-hidden pb-16 sm:pb-20 md:pb-24">
+    <div className="h-screen w-screen bg-white flex flex-col overflow-hidden">
       {/* Top Header */}
       <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-gray-200">
         <div className="flex items-center">
@@ -286,6 +294,17 @@ export function SpotOrders({
               })}
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+        <div className="text-right">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSpotOrdersClick}
+            className="text-gray-900 hover:bg-gray-100 text-sm"
+            data-testid="button-spot-orders"
+          >
+            Spot Orders &gt;
+          </Button>
         </div>
       </div>
 
@@ -418,8 +437,8 @@ export function SpotOrders({
         </div>
       </div>
 
-      {/* Bottom Buy/Sell Buttons */}
-      <div className="bg-white border-t border-gray-200 p-4 pb-20 sm:pb-24">
+      {/* Bottom Buy/Sell Buttons - Positioned above footer */}
+      <div className="bg-white border-t border-gray-200 p-4 mb-16 sm:mb-20">
         <div className="flex space-x-3">
           <Button
             onClick={() => handleTradeClick("up")}

@@ -4,17 +4,17 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
-- **2025-10-14**: Market page complete UI redesign:
+- **2025-10-14**: Market page complete UI redesign with fixes:
   - Clean white background with professional trading interface design
-  - Header: BTC/USDT with grid menu icon for currency selection dropdown
+  - Header: BTC/USDT with grid menu icon for currency selection dropdown, "Spot Orders >" navigation button on right
   - Two-column stats layout: Left (Latest Price, 24H Rise Fall), Right (24H Highest/Lowest Price, Volume USDT/BTC, Transactions)
   - Timeframe controls: 1m, 30m, 1h, D buttons with tool icons (LineChart, Plus, Settings, Indicators dropdown)
   - Ticker line: "Bitcoin / TetherUS · 1D · Binance" with live price, change %, and volume
   - SMA 9 indicator display above chart
   - White background trading chart with blue line and gray volume bars
   - MACD 12 26 indicator display below chart with color-coded values
-  - Bottom action buttons: Green Buy Up (#7CB342) and Red Buy Down (#FF6347)
-  - All functionality preserved: Trading, currency selection, timeframe switching, order placement remain unchanged
+  - Bottom action buttons: Green Buy Up (#7CB342) and Red Buy Down (#FF6347) positioned above footer with proper spacing
+  - All functionality preserved: Trading, currency selection, timeframe switching, order placement, Spot Orders navigation remain unchanged
 - **2025-10-14**: Profile page complete UI redesign:
   - Clean white background design with profile header featuring green-bordered avatar with V1 badge
   - User info: Username, Real Balance, Frozen Amount, Credit Score with copy and visibility toggle buttons
