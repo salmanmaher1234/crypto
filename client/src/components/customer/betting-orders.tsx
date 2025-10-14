@@ -140,9 +140,9 @@ export function CustomerBettingOrders() {
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
 
   useEffect(() => {
-    const checkExpiredOrders = () => {
+    const checkExpiredOrders = async () => {
       const now = Date.now();
-      userBettingOrders.forEach(order => {
+      for (const order of userBettingOrders) {
         if (order.status === "active") {
           const displayStartTime = orderStartTimes.get(order.id);
           if (displayStartTime) {
@@ -151,13 +151,13 @@ export function CustomerBettingOrders() {
             
             // Check if display countdown has reached zero
             if (elapsed >= durationMs) {
-              // Invalidate queries to refresh data from backend
-              queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
-              queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+              // Force immediate refetch to update UI
+              await queryClient.refetchQueries({ queryKey: ["/api/betting-orders"] });
+              await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
             }
           }
         }
-      });
+      }
     };
 
     const interval = setInterval(checkExpiredOrders, 1000);
