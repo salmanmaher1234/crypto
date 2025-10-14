@@ -44,16 +44,21 @@ export const bankAccounts = pgTable("bank_accounts", {
   branchName: text("branch_name"), // nullable - not required
   ifscCode: text("ifsc_code"), // nullable - not required (IFSC Code for Indian banking)
   isDefault: boolean("is_default").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
-  type: text("type").notNull(), // deposit, withdrawal, trade_win, trade_loss, freeze, unfreeze
+  type: text("type").notNull(), // deposit, withdrawal, trade_win, trade_loss, freeze, unfreeze, deduct
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: text("status").notNull().default("pending"), // pending, completed, rejected
   description: text("description"),
+  transactionNo: text("transaction_no"),
+  rechargeInfo: text("recharge_info"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const bettingOrders = pgTable("betting_orders", {
@@ -82,15 +87,17 @@ export const withdrawalRequests = pgTable("withdrawal_requests", {
   note: text("note"), // admin note for rejection/approval
   createdAt: timestamp("created_at").notNull().defaultNow(),
   processedAt: timestamp("processed_at"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const announcements = pgTable("announcements", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  type: text("type").notNull().default("News"), // News, Important, Maintenance, Update
+  type: text("type").notNull().default("News"), // News, Important, Maintenance, Update, Alert
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const messages = pgTable("messages", {
