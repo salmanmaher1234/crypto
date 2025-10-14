@@ -4,6 +4,12 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-14**: Orders tab UI redesign matching new specifications:
+  - Redesigned tab navigation: Changed from "Position Order/Closing Order" to "Pending/Closed/Cancelled"
+  - Updated tab styling: Simple text buttons with green (#7CB342) bottom border for active state
+  - Enhanced empty state: FileText icon with "No data available" message matching design specifications
+  - Improved visual consistency: Light gray background (bg-gray-50) with white content cards
+  - All functionality preserved: Order filtering, time selection, detail view, and real-time updates remain unchanged
 - **2025-10-13**: Trading fixes and balance update improvements:
   - Updated trading time scales: 60s→30%, 120s→40%, 180s→50% (frontend display and calculations)
   - Fixed Buy Down to generate profit instead of loss (both Buy Up and Buy Down now increase balance)

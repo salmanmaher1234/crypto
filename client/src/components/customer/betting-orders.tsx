@@ -6,58 +6,48 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useBettingOrders, useUpdateBettingOrder } from "@/lib/api";
-import { FileText, Copy, ChevronRight, ArrowLeft } from "lucide-react";
+import { FileText, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { queryClient } from "@/lib/queryClient";
-// import { useToast } from "@/hooks/use-toast";
 
-// Helper function to ensure UTC timestamp is properly parsed to local time
 const parseUTCTimestamp = (timestamp: Date | string): Date => {
-  // If already a Date object, return as-is
   if (timestamp instanceof Date) {
     return timestamp;
   }
   
-  // If string doesn't have timezone info (no 'Z' or '+'/'-'), assume UTC
   const timestampStr = timestamp.toString();
   if (!timestampStr.includes('Z') && !timestampStr.includes('+') && !timestampStr.includes('-', 10)) {
-    // Append 'Z' to indicate UTC
     return new Date(timestampStr + 'Z');
   }
   
-  // Already has timezone info, parse normally
   return new Date(timestampStr);
 };
 
 export function CustomerBettingOrders() {
   const { user } = useAuth();
-  const { data: allBettingOrders, isLoading, error } = useBettingOrders();
+  const { data: allBettingOrders, isLoading } = useBettingOrders();
   const updateBettingOrder = useUpdateBettingOrder();
-  // const { toast } = useToast();
   
-  // Check for tab parameter in URL to navigate directly to Position Orders
   const urlParams = new URLSearchParams(window.location.search);
-  const tabFromUrl = urlParams.get('tab') as 'position' | 'closing' | null;
+  const tabFromUrl = urlParams.get('tab') as 'pending' | 'closed' | 'cancelled' | null;
   
-  const [activeTab, setActiveTab] = useState<"position" | "closing">(tabFromUrl || "position");
+  const [activeTab, setActiveTab] = useState<"pending" | "closed" | "cancelled">(tabFromUrl || "pending");
   const [timeFilter, setTimeFilter] = useState("today");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showDetailView, setShowDetailView] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Auto-refresh betting orders every 1 second to catch completed orders and update countdown
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    }, 1000); // Refresh every 1 second for real-time countdown
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Function to get payout percentage based on duration
   const getPayoutPercentage = (duration: number) => {
     const payoutMap: { [key: number]: string } = {
       30: "20%",
@@ -66,10 +56,9 @@ export function CustomerBettingOrders() {
       180: "50%",
       240: "60%"
     };
-    return payoutMap[duration] || "30%"; // Default to 30% if duration not found
+    return payoutMap[duration] || "30%";
   };
 
-  // Function to calculate remaining time for position orders
   const getRemainingTime = (order: any) => {
     const now = new Date().getTime();
     const expiresAt = parseUTCTimestamp(order.expiresAt).getTime();
@@ -83,32 +72,22 @@ export function CustomerBettingOrders() {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Function to check if order should be moved to closed
-  const isOrderExpired = (order: any) => {
-    const now = new Date().getTime();
-    const expiresAt = parseUTCTimestamp(order.expiresAt).getTime();
-    return now >= expiresAt;
-  };
-
-  // Function to calculate profit based on order amount and duration
   const calculateProfit = (order: any) => {
     const orderAmount = parseFloat(order.amount);
     const profitPercentageMap: { [key: number]: number } = {
-      30: 0.20,  // 20%
-      60: 0.30,  // 30%
-      120: 0.40, // 40%
-      180: 0.50, // 50%
-      240: 0.60  // 60%
+      30: 0.20,
+      60: 0.30,
+      120: 0.40,
+      180: 0.50,
+      240: 0.60
     };
     
-    const profitRate = profitPercentageMap[order.duration] || 0.30; // Default to 30%
+    const profitRate = profitPercentageMap[order.duration] || 0.30;
     
-    // For active orders, show expected profit
     if (order.status === "active") {
       return orderAmount * profitRate;
     }
     
-    // For completed orders, show actual profit (should be positive for display)
     if (order.status === "completed" && order.profit) {
       return Math.abs(parseFloat(order.profit));
     }
@@ -116,33 +95,22 @@ export function CustomerBettingOrders() {
     return orderAmount * profitRate;
   };
 
-  // Handle time filter change
   const handleTimeFilterChange = (value: string) => {
     setTimeFilter(value);
-    // Reset dates when switching away from conditional
     if (value !== "conditional") {
       setStartDate("");
       setEndDate("");
     }
   };
 
-
-
-
-
-  // Filter orders for current user - Debug logging
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
-  
 
-
-  // Auto-expire orders when their duration is reached
   useEffect(() => {
     const checkExpiredOrders = () => {
       const now = new Date();
       userBettingOrders.forEach(order => {
         if (order.status === "active" && order.expiresAt && parseUTCTimestamp(order.expiresAt) <= now) {
-          // Calculate profit based on direction and random outcome
-          const isWin = Math.random() > 0.5; // 50% win rate simulation
+          const isWin = Math.random() > 0.5;
           const profitAmount = isWin ? parseFloat(order.amount) * 0.8 : -parseFloat(order.amount);
           
           updateBettingOrder.mutate({
@@ -150,25 +118,23 @@ export function CustomerBettingOrders() {
             updates: {
               status: "completed",
               result: isWin ? "win" : "loss",
-              exitPrice: order.entryPrice, // Using same price for simplicity
+              exitPrice: order.entryPrice,
             }
           });
         }
       });
     };
 
-    const interval = setInterval(checkExpiredOrders, 1000); // Check every second
+    const interval = setInterval(checkExpiredOrders, 1000);
     return () => clearInterval(interval);
   }, [userBettingOrders, updateBettingOrder]);
 
-  // Filter by status and time - Position Order (active) and Closing Order (completed)
   const filteredOrders = userBettingOrders.filter(order => {
-    const statusMatch = activeTab === "position" ? order.status === "active" :
-                       activeTab === "closing" ? order.status === "completed" :
+    const statusMatch = activeTab === "pending" ? order.status === "active" :
+                       activeTab === "closed" ? order.status === "completed" :
+                       activeTab === "cancelled" ? order.status === "cancelled" :
                        false;
 
-    // Time filtering logic
-    // Ensure UTC timestamp is properly converted to local time for filtering
     const orderDate = parseUTCTimestamp(order.createdAt);
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -193,7 +159,7 @@ export function CustomerBettingOrders() {
     } else if (timeFilter === "conditional" && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // Include full end date
+      end.setHours(23, 59, 59, 999);
       timeMatch = orderDate >= start && orderDate <= end;
     } else if (timeFilter === "all") {
       timeMatch = true;
@@ -204,8 +170,6 @@ export function CustomerBettingOrders() {
 
   const copyOrderDetails = (order: any) => {
     const orderNumber = order.orderId || `B${Date.now().toString().slice(-12)}${order.id.toString().padStart(3, '0')}`;
-    
-    // Only copy Order No.
     navigator.clipboard.writeText(orderNumber);
     console.log("Order No. copied:", orderNumber);
   };
@@ -219,21 +183,18 @@ export function CustomerBettingOrders() {
     return <div className="p-4">Loading orders...</div>;
   }
 
-  // Detailed order view
   if (showDetailView && selectedOrder) {
     const orderNumber = selectedOrder.orderId || `${selectedOrder.id}`;
-    
-    // Calculate profit for the selected order
     const profit = calculateProfit(selectedOrder);
     
     return (
       <div className="p-4 bg-white min-h-screen">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
             onClick={() => setShowDetailView(false)}
             className="flex items-center text-gray-600"
+            data-testid="button-back"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -242,12 +203,12 @@ export function CustomerBettingOrders() {
             variant="ghost"
             onClick={() => copyOrderDetails(selectedOrder)}
             className="text-blue-600"
+            data-testid="button-copy-order"
           >
             Copy Order No.
           </Button>
         </div>
 
-        {/* Order Details */}
         <div className="space-y-4">
           {[
             { label: "Order No.", value: orderNumber },
@@ -259,7 +220,7 @@ export function CustomerBettingOrders() {
             { label: "Billing Time", value: `${selectedOrder.duration}s` },
             { label: "Order Amount", value: selectedOrder.amount },
             { label: "Order Status", value: selectedOrder.status === 'active' ? 'Pending' : selectedOrder.status },
-            { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}{profit.toFixed(0)}`, isProfit: true },
+            { label: "Profit Amount", value: `${profit > 0 ? '+' : ''}${profit.toFixed(0)}`, isProfit: true },
             { label: "Scale", value: `${selectedOrder.duration === 60 ? '30' : selectedOrder.duration === 120 ? '40' : '50'}%` },
             { label: "Buy Direction", value: user?.direction === "Actual" ? (selectedOrder.direction || "Buy Up") : user?.direction === "Buy Up" ? "Buy Up" : "Buy Down", isDirection: true },
             { label: "Actual Rise Fall", value: selectedOrder.result === 'win' ? 'Rise' : selectedOrder.result === 'loss' ? 'Fall' : 'Rise', isActual: true },
@@ -287,13 +248,13 @@ export function CustomerBettingOrders() {
   }
 
   return (
-    <div className="p-4 space-y-4 pb-16 sm:pb-20 md:pb-24">
-      {/* Header */}
+    <div className="p-4 space-y-4 pb-16 sm:pb-20 md:pb-24 bg-gray-50 min-h-screen">
+      {/* Header with Title and Time Filter */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">Order</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Order</h1>
           <Select value={timeFilter} onValueChange={handleTimeFilterChange}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-32 bg-white" data-testid="select-time-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -308,7 +269,6 @@ export function CustomerBettingOrders() {
           </Select>
         </div>
         
-        {/* Conditional Date Inputs */}
         {timeFilter === "conditional" && (
           <div className="space-y-2">
             <div className="space-y-1">
@@ -318,7 +278,8 @@ export function CustomerBettingOrders() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full"
+                className="w-full bg-white"
+                data-testid="input-start-date"
               />
             </div>
             <div className="space-y-1">
@@ -328,90 +289,91 @@ export function CustomerBettingOrders() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full"
+                className="w-full bg-white"
+                data-testid="input-end-date"
               />
             </div>
           </div>
         )}
       </div>
 
-      {/* Order Record Header */}
-      <div className="text-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Order Record</h2>
-        
-        {/* Tab Navigation - Exact Match to Screenshot */}
-        <div className="flex justify-center space-x-1">
-          <Button
-            variant={activeTab === "position" ? "default" : "outline"}
-            className={`px-6 py-2 rounded-full text-sm font-medium ${
-              activeTab === "position" 
-                ? "bg-yellow-500 text-black hover:bg-yellow-600" 
-                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-            }`}
-            onClick={() => setActiveTab("position")}
-          >
-            Position Order
-          </Button>
-          <Button
-            variant={activeTab === "closing" ? "default" : "outline"}
-            className={`px-6 py-2 rounded-full text-sm font-medium ${
-              activeTab === "closing"
-                ? "bg-yellow-500 text-black hover:bg-yellow-600"
-                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-            }`}
-            onClick={() => setActiveTab("closing")}
-          >
-            Closing Order
-          </Button>
-        </div>
+      {/* Tabs - Matching Screenshot Design */}
+      <div className="flex justify-center space-x-8 border-b border-gray-200 pb-0">
+        <button
+          onClick={() => setActiveTab("pending")}
+          className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
+            activeTab === "pending"
+              ? "text-gray-900"
+              : "text-gray-500"
+          }`}
+          data-testid="tab-pending"
+        >
+          Pending
+          {activeTab === "pending" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7CB342]" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("closed")}
+          className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
+            activeTab === "closed"
+              ? "text-gray-900"
+              : "text-gray-500"
+          }`}
+          data-testid="tab-closed"
+        >
+          Closed
+          {activeTab === "closed" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7CB342]" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("cancelled")}
+          className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
+            activeTab === "cancelled"
+              ? "text-gray-900"
+              : "text-gray-500"
+          }`}
+          data-testid="tab-cancelled"
+        >
+          Cancelled
+          {activeTab === "cancelled" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7CB342]" />
+          )}
+        </button>
       </div>
 
       {/* Orders Content */}
-      <div className="min-h-96">
-
+      <div className="min-h-[400px] bg-white rounded-lg">
         {filteredOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-            {/* Empty state icon matching screenshot */}
-            <div className="w-24 h-24 mb-4 flex items-center justify-center">
-              <div className="relative">
-                <div className="w-16 h-12 border-2 border-gray-300 rounded bg-gray-50 flex items-center justify-center">
-                  <div className="w-8 h-6 border border-gray-300 rounded bg-white"></div>
-                </div>
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                  <div className="w-6 h-4 border border-gray-300 rounded-b bg-gray-50"></div>
-                </div>
-              </div>
-            </div>
-            <p className="text-gray-400 text-sm">No More</p>
+            <FileText className="w-16 h-16 mb-3 text-gray-300" strokeWidth={1.5} />
+            <p className="text-gray-500 text-sm">No data available</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 p-4">
             {filteredOrders.map((order) => {
               const orderNumber = order.orderId || `${order.id}`;
-              
-              // Calculate profit using our function
               const profit = calculateProfit(order);
               const isProfit = profit > 0;
               
               return (
-                <Card key={order.id} className="bg-white border border-gray-200">
+                <Card key={order.id} className="bg-white border border-gray-200" data-testid={`card-order-${order.id}`}>
                   <CardContent className="p-4">
-                    {/* Header with currency and timestamp */}
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="font-bold text-lg text-gray-900">
+                        <h3 className="font-bold text-lg text-gray-900" data-testid={`text-asset-${order.id}`}>
                           {order.asset.includes("/") ? order.asset : `${order.asset}/USDT`}
                         </h3>
                       </div>
-                      <div className="text-right text-sm text-gray-600">
+                      <div className="text-right text-sm text-gray-600" data-testid={`text-created-${order.id}`}>
                         {format(parseUTCTimestamp(order.createdAt), 'yyyy-MM-dd HH:mm:ss')}
                       </div>
                     </div>
 
-                    {/* Settlement Timing - Centered with live countdown */}
                     <div className="text-center mb-4">
                       <div className="text-sm text-gray-600 mb-1">Settlement Timing</div>
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-lg font-bold text-gray-900" data-testid={`text-timing-${order.id}`}>
                         {order.status === 'active' ? 
                           getRemainingTime(order) : 
                           `${order.duration}s`
@@ -419,32 +381,28 @@ export function CustomerBettingOrders() {
                       </div>
                     </div>
 
-                    {/* Main content grid - 4 columns matching screenshot */}
                     <div className="grid grid-cols-4 gap-4 text-sm">
-                      {/* Column 1: Investment Amount & Buy Price */}
                       <div className="space-y-3">
                         <div>
                           <div className="text-gray-500 text-xs mb-1">Investment Amount</div>
-                          <div className="font-medium">{order.amount}</div>
+                          <div className="font-medium" data-testid={`text-amount-${order.id}`}>{order.amount}</div>
                         </div>
                         <div>
                           <div className="text-gray-500 text-xs mb-1">Buy Price</div>
-                          <div className="font-medium">{order.entryPrice}</div>
+                          <div className="font-medium" data-testid={`text-entry-price-${order.id}`}>{order.entryPrice}</div>
                         </div>
                         <div>
                           <div className="text-gray-500 text-xs mb-1">Closing Price</div>
-                          <div className="font-medium">{order.exitPrice || order.entryPrice}</div>
+                          <div className="font-medium" data-testid={`text-exit-price-${order.id}`}>{order.exitPrice || order.entryPrice}</div>
                         </div>
                         <div>
                           <div className="text-gray-500 text-xs mb-1">Profit</div>
-                          <div className={`font-medium ${isProfit ? 'text-red-500' : 'text-green-500'}`}>
-                            {/* Don't show profit for position orders, only for closed orders */}
+                          <div className={`font-medium ${isProfit ? 'text-red-500' : 'text-green-500'}`} data-testid={`text-profit-${order.id}`}>
                             {order.status === 'active' ? '0.00' : (isProfit ? '+' : '') + profit.toFixed(0)}
                           </div>
                         </div>
                       </div>
 
-                      {/* Column 2: Direction */}
                       <div className="flex items-center justify-center">
                         <div className="text-center">
                           <div className="text-gray-500 text-xs mb-1">Direction</div>
@@ -452,27 +410,25 @@ export function CustomerBettingOrders() {
                             user?.direction === "Actual" ? 
                               (order.direction === "Buy Up" ? 'text-green-500' : 'text-red-500') :
                               (user?.direction === 'Buy Up' ? 'text-green-500' : 'text-red-500')
-                          }`}>
+                          }`} data-testid={`text-direction-${order.id}`}>
                             {order.direction === "Buy Up" ? "Up" : "Down"}
                           </div>
                         </div>
                       </div>
 
-                      {/* Column 3: Scale */}
                       <div className="flex items-center justify-center">
                         <div className="text-center">
                           <div className="text-gray-500 text-xs mb-1">Scale</div>
-                          <div className="font-medium">
+                          <div className="font-medium" data-testid={`text-scale-${order.id}`}>
                             {order.duration === 60 ? '30.00%' : 
                              order.duration === 120 ? '40.00%' : '50.00%'}
                           </div>
                         </div>
                       </div>
 
-                      {/* Column 4: Investment Time */}
                       <div className="text-right">
                         <div className="text-gray-500 text-xs mb-1">Investment Time</div>
-                        <div className="font-medium text-xs">{order.duration}s</div>
+                        <div className="font-medium text-xs" data-testid={`text-duration-${order.id}`}>{order.duration}s</div>
                         <div className="font-medium text-xs mt-2">
                           {parseFloat(order.entryPrice).toFixed(4)}
                         </div>
@@ -491,8 +447,6 @@ export function CustomerBettingOrders() {
           </div>
         )}
       </div>
-
-
     </div>
   );
 }

@@ -705,9 +705,9 @@ export function SpotOrders({
                       <div className="text-xs text-green-400">
                         Scale:
                         {duration.value === "60"
-                          ? "20"
+                          ? "30"
                           : duration.value === "120"
-                            ? "30"
+                            ? "40"
                             : "50"}
                         %
                       </div>
