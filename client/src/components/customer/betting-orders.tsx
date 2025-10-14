@@ -37,6 +37,7 @@ export function CustomerBettingOrders() {
   const [showDetailView, setShowDetailView] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [orderStartTimes, setOrderStartTimes] = useState<Map<number, number>>(new Map());
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,10 +60,43 @@ export function CustomerBettingOrders() {
     return payoutMap[duration] || "30%";
   };
 
+  // Track when we first see each active order for display countdown
+  useEffect(() => {
+    if (allBettingOrders) {
+      setOrderStartTimes(prev => {
+        const newMap = new Map(prev);
+        allBettingOrders.forEach(order => {
+          if (order.status === 'active' && !newMap.has(order.id)) {
+            // Store the current time as display start time for this order
+            newMap.set(order.id, Date.now());
+          }
+          if (order.status !== 'active' && newMap.has(order.id)) {
+            // Remove completed orders from tracking
+            newMap.delete(order.id);
+          }
+        });
+        return newMap;
+      });
+    }
+  }, [allBettingOrders]);
+
   const getRemainingTime = (order: any) => {
-    const now = new Date().getTime();
-    const expiresAt = parseUTCTimestamp(order.expiresAt).getTime();
-    const remaining = Math.max(0, expiresAt - now);
+    const now = Date.now();
+    const durationMs = order.duration * 1000;
+    
+    // Get the display start time (when we first saw this order)
+    const displayStartTime = orderStartTimes.get(order.id);
+    
+    if (!displayStartTime) {
+      // First time seeing this order - show full duration
+      const minutes = Math.floor(durationMs / 60000);
+      const seconds = Math.floor((durationMs % 60000) / 1000);
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Calculate remaining time from when we first displayed this order
+    const elapsed = now - displayStartTime;
+    const remaining = Math.max(0, durationMs - elapsed);
     
     if (remaining <= 0) return "00:00";
     
@@ -107,27 +141,28 @@ export function CustomerBettingOrders() {
 
   useEffect(() => {
     const checkExpiredOrders = () => {
-      const now = new Date();
+      const now = Date.now();
       userBettingOrders.forEach(order => {
-        if (order.status === "active" && order.expiresAt && parseUTCTimestamp(order.expiresAt) <= now) {
-          const isWin = Math.random() > 0.5;
-          const profitAmount = isWin ? parseFloat(order.amount) * 0.8 : -parseFloat(order.amount);
-          
-          updateBettingOrder.mutate({
-            id: order.id,
-            updates: {
-              status: "completed",
-              result: isWin ? "win" : "loss",
-              exitPrice: order.entryPrice,
+        if (order.status === "active") {
+          const displayStartTime = orderStartTimes.get(order.id);
+          if (displayStartTime) {
+            const elapsed = now - displayStartTime;
+            const durationMs = order.duration * 1000;
+            
+            // Check if display countdown has reached zero
+            if (elapsed >= durationMs) {
+              // Invalidate queries to refresh data from backend
+              queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
+              queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
             }
-          });
+          }
         }
       });
     };
 
     const interval = setInterval(checkExpiredOrders, 1000);
     return () => clearInterval(interval);
-  }, [userBettingOrders, updateBettingOrder]);
+  }, [userBettingOrders, orderStartTimes]);
 
   const filteredOrders = userBettingOrders.filter(order => {
     const statusMatch = activeTab === "pending" ? order.status === "active" :
