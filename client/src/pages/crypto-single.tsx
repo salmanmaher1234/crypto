@@ -82,12 +82,6 @@ const cryptoData: { [key: string]: any } = {
     icon: "Ξ",
     color: "#627EEA",
   },
-  "SUP": {
-    symbol: "SUP/USDT",
-    name: "SuperCoin", 
-    icon: "Ⓢ",
-    color: "#C2A633",
-  },
   "CHZ": {
     symbol: "CHZ/USDT",
     name: "Chiliz",
@@ -110,12 +104,6 @@ const cryptoData: { [key: string]: any } = {
     symbol: "JUV/USDT",
     name: "Juventus",
     icon: "⚽",
-    color: "#000000",
-  },
-  "KSM": {
-    symbol: "KSM/USDT",
-    name: "Kusama",
-    icon: "🔗",
     color: "#000000",
   },
   "LTC": {

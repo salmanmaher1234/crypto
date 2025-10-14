@@ -100,18 +100,6 @@ export function CryptoHome({
       color: "blue",
     },
     {
-      symbol: "SUP/USDT",
-      name: "SuperCoin",
-      price: cryptoPrices?.["SUP/USD"]?.price || "0.18",
-      change: cryptoPrices?.["SUP/USD"]?.change || "-1.3%",
-      isPositive: cryptoPrices?.["SUP/USD"]?.change
-        ? !cryptoPrices["SUP/USD"].change.startsWith("-")
-        : false,
-      icon: "Ⓢ",
-      color: "yellow",
-    },
-
-    {
       symbol: "LTC/USDT",
       name: "Litecoin",
       price: cryptoPrices?.["LTC/USD"]?.price || "412.89",

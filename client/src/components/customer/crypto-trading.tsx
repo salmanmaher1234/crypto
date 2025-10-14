@@ -41,12 +41,10 @@ export function CryptoTrading({ currency, onBack }: CryptoTradingProps) {
   const cryptoOptions = [
     { symbol: "BTC/USDT", name: "Bitcoin" },
     { symbol: "ETH/USDT", name: "Ethereum" },
-    { symbol: "SUP/USDT", name: "SuperCoin" },
     { symbol: "CHZ/USDT", name: "Chiliz" },
     { symbol: "PSG/USDT", name: "Paris Saint-Germain" },
     { symbol: "ATM/USDT", name: "Atletico Madrid" },
     { symbol: "JUV/USDT", name: "Juventus" },
-    { symbol: "KSM/USDT", name: "Kusama" },
     { symbol: "LTC/USDT", name: "Litecoin" },
     { symbol: "EOS/USDT", name: "EOS" },
     { symbol: "BTS/USDT", name: "BitShares" },

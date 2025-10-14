@@ -556,7 +556,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       "PSG/USDT": { basePrice: 1.8354, baseChange: -2.87 },
       "ATM/USDT": { basePrice: 1.4263, baseChange: -5.63 },
       "JUV/USDT": { basePrice: 1.3628, baseChange: -4.91 },
-      "KSM/USDT": { basePrice: 14.6653, baseChange: -7.50 },
       "LTC/USDT": { basePrice: 116.4456, baseChange: -4.81 },
       "EOS/USDT": { basePrice: 0.7240, baseChange: -1.23 },
       "BTS/USDT": { basePrice: 10.2999, baseChange: -9.28 },

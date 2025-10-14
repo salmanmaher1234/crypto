@@ -4,6 +4,13 @@
 C BOE is a full-stack cryptocurrency investment platform providing customer and administrative interfaces for managing cryptocurrency trading orders, user accounts, and financial transactions. Its purpose is to offer a robust and user-friendly experience for cryptocurrency investment.
 
 ## Recent Changes
+- **2025-10-14**: Removed KSM/USDT and SUP/USDT cryptocurrencies from the platform:
+  - Removed from backend crypto prices API (server/routes.ts)
+  - Removed from home page crypto display (crypto-home.tsx)
+  - Removed from marketplace page (crypto-marketplace.tsx)
+  - Removed from single crypto view page (crypto-single.tsx)
+  - Removed from trading page currency dropdown (crypto-trading.tsx)
+  - Platform now displays 11 cryptocurrencies (was 13)
 - **2025-10-14**: Trading improvements and UI updates:
   - Changed "Confirm" button to "Submit Order" in trade popup
   - Fixed settlement time accuracy: Reduced order expiration check interval from 10 seconds to 1 second for faster and more accurate order completion
