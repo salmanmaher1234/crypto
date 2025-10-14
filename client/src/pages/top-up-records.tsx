@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText } from "lucide-react";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 
 const tabs = [
@@ -13,8 +14,8 @@ const tabs = [
 export default function TopUpRecordsPage() {
   const [location] = useLocation();
   const [activeTab, setActiveTab] = useState("recharges");
+  const [timeFilter, setTimeFilter] = useState("today");
 
-  // Check for URL parameters to set default tab
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
@@ -27,13 +28,11 @@ export default function TopUpRecordsPage() {
     }
   }, [location]);
 
-  // Get transactions for recharges
   const { data: transactions = [] } = useQuery({
     queryKey: ["/api/transactions"],
     enabled: activeTab === "recharges"
   });
 
-  // Get withdrawal requests for withdraws
   const { data: withdrawalRequests = [] } = useQuery({
     queryKey: ["/api/withdrawal-requests"],
     enabled: activeTab === "withdraws"
@@ -69,34 +68,44 @@ export default function TopUpRecordsPage() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="w-full px-4 py-3">
-          <div className="flex items-center">
-            <Link href="/recharge">
-              <Button variant="ghost" size="sm" className="mr-2">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
-            <h1 className="text-lg font-medium text-gray-900">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-gray-900">
               Asset
             </h1>
+            <Select value={timeFilter} onValueChange={setTimeFilter}>
+              <SelectTrigger className="w-32 bg-white" data-testid="select-time-filter">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="yesterday">Yesterday</SelectItem>
+                <SelectItem value="week">Last Week</SelectItem>
+                <SelectItem value="month">Last Month</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </header>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Matching Orders Tab Design */}
       <div className="bg-white border-b border-gray-200">
-        <div className="px-4 py-2">
-          <div className="flex space-x-8">
+        <div className="px-4">
+          <div className="flex justify-center space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-2 py-2 text-sm font-medium transition-colors border-b-2 ${
+                className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
                   activeTab === tab.id
-                    ? "border-[#7CB342] text-gray-900"
-                    : "border-transparent text-gray-500"
+                    ? "text-gray-900"
+                    : "text-gray-500"
                 }`}
+                data-testid={`tab-${tab.id}`}
               >
                 {tab.label}
+                {activeTab === tab.id && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7CB342]" />
+                )}
               </button>
             ))}
           </div>
@@ -104,25 +113,25 @@ export default function TopUpRecordsPage() {
       </div>
 
       {/* Content */}
-      <main className="flex-1 overflow-auto bg-gray-100">
+      <main className="flex-1 overflow-auto bg-white">
         {activeTab === "recharges" && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="text-gray-400 text-lg mb-2">📄</div>
-            <div className="text-gray-400 text-sm">No data available</div>
+          <div className="flex flex-col items-center justify-center h-96">
+            <FileText className="w-16 h-16 mb-3 text-gray-300" strokeWidth={1.5} />
+            <p className="text-gray-500 text-sm">No data available</p>
           </div>
         )}
         
         {activeTab === "withdraws" && (
           <div className="p-0">
             {(withdrawalRequests as any[]).length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16">
-                <div className="text-gray-400 text-lg mb-2">📄</div>
-                <div className="text-gray-400 text-sm">No data available</div>
+              <div className="flex flex-col items-center justify-center h-96">
+                <FileText className="w-16 h-16 mb-3 text-gray-300" strokeWidth={1.5} />
+                <p className="text-gray-500 text-sm">No data available</p>
               </div>
             ) : (
               <div className="space-y-0">
                 {(withdrawalRequests as any[]).map((request: any) => (
-                  <div key={request.id} className="bg-white border-b border-gray-100 p-4">
+                  <div key={request.id} className="bg-white border-b border-gray-100 p-4" data-testid={`withdrawal-${request.id}`}>
                     <div className="flex justify-between items-start mb-1">
                       <div className="text-sm font-medium text-black">INR</div>
                       <div className="text-xs text-gray-500">
@@ -160,9 +169,9 @@ export default function TopUpRecordsPage() {
         )}
         
         {activeTab === "funds" && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="text-gray-400 text-lg mb-2">📄</div>
-            <div className="text-gray-400 text-sm">No data available</div>
+          <div className="flex flex-col items-center justify-center h-96">
+            <FileText className="w-16 h-16 mb-3 text-gray-300" strokeWidth={1.5} />
+            <p className="text-gray-500 text-sm">No data available</p>
           </div>
         )}
       </main>
