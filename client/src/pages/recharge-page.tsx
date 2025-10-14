@@ -50,7 +50,7 @@ export default function RechargePage() {
       <header className="bg-white shadow-sm">
         <div className="px-4 py-4 flex items-center">
           <button
-            onClick={() => setLocation('/profile')}
+            onClick={() => setLocation('/customer')}
             className="mr-4 p-1"
             data-testid="button-back"
           >
@@ -149,7 +149,7 @@ export default function RechargePage() {
             <Button
               onClick={() => {
                 setShowDialog(false);
-                setLocation('/profile');
+                setLocation('/customer');
               }}
               className="bg-[#7CB342] hover:bg-[#6DA33A] text-white px-8"
               data-testid="button-close-dialog"
