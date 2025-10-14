@@ -41,9 +41,9 @@ export function CustomerBettingOrders() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ["/api/betting-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      queryClient.refetchQueries({ queryKey: ["/api/betting-orders"] });
+      queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.refetchQueries({ queryKey: ["/api/users"] });
     }, 1000);
 
     return () => clearInterval(interval);
@@ -138,31 +138,6 @@ export function CustomerBettingOrders() {
   };
 
   const userBettingOrders = allBettingOrders?.filter(order => order.userId === user?.id) || [];
-
-  useEffect(() => {
-    const checkExpiredOrders = async () => {
-      const now = Date.now();
-      for (const order of userBettingOrders) {
-        if (order.status === "active") {
-          const displayStartTime = orderStartTimes.get(order.id);
-          if (displayStartTime) {
-            const elapsed = now - displayStartTime;
-            const durationMs = order.duration * 1000;
-            
-            // Check if display countdown has reached zero
-            if (elapsed >= durationMs) {
-              // Force immediate refetch to update UI
-              await queryClient.refetchQueries({ queryKey: ["/api/betting-orders"] });
-              await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
-            }
-          }
-        }
-      }
-    };
-
-    const interval = setInterval(checkExpiredOrders, 1000);
-    return () => clearInterval(interval);
-  }, [userBettingOrders, orderStartTimes]);
 
   const filteredOrders = userBettingOrders.filter(order => {
     const statusMatch = activeTab === "pending" ? order.status === "active" :
